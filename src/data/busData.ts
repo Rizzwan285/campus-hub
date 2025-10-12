@@ -7,6 +7,10 @@ export interface BusSchedule {
   sahyadriToNila: string[];
   palakkadTown?: BusRoute[];
   wisePark?: BusRoute[];
+  multipleBusTimings?: {
+    nilaToSahyadri: string[];
+    sahyadriToNila: string[];
+  };
 }
 
 // Working Days
@@ -32,7 +36,11 @@ export const workingDaysBus: BusSchedule = {
   wisePark: [
     { description: "Nila 8:15 AM → Wise Park Junction 8:30 AM → Nila Manogata 8:45 AM → Sahyadri 9:00 AM (service roads only)" },
     { description: "Sahyadri 6:15 PM → Nila Gate → Wise Park Junction 6:45 PM → Nila Manogata 7:00 PM (service roads only)" }
-  ]
+  ],
+  multipleBusTimings: {
+    nilaToSahyadri: ["8:30", "11:50", "12:30", "1:00", "1:30", "1:45", "5:15", "8:00"],
+    sahyadriToNila: ["8:30", "9:00", "10:20", "11:50", "12:30", "1:00", "1:30", "1:45", "5:15"]
+  }
 };
 
 // Saturdays & Holidays
@@ -56,7 +64,11 @@ export const saturdayHolidayBus: BusSchedule = {
   wisePark: [
     { description: "Nila 8:45 AM → Wise Park Junction 9:00 AM → Nila Manogata 9:15 AM → Sahyadri 9:30 AM (service roads only)" },
     { description: "Sahyadri 6:15 PM → Nila Gate → Wise Park Junction 6:45 PM → Nila Manogata 7:00 PM" }
-  ]
+  ],
+  multipleBusTimings: {
+    nilaToSahyadri: ["8:00"],
+    sahyadriToNila: []
+  }
 };
 
 // Sundays

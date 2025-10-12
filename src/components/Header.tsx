@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, Moon, Sun } from 'lucide-react';
+import { RefreshCw, Moon, Sun, ChevronRight, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DatePickerDialog } from '@/components/DatePickerDialog';
 import { formatTime, formatDate, getCurrentTimeInKolkata } from '@/utils/dateUtils';
+import { addDays } from 'date-fns';
 
 interface HeaderProps {
   onRefresh: () => void;
@@ -34,6 +34,15 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
   const displayDate = selectedDate || currentTime;
   const isToday = !selectedDate;
 
+  const handleNextDay = () => {
+    const nextDate = addDays(displayDate, 1);
+    onDateChange(nextDate);
+  };
+
+  const handleToday = () => {
+    onDateChange(null);
+  };
+
   return (
     <header className="mb-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -63,10 +72,25 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           
-          <DatePickerDialog
-            selectedDate={selectedDate}
-            onDateChange={onDateChange}
-          />
+          {!isToday && (
+            <Button
+              variant="outline"
+              onClick={handleToday}
+              className="transition-transform hover:scale-105"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Today
+            </Button>
+          )}
+          
+          <Button
+            variant="outline"
+            onClick={handleNextDay}
+            className="transition-transform hover:scale-105"
+          >
+            Next Day
+            <ChevronRight className="h-4 w-4 ml-2" />
+          </Button>
           
           <Button
             variant="outline"

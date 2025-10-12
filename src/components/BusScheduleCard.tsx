@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Bus, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { getDayType } from '@/utils/dateUtils';
@@ -40,7 +41,11 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
   const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : 'Weekday';
 
-  const BusTimesList = ({ times, nextBus }: { times: string[]; nextBus: string | null }) => (
+  const isMultipleBus = (time: string, direction: 'nilaToSahyadri' | 'sahyadriToNila'): boolean => {
+    return schedule.multipleBusTimings?.[direction]?.includes(time) || false;
+  };
+
+  const BusTimesList = ({ times, nextBus, direction }: { times: string[]; nextBus: string | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => (
     <div className="space-y-3">
       {times.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">
@@ -75,10 +80,15 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
             {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => (
               <div 
                 key={idx}
-                className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
               >
                 <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
                 <p className="text-sm font-medium">{time}</p>
+                {isMultipleBus(time, direction) && (
+                  <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
+                    x2
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
@@ -106,11 +116,11 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </TabsList>
         
         <TabsContent value="nila-sahyadri">
-          <BusTimesList times={upcomingNilaToSahyadri} nextBus={nextNilaToSahyadri} />
+          <BusTimesList times={upcomingNilaToSahyadri} nextBus={nextNilaToSahyadri} direction="nilaToSahyadri" />
         </TabsContent>
         
         <TabsContent value="sahyadri-nila">
-          <BusTimesList times={upcomingSahyadriToNila} nextBus={nextSahyadriToNila} />
+          <BusTimesList times={upcomingSahyadriToNila} nextBus={nextSahyadriToNila} direction="sahyadriToNila" />
         </TabsContent>
       </Tabs>
 
