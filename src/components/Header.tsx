@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Calendar, RefreshCw, Moon, Sun } from 'lucide-react';
+import { RefreshCw, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DatePickerDialog } from '@/components/DatePickerDialog';
 import { formatTime, formatDate, getCurrentTimeInKolkata } from '@/utils/dateUtils';
 
 interface HeaderProps {
@@ -30,6 +31,9 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
     setIsDark(!isDark);
   };
 
+  const displayDate = selectedDate || currentTime;
+  const isToday = !selectedDate;
+
   return (
     <header className="mb-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -37,12 +41,19 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             IIT Palakkad Mess & Bus Info
           </h1>
-          <p className="text-muted-foreground">
-            {formatDate(selectedDate || currentTime)} • {formatTime(currentTime)}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-muted-foreground">
+              {formatDate(displayDate)} • {formatTime(currentTime)}
+            </p>
+            {!isToday && (
+              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                Preview Mode
+              </span>
+            )}
+          </div>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -52,15 +63,10 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onDateChange(null)}
-            className="transition-transform hover:scale-105"
-            title="Pick Date"
-          >
-            <Calendar className="h-4 w-4" />
-          </Button>
+          <DatePickerDialog
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+          />
           
           <Button
             variant="outline"

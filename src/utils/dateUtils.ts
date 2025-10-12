@@ -71,14 +71,49 @@ export function parseTime(timeStr: string, referenceDate: Date): Date {
     } else if (isAM && hours === 12) {
       hours = 0;
     } else if (!isAM && !isPM) {
-      // If no AM/PM specified, assume times before 8 are PM
-      if (hours < 8 && hours !== 12) {
+      // For times without AM/PM:
+      // Morning times: 7-11 are AM (7:00-11:59)
+      // Afternoon: 12-7 stay as is for PM interpretation (12:00-7:59 PM)
+      // Evening/Night: 8-11 are PM (8:00-11:59 PM)
+      // Midnight: 12:00 at end of schedule is next day (00:00)
+      if (hours >= 1 && hours <= 7) {
+        // Early morning hours or late night continuation
+        if (hours < 7) {
+          // 1:00-6:59 are AM next day
+          hours += 12;
+          if (hours >= 24) hours -= 24;
+        } else {
+          // 7:xx is morning
+          hours = hours;
+        }
+      } else if (hours === 8 || hours === 9 || hours === 10 || hours === 11) {
+        // Evening times 8-11 PM
         hours += 12;
+      } else if (hours === 12) {
+        // 12:00 can be noon or midnight
+        // If minutes are 00, 15, 30, context suggests it's likely noon for 12:15, 12:30
+        // But standalone 12:00 at the end is midnight (next day)
+        if (minutes === 0) {
+          // Treat 12:00 as midnight (00:00 next day)
+          hours = 0;
+          // Don't add a day here, handle in filtering logic
+        } else {
+          // 12:15, 12:30 etc. are noon
+          hours = 12;
+        }
       }
     }
   }
   
   date.setHours(hours, minutes, 0, 0);
+  
+  // Handle midnight transition: if we parsed as early morning (0-6 hours) 
+  // and it's meant to be next day
+  if (hours < 7 && cleanTime.match(/^(12:00|1:|2:|3:|4:|5:|6:)/)) {
+    // This is next day early morning
+    date.setDate(date.getDate() + 1);
+  }
+  
   return date;
 }
 

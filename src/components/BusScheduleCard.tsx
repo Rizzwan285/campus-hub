@@ -10,11 +10,16 @@ import { workingDaysBus, saturdayHolidayBus, sundayBus } from '@/data/busData';
 
 interface BusScheduleCardProps {
   currentTime: Date;
+  displayDate: Date;
 }
 
-export function BusScheduleCard({ currentTime }: BusScheduleCardProps) {
+export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
-  const dayType = getDayType(currentTime);
+  const dayType = getDayType(displayDate);
+  
+  // Use displayDate for filtering if it's different from currentTime
+  const isPreviewMode = displayDate.toDateString() !== currentTime.toDateString();
+  const filterTime = isPreviewMode ? new Date(displayDate) : currentTime;
   
   const schedule = dayType === 'sunday' 
     ? sundayBus 
@@ -22,11 +27,16 @@ export function BusScheduleCard({ currentTime }: BusScheduleCardProps) {
     ? saturdayHolidayBus 
     : workingDaysBus;
 
-  const upcomingNilaToSahyadri = getUpcomingBuses(schedule.nilaToSahyadri, currentTime);
-  const upcomingSahyadriToNila = getUpcomingBuses(schedule.sahyadriToNila, currentTime);
+  // For preview mode, show all buses. For current time, show only upcoming
+  const upcomingNilaToSahyadri = isPreviewMode 
+    ? schedule.nilaToSahyadri 
+    : getUpcomingBuses(schedule.nilaToSahyadri, filterTime);
+  const upcomingSahyadriToNila = isPreviewMode 
+    ? schedule.sahyadriToNila 
+    : getUpcomingBuses(schedule.sahyadriToNila, filterTime);
   
-  const nextNilaToSahyadri = getNextBus(schedule.nilaToSahyadri, currentTime);
-  const nextSahyadriToNila = getNextBus(schedule.sahyadriToNila, currentTime);
+  const nextNilaToSahyadri = getNextBus(schedule.nilaToSahyadri, filterTime);
+  const nextSahyadriToNila = getNextBus(schedule.sahyadriToNila, filterTime);
 
   const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : 'Weekday';
 
@@ -38,7 +48,7 @@ export function BusScheduleCard({ currentTime }: BusScheduleCardProps) {
         </p>
       ) : (
         <>
-          {nextBus && (
+          {nextBus && !isPreviewMode && (
             <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary">
               <div className="flex items-center justify-between">
                 <div>
@@ -55,8 +65,14 @@ export function BusScheduleCard({ currentTime }: BusScheduleCardProps) {
             </div>
           )}
           
+          {isPreviewMode && (
+            <p className="text-sm text-center text-muted-foreground mb-2">
+              All scheduled buses for this day
+            </p>
+          )}
+          
           <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
-            {times.slice(nextBus ? 1 : 0).map((time, idx) => (
+            {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => (
               <div 
                 key={idx}
                 className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors"

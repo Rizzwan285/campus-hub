@@ -43,7 +43,7 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-1">
-            <BusScheduleCard currentTime={currentTime} />
+            <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
           </div>
         </div>
 
