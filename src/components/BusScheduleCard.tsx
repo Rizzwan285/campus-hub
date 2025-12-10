@@ -45,57 +45,62 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     return schedule.multipleBusTimings?.[direction]?.includes(time) || false;
   };
 
-  const BusTimesList = ({ times, nextBus, direction }: { times: string[]; nextBus: string | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => (
-    <div className="space-y-3">
-      {times.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">
-          No more buses today. Check another date or see full schedule.
-        </p>
-      ) : (
-        <>
-          {nextBus && !isPreviewMode && (
-            <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Next Bus</p>
-                  <p className="text-2xl font-bold text-primary">{nextBus}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
-                  <p className="text-xl font-semibold text-primary">
-                    {getTimeUntil(nextBus, currentTime)}
-                  </p>
+  const BusTimesList = ({ times, nextBus, direction }: { times: string[]; nextBus: string | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
+    // Determine if we're in afternoon context for the next bus
+    const isAfternoonContext = currentTime.getHours() >= 12;
+    
+    return (
+      <div className="space-y-3">
+        {times.length === 0 ? (
+          <p className="text-center text-muted-foreground py-8">
+            No more buses today. Check another date or see full schedule.
+          </p>
+        ) : (
+          <>
+            {nextBus && !isPreviewMode && (
+              <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Next Bus</p>
+                    <p className="text-2xl font-bold text-primary">{nextBus}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
+                    <p className="text-xl font-semibold text-primary">
+                      {getTimeUntil(nextBus, currentTime, isAfternoonContext)}
+                    </p>
+                  </div>
                 </div>
               </div>
+            )}
+            
+            {isPreviewMode && (
+              <p className="text-sm text-center text-muted-foreground mb-2">
+                All scheduled buses for this day
+              </p>
+            )}
+            
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
+              {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => (
+                <div 
+                  key={idx}
+                  className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
+                >
+                  <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-sm font-medium">{time}</p>
+                  {isMultipleBus(time, direction) && (
+                    <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
+                      x2
+                    </Badge>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
-          
-          {isPreviewMode && (
-            <p className="text-sm text-center text-muted-foreground mb-2">
-              All scheduled buses for this day
-            </p>
-          )}
-          
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
-            {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => (
-              <div 
-                key={idx}
-                className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
-              >
-                <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
-                <p className="text-sm font-medium">{time}</p>
-                {isMultipleBus(time, direction) && (
-                  <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
-                    x2
-                  </Badge>
-                )}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Card className="p-6 bg-card hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
