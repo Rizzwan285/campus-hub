@@ -155,7 +155,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
     return {
       time: startTime,
-      title: `${startLoc} → ${endLoc}`
+      startLoc: startLoc
     };
   };
 
@@ -186,84 +186,91 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </TabsContent>
       </Tabs>
 
-      {(schedule.palakkadTown || schedule.wisePark) && (
-        <Collapsible open={showExtraRoutes} onOpenChange={setShowExtraRoutes} className="mt-6">
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full flex justify-between items-center p-4 h-auto border-2 border-dashed border-muted hover:border-primary/50 hover:bg-muted/50 transition-all">
-              <span className="font-semibold text-lg">Special Routes</span>
-              {showExtraRoutes ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-4 space-y-6 animate-in slide-in-from-top-2">
-            {schedule.palakkadTown && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                  <h3 className="font-bold text-primary whitespace-nowrap">Palakkad Town</h3>
-                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                </div>
-                <Accordion type="single" collapsible className="w-full space-y-2">
-                  {schedule.palakkadTown.map((route, idx) => {
-                    const summary = extractRouteSummary(route.description);
-                    return (
-                      <AccordionItem key={idx} value={`pt-${idx}`} className="border rounded-lg bg-muted/30 px-2">
-                        <AccordionTrigger className="hover:no-underline py-3">
-                          <div className="flex flex-col items-start gap-1 text-left">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold">
-                                {summary.time}
-                              </Badge>
-                              <span className="text-sm font-medium">{summary.title}</span>
+      {dayType === 'sunday' ? (
+        <div className="mt-6 p-4 rounded-lg bg-muted text-center border-2 border-dashed">
+          <p className="text-muted-foreground font-medium">No Palakkad Town or Wise Park bus services available on Sundays.</p>
+        </div>
+      ) : (
+        (schedule.palakkadTown || schedule.wisePark) && (
+          <Collapsible open={showExtraRoutes} onOpenChange={setShowExtraRoutes} className="mt-6">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="w-full flex justify-between items-center p-4 h-auto border-2 border-dashed border-muted hover:border-primary/50 hover:bg-muted/50 transition-all">
+                <span className="font-semibold text-lg">Special Routes</span>
+                {showExtraRoutes ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-6 animate-in slide-in-from-top-2">
+              {schedule.palakkadTown && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                    <h3 className="font-bold text-primary whitespace-nowrap">Palakkad Town</h3>
+                    <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                  </div>
+                  <Accordion type="single" collapsible className="w-full space-y-2">
+                    {schedule.palakkadTown.map((route, idx) => {
+                      const summary = extractRouteSummary(route.description);
+                      return (
+                        <AccordionItem key={idx} value={`pt-${idx}`} className="border rounded-lg bg-muted/30 px-2">
+                          <AccordionTrigger className="hover:no-underline py-3">
+                            <div className="flex flex-col items-start gap-1 text-left">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold">
+                                  {summary.time}
+                                </Badge>
+                                <span className="text-sm font-medium">From {summary.startLoc}</span>
+                              </div>
                             </div>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pb-4 px-2">
-                          <Card className="p-4 border-none shadow-sm bg-background/50">
-                            <RouteTimeline route={route.description} />
-                          </Card>
-                        </AccordionContent>
-                      </AccordionItem>
-                    );
-                  })}
-                </Accordion>
-              </div>
-            )}
-            {schedule.wisePark && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                  <h3 className="font-bold text-primary whitespace-nowrap">Wise Park Junction</h3>
-                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                          </AccordionTrigger>
+                          <AccordionContent className="pt-2 pb-4 px-2">
+                            <Card className="p-4 border-none shadow-sm bg-background/50">
+                              <RouteTimeline route={route.description} />
+                            </Card>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
                 </div>
-                <Accordion type="single" collapsible className="w-full space-y-2">
-                  {schedule.wisePark.map((route, idx) => {
-                    const summary = extractRouteSummary(route.description);
-                    return (
-                      <AccordionItem key={idx} value={`wp-${idx}`} className="border rounded-lg bg-muted/30 px-2">
-                        <AccordionTrigger className="hover:no-underline py-3">
-                          <div className="flex flex-col items-start gap-1 text-left">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold">
-                                {summary.time}
-                              </Badge>
-                              <span className="text-sm font-medium">{summary.title}</span>
+              )}
+              {schedule.wisePark && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                    <h3 className="font-bold text-primary whitespace-nowrap">Wise Park Junction</h3>
+                    <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                  </div>
+                  <Accordion type="single" collapsible className="w-full space-y-2">
+                    {schedule.wisePark.map((route, idx) => {
+                      const summary = extractRouteSummary(route.description);
+                      return (
+                        <AccordionItem key={idx} value={`wp-${idx}`} className="border rounded-lg bg-muted/30 px-2">
+                          <AccordionTrigger className="hover:no-underline py-3">
+                            <div className="flex flex-col items-start gap-1 text-left">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold">
+                                  {summary.time}
+                                </Badge>
+                                <span className="text-sm font-medium">From {summary.startLoc}</span>
+                              </div>
                             </div>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pb-4 px-2">
-                          <Card className="p-4 border-none shadow-sm bg-background/50">
-                            <RouteTimeline route={route.description} />
-                          </Card>
-                        </AccordionContent>
-                      </AccordionItem>
-                    );
-                  })}
-                </Accordion>
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+                          </AccordionTrigger>
+                          <AccordionContent className="pt-2 pb-4 px-2">
+                            <Card className="p-4 border-none shadow-sm bg-background/50">
+                              <RouteTimeline route={route.description} />
+                            </Card>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+        )
       )}
     </Card>
   );
 }
+
