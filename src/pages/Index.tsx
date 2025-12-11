@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
-import { MessMenuCard } from '@/components/MessMenuCard';
-import { MessTimingsCard } from '@/components/MessTimingsCard';
-import { BusScheduleCard } from '@/components/BusScheduleCard';
-import { Footer } from '@/components/Footer';
+import { Header } from '@/components/layout/Header';
+import { MessMenuCard } from '@/components/features/MessMenuCard';
+import { MessTimingsCard } from '@/components/features/MessTimingsCard';
+import { BusScheduleCard } from '@/components/features/BusScheduleCard';
+import { Footer } from '@/components/layout/Footer';
 import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 
 const Index = () => {
