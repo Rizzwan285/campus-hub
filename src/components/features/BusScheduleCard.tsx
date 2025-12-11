@@ -17,25 +17,25 @@ interface BusScheduleCardProps {
 export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
   const dayType = getDayType(displayDate);
-  
+
   // Use displayDate for filtering if it's different from currentTime
   const isPreviewMode = displayDate.toDateString() !== currentTime.toDateString();
   const filterTime = isPreviewMode ? new Date(displayDate) : currentTime;
-  
-  const schedule = dayType === 'sunday' 
-    ? sundayBus 
-    : dayType === 'saturday' 
-    ? saturdayHolidayBus 
-    : workingDaysBus;
+
+  const schedule = dayType === 'sunday'
+    ? sundayBus
+    : dayType === 'saturday'
+      ? saturdayHolidayBus
+      : workingDaysBus;
 
   // For preview mode, show all buses. For current time, show only upcoming
-  const upcomingNilaToSahyadri = isPreviewMode 
-    ? schedule.nilaToSahyadri 
+  const upcomingNilaToSahyadri = isPreviewMode
+    ? schedule.nilaToSahyadri
     : getUpcomingBuses(schedule.nilaToSahyadri, filterTime);
-  const upcomingSahyadriToNila = isPreviewMode 
-    ? schedule.sahyadriToNila 
+  const upcomingSahyadriToNila = isPreviewMode
+    ? schedule.sahyadriToNila
     : getUpcomingBuses(schedule.sahyadriToNila, filterTime);
-  
+
   const nextNilaToSahyadri = getNextBus(schedule.nilaToSahyadri, filterTime);
   const nextSahyadriToNila = getNextBus(schedule.sahyadriToNila, filterTime);
 
@@ -48,7 +48,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
   const BusTimesList = ({ times, nextBus, direction }: { times: string[]; nextBus: string | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
     // Determine if we're in afternoon context for the next bus
     const isAfternoonContext = currentTime.getHours() >= 12;
-    
+
     return (
       <div className="space-y-3">
         {times.length === 0 ? (
@@ -73,16 +73,16 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                 </div>
               </div>
             )}
-            
+
             {isPreviewMode && (
               <p className="text-sm text-center text-muted-foreground mb-2">
                 All scheduled buses for this day
               </p>
             )}
-            
+
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
               {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => (
-                <div 
+                <div
                   key={idx}
                   className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
                 >
@@ -98,6 +98,40 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
             </div>
           </>
         )}
+      </div>
+    );
+  };
+
+  const RouteTimeline = ({ route }: { route: string }) => {
+    const steps = route.split('→').map(s => s.trim());
+
+    return (
+      <div className="relative pl-4 border-l-2 border-muted py-2 space-y-6">
+        {steps.map((step, idx) => {
+          // Highlight times in the text (e.g., 8:25 AM)
+          const timeMatch = step.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+          const time = timeMatch ? timeMatch[0] : null;
+          const text = step.replace(time || '', '').trim();
+
+          return (
+            <div key={idx} className="relative">
+              {/* Timeline dot */}
+              <div className={`absolute -left-[21px] top-1.5 h-3 w-3 rounded-full border-2 ${idx === 0 || idx === steps.length - 1
+                  ? 'border-primary bg-primary'
+                  : 'border-muted-foreground bg-background'
+                }`} />
+
+              <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                <span className="text-sm font-medium text-foreground">{text}</span>
+                {time && (
+                  <Badge variant="outline" className="w-fit text-xs font-bold bg-primary/5 border-primary/20">
+                    {time}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -119,11 +153,11 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           <TabsTrigger value="nila-sahyadri">Nila → Sahyadri</TabsTrigger>
           <TabsTrigger value="sahyadri-nila">Sahyadri → Nila</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="nila-sahyadri">
           <BusTimesList times={upcomingNilaToSahyadri} nextBus={nextNilaToSahyadri} direction="nilaToSahyadri" />
         </TabsContent>
-        
+
         <TabsContent value="sahyadri-nila">
           <BusTimesList times={upcomingSahyadriToNila} nextBus={nextSahyadriToNila} direction="sahyadriToNila" />
         </TabsContent>
@@ -132,32 +166,40 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
       {(schedule.palakkadTown || schedule.wisePark) && (
         <Collapsible open={showExtraRoutes} onOpenChange={setShowExtraRoutes} className="mt-6">
           <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full">
-              {showExtraRoutes ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
-              Palakkad Town & Wise Park Routes
+            <Button variant="ghost" className="w-full flex justify-between items-center p-4 h-auto border-2 border-dashed border-muted hover:border-primary/50 hover:bg-muted/50 transition-all">
+              <span className="font-semibold text-lg">Special Routes</span>
+              {showExtraRoutes ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="mt-4 space-y-4">
+          <CollapsibleContent className="mt-4 space-y-6 animate-in slide-in-from-top-2">
             {schedule.palakkadTown && (
-              <div>
-                <h3 className="font-semibold mb-2 text-primary">Palakkad Town</h3>
-                <div className="space-y-2">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                  <h3 className="font-bold text-primary whitespace-nowrap">Palakkad Town</h3>
+                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                </div>
+                <div className="grid gap-4">
                   {schedule.palakkadTown.map((route, idx) => (
-                    <div key={idx} className="p-3 bg-muted/50 rounded-lg text-sm">
-                      {route.description}
-                    </div>
+                    <Card key={idx} className="p-4 bg-muted/30 border-none shadow-sm">
+                      <RouteTimeline route={route.description} />
+                    </Card>
                   ))}
                 </div>
               </div>
             )}
             {schedule.wisePark && (
-              <div>
-                <h3 className="font-semibold mb-2 text-primary">Wise Park Junction</h3>
-                <div className="space-y-2">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                  <h3 className="font-bold text-primary whitespace-nowrap">Wise Park Junction</h3>
+                  <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                </div>
+                <div className="grid gap-4">
                   {schedule.wisePark.map((route, idx) => (
-                    <div key={idx} className="p-3 bg-muted/50 rounded-lg text-sm">
-                      {route.description}
-                    </div>
+                    <Card key={idx} className="p-4 bg-muted/30 border-none shadow-sm">
+                      <RouteTimeline route={route.description} />
+                    </Card>
                   ))}
                 </div>
               </div>
