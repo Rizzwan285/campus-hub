@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
 import { getUpcomingBuses, getNextBus, getTimeUntil } from '@/utils/dateUtils';
 import { workingDaysBus, saturdayHolidayBus, sundayBus } from '@/data/busData';
@@ -117,8 +118,8 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
             <div key={idx} className="relative">
               {/* Timeline dot */}
               <div className={`absolute -left-[21px] top-1.5 h-3 w-3 rounded-full border-2 ${idx === 0 || idx === steps.length - 1
-                  ? 'border-primary bg-primary'
-                  : 'border-muted-foreground bg-background'
+                ? 'border-primary bg-primary'
+                : 'border-muted-foreground bg-background'
                 }`} />
 
               <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
@@ -134,6 +135,28 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         })}
       </div>
     );
+  };
+
+  // ... (existing helper functions)
+
+  const extractRouteSummary = (routeDescription: string) => {
+    const steps = routeDescription.split('→').map(s => s.trim());
+    const startStep = steps[0];
+    const endStep = steps[steps.length - 1];
+
+    const timeMatch = startStep.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+    const startTime = timeMatch ? timeMatch[0] : '';
+
+    // Clean up locations by removing times
+    const startLoc = startStep.replace(startTime, '').trim();
+    // For end location, removing time if present at the end
+    const endTimeMatch = endStep.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+    const endLoc = endStep.replace(endTimeMatch ? endTimeMatch[0] : '', '').trim();
+
+    return {
+      time: startTime,
+      title: `${startLoc} → ${endLoc}`
+    };
   };
 
   return (
@@ -179,13 +202,30 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                   <h3 className="font-bold text-primary whitespace-nowrap">Palakkad Town</h3>
                   <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
                 </div>
-                <div className="grid gap-4">
-                  {schedule.palakkadTown.map((route, idx) => (
-                    <Card key={idx} className="p-4 bg-muted/30 border-none shadow-sm">
-                      <RouteTimeline route={route.description} />
-                    </Card>
-                  ))}
-                </div>
+                <Accordion type="single" collapsible className="w-full space-y-2">
+                  {schedule.palakkadTown.map((route, idx) => {
+                    const summary = extractRouteSummary(route.description);
+                    return (
+                      <AccordionItem key={idx} value={`pt-${idx}`} className="border rounded-lg bg-muted/30 px-2">
+                        <AccordionTrigger className="hover:no-underline py-3">
+                          <div className="flex flex-col items-start gap-1 text-left">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold">
+                                {summary.time}
+                              </Badge>
+                              <span className="text-sm font-medium">{summary.title}</span>
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pb-4 px-2">
+                          <Card className="p-4 border-none shadow-sm bg-background/50">
+                            <RouteTimeline route={route.description} />
+                          </Card>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
               </div>
             )}
             {schedule.wisePark && (
@@ -195,13 +235,30 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                   <h3 className="font-bold text-primary whitespace-nowrap">Wise Park Junction</h3>
                   <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
                 </div>
-                <div className="grid gap-4">
-                  {schedule.wisePark.map((route, idx) => (
-                    <Card key={idx} className="p-4 bg-muted/30 border-none shadow-sm">
-                      <RouteTimeline route={route.description} />
-                    </Card>
-                  ))}
-                </div>
+                <Accordion type="single" collapsible className="w-full space-y-2">
+                  {schedule.wisePark.map((route, idx) => {
+                    const summary = extractRouteSummary(route.description);
+                    return (
+                      <AccordionItem key={idx} value={`wp-${idx}`} className="border rounded-lg bg-muted/30 px-2">
+                        <AccordionTrigger className="hover:no-underline py-3">
+                          <div className="flex flex-col items-start gap-1 text-left">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold">
+                                {summary.time}
+                              </Badge>
+                              <span className="text-sm font-medium">{summary.title}</span>
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pb-4 px-2">
+                          <Card className="p-4 border-none shadow-sm bg-background/50">
+                            <RouteTimeline route={route.description} />
+                          </Card>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
               </div>
             )}
           </CollapsibleContent>
