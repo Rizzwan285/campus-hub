@@ -78,7 +78,7 @@ export const week2and4Menu: WeekMenu = {
     Breakfast: [{ meal: "Breakfast", items: ["Upma", "Vada", "Coriander Chutney", "Curd"] }],
     Lunch: [{ meal: "Lunch", items: ["Chola Bhatura", "Toor Dal Fry", "Watermelon", "Green Mix Vegetables (Dry)", "Lemon Rice", "Curd"] }],
     Snacks: [{ meal: "Snacks", items: ["Dahi Papdi Chat"] }],
-    Dinner: [{ meal: "Dinner", items: ["Phulka", "White Rice", "Methi Dal", "Mix Veg (Dry)", "Sambar", "Ice Cream"] }]
+    Dinner: [{ meal: "Dinner", items: ["Phulka", "White Rice", "Methi Dal", "Cabbage Mutter", "Sambar", "Ice Cream"] }]
   },
   Wednesday: {
     Breakfast: [{ meal: "Breakfast", items: ["Puttu", "Kadala Curry", "Peanut Butter"], nonVeg: "Omelette" }],
