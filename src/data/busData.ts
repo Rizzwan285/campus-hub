@@ -33,7 +33,7 @@ export const workingDaysBus: BusSchedule = {
     { description: "Nila Gate 7:55 AM → Kalleppulley 8:25 AM → Koppam → Sekharipuram → Mattumantha → Malampuza → Nila Gate → Sahyadri 8:55 AM" },
     { description: "Sahyadri 5:10 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad 5:40 PM. Stadium Bus Stand 5:45 PM → Chandranagar → Pudussery → Nila. (On Fridays: Sahyadri 5:10 PM to Kinar Stop)" },
     { description: "Sahyadri 5:20 PM → Nila Manogata → Malampuzha Road → Mattumantha → Sekharipuram → Koppam → Kalleppulley 5:55 PM. Sekharipuram 5:50 PM → Chandranagar → Pudussery → Nila" },
-    { description: "Saraswati Building 6:15 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Chandranagar → Pudussery → Nila" }
+    { description: "Saraswati 6:15 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Chandranagar → Pudussery → Nila" }
   ],
   wisePark: [
     { description: "Nila 8:15 AM → Wise Park Junction 8:30 AM → Nila Manogata 8:45 AM → Sahyadri 9:00 AM (service roads only)" },
@@ -62,7 +62,7 @@ export const saturdayHolidayBus: BusSchedule = {
     { description: "Nila Gate 7:55 AM → Kalleppulley 8:25 AM → Koppam → Sekharipuram → Mattumantha → Malampuzha → Nila Gate → Sahyadri 8:55 AM" },
     { description: "Sahyadri 5:10 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad 5:40 PM → Stadium Bus Stand 5:45 PM → Chandranagar → Pudussery → Nila" },
     { description: "Sahyadri 1:00 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad 1:30 PM → Stadium Bus Stand 1:30 PM → Chandranagar → Pudussery → Nila → Saraswati 2:00 PM" },
-    { description: "Saraswati Building 6:15 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Chandranagar → Pudussery → Nila" }
+    { description: "Saraswati 6:15 PM → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Chandranagar → Pudussery → Nila" }
   ],
   wisePark: [
     { description: "Nila 8:45 AM → Wise Park Junction 9:00 AM → Nila Manogata 9:15 AM → Sahyadri 9:30 AM (service roads only)" },
