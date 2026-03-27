@@ -40,9 +40,9 @@ export function getWeekCycle(date: Date): 'week13' | 'week24' {
   const semesterStart = new Date('2025-07-30');
   const diffTime = Math.abs(date.getTime() - semesterStart.getTime());
   const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
-  
-  // Week 1 & 3 for odd weeks, Week 2 & 4 for even weeks
-  return diffWeeks % 2 === 0 ? 'week24' : 'week13';
+
+  // Week 1 & 3 for even diffWeeks, Week 2 & 4 for odd diffWeeks
+  return diffWeeks % 2 === 0 ? 'week13' : 'week24';
 }
 
 export function parseTime(timeStr: string, referenceDate: Date): Date {
