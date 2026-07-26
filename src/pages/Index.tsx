@@ -35,24 +35,24 @@ const Index = () => {
           selectedDate={selectedDate}
         />
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
+        <div className="columns-1 lg:columns-2 gap-6 space-y-6 [column-fill:_balance]">
+          <div className="break-inside-avoid">
             <MessMenuCard date={displayDate} />
           </div>
 
-          <div>
+          <div className="break-inside-avoid">
             <CanteenMenuCard date={displayDate} />
           </div>
           
-          <div>
+          <div className="break-inside-avoid">
             <ClassTimetableCard date={displayDate} />
           </div>
           
-          <div>
+          <div className="break-inside-avoid">
             <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
           </div>
           
-          <div>
+          <div className="break-inside-avoid">
             <MessTimingsCard date={displayDate} />
           </div>
         </div>
