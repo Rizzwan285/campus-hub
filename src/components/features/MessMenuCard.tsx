@@ -1,8 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { UtensilsCrossed, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { week1and3Menu, week2and4Menu, commonItems, weekdayTimings, weekendTimings } from '@/data/messData';
-import { getWeekCycle } from '@/utils/dateUtils';
+import {
+  kedaramMessMenu, commonItems,
+  nilaMessMenu, nilaCommonItems,
+  weekdayTimings, weekendTimings,
+  type WeekMenu,
+} from '@/data/messData';
 
 interface MessMenuCardProps {
   date: Date;
@@ -11,13 +15,39 @@ interface MessMenuCardProps {
 const MEAL_ORDER = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] as const;
 type MealType = typeof MEAL_ORDER[number];
 
-const mealCommonItemsMap: Record<string, string> = {
-  Breakfast: commonItems.breakfast,
-  Lunch: commonItems.lunch,
-  Snacks: commonItems.snacks,
-  Dinner: commonItems.dinner,
-};
+type Campus = 'kedaram' | 'nila';
 
+interface CampusConfig {
+  label: string;
+  subtitle: string;
+  menu: WeekMenu;
+  commonItems: Record<string, string>;
+}
+
+const CAMPUS_CONFIG: Record<Campus, CampusConfig> = {
+  kedaram: {
+    label: 'Kedaram',
+    subtitle: 'Ideal Catering',
+    menu: kedaramMessMenu,
+    commonItems: {
+      Breakfast: commonItems.breakfast,
+      Lunch: commonItems.lunch,
+      Snacks: commonItems.snacks,
+      Dinner: commonItems.dinner,
+    },
+  },
+  nila: {
+    label: 'Nila',
+    subtitle: 'Manu Catering',
+    menu: nilaMessMenu,
+    commonItems: {
+      Breakfast: nilaCommonItems.breakfast,
+      Lunch: nilaCommonItems.lunch,
+      Snacks: nilaCommonItems.snacks,
+      Dinner: nilaCommonItems.dinner,
+    },
+  },
+};
 
 /**
  * Parse a time string like "7:15am", "12pm", "9:30am" into { hours, minutes } in 24h format.
@@ -40,11 +70,6 @@ function parseTimePart(timeStr: string): { hours: number; minutes: number } {
 
 /**
  * Returns the index of the meal that is currently being served or is next up.
- * Logic:
- *  - If we are currently within a meal's time window → show that meal.
- *  - If we are between meals → show the next upcoming meal.
- *  - If all meals are over for the day → show Dinner (last meal).
- *  - If before first meal → show Breakfast.
  */
 function getCurrentMealIndex(date: Date): number {
   const day = date.getDay();
@@ -55,9 +80,8 @@ function getCurrentMealIndex(date: Date): number {
 
   const mealKeys: (keyof typeof timings)[] = ['breakfast', 'lunch', 'snacks', 'dinner'];
 
-  // Parse start and end times for each meal
   const mealWindows = mealKeys.map((key) => {
-    const range = timings[key]; // e.g. "7:15am - 9:30am"
+    const range = timings[key];
     const [startStr, endStr] = range.split('-').map(s => s.trim());
     const start = parseTimePart(startStr);
     const end = parseTimePart(endStr);
@@ -67,39 +91,35 @@ function getCurrentMealIndex(date: Date): number {
     };
   });
 
-  // Check if currently within a meal window
   for (let i = 0; i < mealWindows.length; i++) {
     if (nowMinutes >= mealWindows[i].startMin && nowMinutes <= mealWindows[i].endMin) {
       return i;
     }
   }
 
-  // Check if before first meal
   if (nowMinutes < mealWindows[0].startMin) {
-    return 0; // Breakfast
+    return 0;
   }
 
-  // Find next upcoming meal
   for (let i = 0; i < mealWindows.length; i++) {
     if (nowMinutes < mealWindows[i].startMin) {
       return i;
     }
   }
 
-  // All meals are over → show Dinner
   return 3;
 }
 
 export function MessMenuCard({ date }: MessMenuCardProps) {
   const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-  const weekCycle = getWeekCycle(date);
-  const menu = weekCycle === 'week13' ? week1and3Menu : week2and4Menu;
-  const dayMenu = menu[dayName];
+
+  const [campus, setCampus] = useState<Campus>('kedaram');
+  const config = CAMPUS_CONFIG[campus];
+  const dayMenu = config.menu[dayName];
 
   const autoMealIndex = useMemo(() => getCurrentMealIndex(date), [date]);
   const [activeMealIndex, setActiveMealIndex] = useState(autoMealIndex);
 
-  // Sync when date changes (e.g. timer update or date picker change)
   useEffect(() => {
     setActiveMealIndex(autoMealIndex);
   }, [autoMealIndex]);
@@ -107,7 +127,6 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
   const activeMealType: MealType = MEAL_ORDER[activeMealIndex];
   const meals = dayMenu?.[activeMealType];
 
-  // Get timing string for the active meal
   const day = date.getDay();
   const isWeekend = day === 0 || day === 6;
   const timings = isWeekend ? weekendTimings : weekdayTimings;
@@ -125,14 +144,31 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
   return (
     <Card className="p-5 sm:p-6 bg-card hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-4">
         <div className="p-2 bg-primary/10 rounded-lg">
           <UtensilsCrossed className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="text-lg sm:text-xl font-semibold">Mess Menu</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground">Kedaram Mess • {dayName}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">{config.subtitle} • {dayName}</p>
         </div>
+      </div>
+
+      {/* Campus Toggle */}
+      <div className="flex rounded-lg bg-muted/50 p-1 mb-5">
+        {(Object.keys(CAMPUS_CONFIG) as Campus[]).map((key) => (
+          <button
+            key={key}
+            onClick={() => setCampus(key)}
+            className={`flex-1 text-xs sm:text-sm font-medium py-1.5 px-3 rounded-md transition-all duration-200 touch-manipulation ${
+              campus === key
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {CAMPUS_CONFIG[key].label}
+          </button>
+        ))}
       </div>
 
       {/* Meal Navigation */}
@@ -223,11 +259,11 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
             )}
 
             {/* Common / Daily Extras */}
-            {mealCommonItemsMap[activeMealType] && (
+            {config.commonItems[activeMealType] && (
               <div className="pt-2 border-t border-border/50">
                 <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
                   <span className="font-semibold text-muted-foreground/80">Daily extras:</span>{' '}
-                  {mealCommonItemsMap[activeMealType]}
+                  {config.commonItems[activeMealType]}
                 </p>
               </div>
             )}

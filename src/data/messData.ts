@@ -70,6 +70,59 @@ export const kedaramMessMenu: WeekMenu = {
 export const week1and3Menu: WeekMenu = kedaramMessMenu;
 export const week2and4Menu: WeekMenu = kedaramMessMenu;
 
+// Nila Campus Mess - Manu Catering Service
+export const nilaCommonItems = {
+  breakfast: "Tea, Coffee, Milk, Cornflakes, Fruit or Egg (Single), Jam & Butter, Bread (White & Brown), Sprouts",
+  lunch: "White Rice, Boiled Rice, Sambar, Buttermilk, Moru Curry or Rasam, Pickle, Chapathi, Dhal, Pappadam or Fryums",
+  snacks: "Watermelon Juice or Lemon Juice",
+  dinner: "White Rice, Boiled Rice, Sambar, Dhal, Chapathi, Veg Salad, Lime Juice"
+};
+
+export const nilaMessMenu: WeekMenu = {
+  Monday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Poori Masala"], veg: "Puttu Kadala" }],
+    Lunch: [{ meal: "Lunch", items: ["Mini Meals: Bisibelebadh", "Tomato Rice", "Curd Rice", "Chana Masala", "Thoran", "Sweet"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["Ghee Rice", "Fruits"], veg: "Kadai Paneer", nonVeg: "Kadai Chicken" }]
+  },
+  Tuesday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Aloo Paratha / Mix Veg Paratha", "Curd", "Tomato Sauce"], veg: "Nool Puttu, Cherupayar Curry" }],
+    Lunch: [{ meal: "Lunch", items: ["Kovakka Upperi", "Alu Soyabean Dry", "Sweet", "Fish Curry"], nonVeg: "Chicken Dry Fry / Chicken Curry / Omelet" }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["Jeera Rice", "Chilli Gobi", "Veg Soup"] }]
+  },
+  Wednesday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Masala Dosa", "Chutney", "Sambar"], veg: "Poha / Vellappam, Kuruma" }],
+    Lunch: [{ meal: "Lunch", items: ["Rajma Masala", "Sweet", "Thoran"], nonVeg: "Chicken Dry Fry, Fish Fry, Chicken Curry" }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["Sweet"], veg: "Mutter Paneer / Palak Paneer", nonVeg: "Egg Masala" }]
+  },
+  Thursday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Poori Masala"], veg: "Vellappam, Veg Stew" }],
+    Lunch: [{ meal: "Lunch", items: ["Mini Sadya with Payasam"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["Ghee Rice", "Kerala Parotta (Max 3)", "Sliced Fruits"], veg: "Gobi Masala", nonVeg: "Chicken Curry" }]
+  },
+  Friday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Ghee Roast", "Chutney", "Sambar"], veg: "Puttu Kadala Curry" }],
+    Lunch: [{ meal: "Lunch", items: ["Thoran", "Sweet"], nonVeg: "Chicken Dry Fry / Chicken Curry / Omelet / Fish Curry", veg: "Kadai Paneer" }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["Raw Rice", "Boiled Rice", "Mixed Veg Sabji"] }]
+  },
+  Saturday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Idli", "Vada", "Chutney", "Sambar"], veg: "Nool Puttu, Green Peas Curry" }],
+    Lunch: [{ meal: "Lunch", items: ["Raw Rice", "Boiled Rice", "Upperi", "Potato Brinjal Subji", "Kootucurry", "Ice Cream"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["Veg Fried Rice", "Sweet / Sliced Fruit"], veg: "Veg Manchurian / Aloo Mutter Sabji" }]
+  },
+  Sunday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Veg Uppuma", "Chutney"], veg: "Vellappam, Veg Stew" }],
+    Lunch: [{ meal: "Lunch", items: ["Gulab Jamun", "Raita", "Mandi (Alternate Sundays)"], veg: "Veg Biryani / Paneer Butter Masala", nonVeg: "Chicken Biryani (100g Chicken)" }],
+    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
+    Dinner: [{ meal: "Dinner", items: ["White Rice", "Boiled Rice", "Soya Fry", "Dal Tadka", "Sweet"] }]
+  }
+};
+
 // Mess Timings
 export interface MessTimings {
   breakfast: string;
