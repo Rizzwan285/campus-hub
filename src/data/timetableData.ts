@@ -11,7 +11,7 @@ export interface DaySchedule {
 
 // Timetable for Aug-Dec 2026
 // MWF: No classes scheduled
-// TuTh: Multi Agent, IR, LAfE
+// TuTh: Multi Agent Systems, Information Retrieval, Linear Algebra for Engineers
 
 export const timetable: DaySchedule[] = [
   {
@@ -21,9 +21,9 @@ export const timetable: DaySchedule[] = [
   {
     day: 'Tuesday',
     slots: [
-      { time: '9:00 - 10:15', subject: 'Multi Agent', room: '212' },
-      { time: '10:30 - 11:45', subject: 'IR', room: '212' },
-      { time: '3:30 - 4:45', subject: 'LAfE', room: '103' },
+      { time: '9:00 - 10:15', subject: 'Multi Agent Systems', room: '212' },
+      { time: '10:30 - 11:45', subject: 'Information Retrieval', room: '212' },
+      { time: '3:30 - 4:45', subject: 'Linear Algebra for Engineers', room: '103' },
     ],
   },
   {
@@ -33,9 +33,9 @@ export const timetable: DaySchedule[] = [
   {
     day: 'Thursday',
     slots: [
-      { time: '9:00 - 10:15', subject: 'IR', room: '212' },
-      { time: '10:30 - 11:45', subject: 'Multi Agent', room: '212' },
-      { time: '2:00 - 3:15', subject: 'LAfE', room: '103' },
+      { time: '9:00 - 10:15', subject: 'Information Retrieval', room: '212' },
+      { time: '10:30 - 11:45', subject: 'Multi Agent Systems', room: '212' },
+      { time: '2:00 - 3:15', subject: 'Linear Algebra for Engineers', room: '103' },
     ],
   },
   {
