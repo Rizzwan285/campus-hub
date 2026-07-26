@@ -128,6 +128,9 @@ export function parseBusTimesForDay(times: string[], referenceDate: Date): { tim
   const baseDate = new Date(referenceDate);
   baseDate.setHours(0, 0, 0, 0);
   
+  let isAfternoonOrLater = false;
+  let prevParsedHour = 0;
+  
   return times.map(timeStr => {
     const cleanTime = timeStr.trim().toLowerCase();
     const isAM = cleanTime.includes('am');
@@ -147,48 +150,30 @@ export function parseBusTimesForDay(times: string[], referenceDate: Date): { tim
       if (hours === 12) hours = 0;
     } else if (isPM) {
       if (hours !== 12) hours += 12;
+      isAfternoonOrLater = true;
     } else {
-      // No AM/PM - interpret based on position in schedule
-      // Bus schedules follow a pattern: morning → afternoon → evening → night
-      // 7-9: morning (AM)
-      // 10-11: late morning (AM)
-      // 12: noon (stays 12)
-      // 1-6: afternoon (PM, so +12)
-      // 7-11: evening (PM, so +12)
-      // 12:00 at the end: midnight (0 hours, next day)
-      
+      // No AM/PM specified
       if (hours >= 1 && hours <= 6) {
-        // 1:00 - 6:xx are PM (afternoon)
         hours += 12;
+        isAfternoonOrLater = true;
       } else if (hours >= 7 && hours <= 11) {
-        // This is tricky - could be AM or PM
-        // Looking at bus data: first occurrences of 7:xx, 8:xx, 9:xx are AM
-        // Later occurrences of 7:xx, 8:xx, 9:xx, 10:xx, 11:xx are PM
-        // We'll use a simple rule: if hour < 10, default to AM for first pass
-        // But bus times 7:00, 7:30, 8:00, etc. in evening are PM
-        // The key insight: look at the raw time value
-        // Times 7:00-11:59 without AM/PM that appear AFTER 6:xx times are PM
-        
-        // Simplified approach: Check if this is likely evening based on common patterns
-        // Bus evening times typically include 7:00, 7:30, 8:00, 8:30, 9:00, 10:00, 11:00
-        // Morning times are 7:45, 8:15, 8:30, 8:45, 9:00, 9:25, 9:45, 10:20, 10:45, 11:15, 11:50
-        // 
-        // Since we're processing the array in order, and afternoon times (1-6) come before
-        // evening times (7-11 PM), we can track this properly
-        // 
-        // For now, use a simpler heuristic that works for this specific data:
-        // The schedule pattern is morning → midday → afternoon → evening → night
-        // So we need to know the "current phase" of the schedule
-        
-        // Leave as AM for now - we'll fix this in getUpcomingBuses
-      } else if (hours === 12 && minutes === 0) {
-        // 12:00 at end of schedule is midnight
-        hours = 0;
-        resultDate.setDate(resultDate.getDate() + 1);
+        if (isAfternoonOrLater) {
+          hours += 12;
+        }
+      } else if (hours === 12) {
+        if (isAfternoonOrLater && prevParsedHour >= 17 && minutes === 0) {
+          // Midnight — end of schedule
+          hours = 0;
+          resultDate.setDate(resultDate.getDate() + 1);
+        } else {
+          // Noon
+          isAfternoonOrLater = true;
+        }
       }
     }
     
     resultDate.setHours(hours, minutes, 0, 0);
+    prevParsedHour = hours;
     return { time: timeStr, parsedDate: resultDate };
   });
 }
@@ -200,6 +185,8 @@ export function getUpcomingBuses(times: string[], currentTime: Date): string[] {
   
   // Track if we've seen PM-range times (indicates we're past the morning section)
   let isAfternoonOrLater = false;
+  // Track previous parsed hour to resolve ambiguous 12:00 (noon vs midnight)
+  let prevParsedHour = 0;
   
   const parsedTimes = times.map(timeStr => {
     const cleanTime = timeStr.trim().toLowerCase();
@@ -235,17 +222,24 @@ export function getUpcomingBuses(times: string[], currentTime: Date): string[] {
         }
         // Otherwise, they're morning (AM) - keep as is
       } else if (hours === 12) {
-        if (minutes === 0) {
-          // 12:00 is midnight (end of day)
+        // 12:xx without AM/PM — distinguish noon from midnight.
+        // If the previous parsed time was in the morning/early-afternoon range
+        // (i.e. we haven't gone through evening yet), this is noon.
+        // If we've already seen evening PM times (prevParsedHour >= 17),
+        // then this 12:00 is midnight.
+        if (isAfternoonOrLater && prevParsedHour >= 17 && minutes === 0) {
+          // Midnight — end of schedule
           hours = 0;
           resultDate.setDate(resultDate.getDate() + 1);
+        } else {
+          // Noon — keep as 12
+          isAfternoonOrLater = true;
         }
-        // 12:15, 12:30 are noon - keep as 12
-        isAfternoonOrLater = true;
       }
     }
     
     resultDate.setHours(hours, minutes, 0, 0);
+    prevParsedHour = hours;
     return { time: timeStr, parsedDate: resultDate };
   });
   
