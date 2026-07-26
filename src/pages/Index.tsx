@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { MessMenuCard } from '@/components/features/MessMenuCard';
+import { CanteenMenuCard } from '@/components/features/CanteenMenuCard';
 import { ClassTimetableCard } from '@/components/features/ClassTimetableCard';
 import { BusScheduleCard } from '@/components/features/BusScheduleCard';
 import { MessTimingsCard } from '@/components/features/MessTimingsCard';
@@ -37,6 +38,10 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <MessMenuCard date={displayDate} />
+          </div>
+
+          <div>
+            <CanteenMenuCard date={displayDate} />
           </div>
           
           <div>
