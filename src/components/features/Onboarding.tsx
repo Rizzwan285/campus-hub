@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles } from 'lucide-react';
+import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Compass } from 'lucide-react';
 
 export function Onboarding() {
   const setProfile = useUserStore((state) => state.setProfile);
@@ -88,14 +88,14 @@ export function Onboarding() {
           <div className="relative px-8 pt-10 pb-6 text-center">
             {/* Logo / Icon */}
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 mb-5 shadow-lg shadow-primary/10">
-              <Sparkles className="w-8 h-8 text-primary" />
+              <Compass className="w-8 h-8 text-primary" />
             </div>
             
             <h1 className="text-3xl font-bold text-foreground tracking-tight">
               Campus Companion
             </h1>
             <p className="text-muted-foreground mt-2 text-sm max-w-xs mx-auto leading-relaxed">
-              Personalize your dashboard with your academic details
+              Making campus life simpler
             </p>
           </div>
 
