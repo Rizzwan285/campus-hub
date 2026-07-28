@@ -194,7 +194,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         (schedule.palakkadTown || schedule.wisePark) && (
           <Collapsible open={showExtraRoutes} onOpenChange={setShowExtraRoutes} className="mt-6">
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full flex justify-between items-center p-4 h-auto border-2 border-dashed border-muted hover:border-primary/50 hover:bg-muted/50 transition-all">
+              <Button variant="outline" className="w-full flex justify-between items-center p-4 h-auto border-2 border-dashed border-muted hover:border-primary/50 hover:bg-muted/50 hover:text-foreground text-foreground transition-all">
                 <span className="font-semibold text-lg">Special Routes</span>
                 {showExtraRoutes ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
               </Button>
