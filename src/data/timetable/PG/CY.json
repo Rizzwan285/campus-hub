@@ -1,0 +1,488 @@
+[
+  {
+    "id": "PG_CY_CY5018",
+    "courseCode": "CY5018",
+    "courseName": "Basic Quantum Chemistry",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5022",
+    "courseCode": "CY5022",
+    "courseName": "Symmetry and Group Theory",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5021",
+    "courseCode": "CY5021",
+    "courseName": "Stereochemistry & Physical Organic Chemistry",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "I",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5019",
+    "courseCode": "CY5019",
+    "courseName": "Main Group Chemistry",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5020",
+    "courseCode": "CY5020",
+    "courseName": "Organic Reaction Mechanisms",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "J",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5106",
+    "courseCode": "CY5106",
+    "courseName": "Inorganic Chemistry Lab",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PM5",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "11:45",
+        "room": "A01-CY lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_CY_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_CY_CY5031",
+    "courseCode": "CY5031",
+    "courseName": "Classical and Statistical Thermodynamics",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5030",
+    "courseCode": "CY5030",
+    "courseName": "Biochemistry",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "J",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5029",
+    "courseCode": "CY5029",
+    "courseName": "Basic Organometallic Chemistry",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5028",
+    "courseCode": "CY5028",
+    "courseName": "Applications of Spectroscopy Techniques in Structure Elucidation",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5614",
+    "courseCode": "CY5614",
+    "courseName": "Electroanalytical Methods and Applications",
+    "credits": "",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-307",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-307",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5622",
+    "courseCode": "CY5622",
+    "courseName": "Physical and Chemical Adsorption at Surfaces and Interfaces",
+    "credits": "",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5623",
+    "courseCode": "CY5623",
+    "courseName": "Advanced Functional Materials",
+    "credits": "",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-303",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_CY_CY5130",
+    "courseCode": "CY5130",
+    "courseName": "Project I",
+    "credits": "2 credits",
+    "category": "project",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  }
+]

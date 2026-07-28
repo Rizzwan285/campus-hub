@@ -1,0 +1,892 @@
+[
+  {
+    "id": "UG_ME_ME1020",
+    "courseCode": "ME1020",
+    "courseName": "Engineering Thermodynamics",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "BTech:ME:S3:50",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME2070",
+    "courseCode": "ME2070",
+    "courseName": "Dynamics",
+    "credits": "2-0-0-2",
+    "category": "core",
+    "rawAvailability": "50",
+    "rawSlot": "E (exam slot: J)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME2080A",
+    "courseCode": "ME2080A",
+    "courseName": "Materials Science and Engineering",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "B.Tech: ME",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME2090",
+    "courseCode": "ME2090",
+    "courseName": "Mechanical Measurements: Theory and Practice",
+    "credits": "1-0-2-2",
+    "category": "core",
+    "rawAvailability": "B.Tech: ME",
+    "rawSlot": "Q+PA2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-202+Mechanical Lab + C06 Electronic Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-202+Mechanical Lab + C06 Electronic Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME3050A",
+    "courseCode": "ME3050A",
+    "courseName": "Heat and Mass Transfer",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "B.Tech: ME",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME3070A",
+    "courseCode": "ME3070A",
+    "courseName": "Design of Machine Elements",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "BTech:ME:S5:50",
+    "rawSlot": "C+PA3",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-118+A01-112",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-118+A01-112",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-118+A01-112",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:50",
+        "room": "A01-118+A01-112",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME3011",
+    "courseCode": "ME3011",
+    "courseName": "Manufacturing Processes-II",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "BTech:ME:S5:50",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME2060A",
+    "courseCode": "ME2060A",
+    "courseName": "Mechanisms and Machines: Theory and Practice",
+    "credits": "2-0-2-3",
+    "category": "core",
+    "rawAvailability": "B.Tech: ME",
+    "rawSlot": "H+PA1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-118+A01-201",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-118+A01-201",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-118+A01-201",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-118+A01-201",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME3013",
+    "courseCode": "ME3013",
+    "courseName": "Energy Conversion Systems",
+    "credits": "3-1-0-4",
+    "category": "core",
+    "rawAvailability": "BTech: ME",
+    "rawSlot": "B+K (Tuesday)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME4607",
+    "courseCode": "ME4607",
+    "courseName": "Introduction to Automotive Systems",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "I",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5639",
+    "courseCode": "ME5639",
+    "courseName": "Principles of Product Design",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5650",
+    "courseCode": "ME5650",
+    "courseName": "Precision Machine Design",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "Open to all",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5649",
+    "courseCode": "ME5649",
+    "courseName": "Design for Additive Manufacturing",
+    "credits": "2-0-2-3",
+    "category": "elective",
+    "rawAvailability": "Open to all",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5007",
+    "courseCode": "ME5007",
+    "courseName": "Advanced Engineering Materials",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "C",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5005",
+    "courseCode": "ME5005",
+    "courseName": "Modern Manufacturing Processes",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-202",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5013",
+    "courseCode": "ME5013",
+    "courseName": "Mechanics of Machining",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5016",
+    "courseCode": "ME5016",
+    "courseName": "Incompressible Fluid Flows",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:TF:S1",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5023",
+    "courseCode": "ME5023",
+    "courseName": "Numerical Methods in Heat Transfer & Fluid Flow",
+    "credits": "2-0-3-4",
+    "category": "elective",
+    "rawAvailability": "MTech:TF:S1",
+    "rawSlot": "G+PA3",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-202+Nila Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-202+Nila Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:50",
+        "room": "A01-202+Nila Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5015",
+    "courseCode": "ME5015",
+    "courseName": "Mechanical Vibrations",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:DA:S1:16;   MTech:Any Specialization:S1+S3:14;     MS+PhD:ME+CE:S1+S2+S3+S4: 20 BTech: ME+CE:S6+S7:20",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5501",
+    "courseCode": "ME5501",
+    "courseName": "Finite Element Methods",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:DA:S1:16;   MTech:AnySpecialization:S1+S3:15;     MS+PhD:ME+CE:S1+S2+S3+S4: 20 BTech: ME+CE:S6+S7:20",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_ME_ME5623",
+    "courseCode": "ME5623",
+    "courseName": "Mechanics and Control of Robotic Manipulators",
+    "credits": "2-1-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech: EE or ME\nMTech: all",
+    "rawSlot": "E+ K (Thursday)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-007",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-007",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-007",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  }
+]

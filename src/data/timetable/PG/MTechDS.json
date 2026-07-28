@@ -1,0 +1,419 @@
+[
+  {
+    "id": "PG_MTechDS_DS5004",
+    "courseCode": "DS5004",
+    "courseName": "Mathematics for Data Science",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "PG:EE/CS:X:30",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-212",
+        "instructors": [
+          "Nikhil Krishnan M\nnikhil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-212",
+        "instructors": [
+          "Nikhil Krishnan M\nnikhil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5003A",
+    "courseCode": "DS5003A",
+    "courseName": "Data Engineering",
+    "credits": "1-0-3-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "M [Thu] + PA5",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "A01-102 + A01-201",
+        "instructors": [
+          "Koninika Pal\nkpal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-102 + A01-201",
+        "instructors": [
+          "Koninika Pal\nkpal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5006",
+    "courseCode": "DS5006",
+    "courseName": "Machine Learning",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "X:X:X:20",
+    "rawSlot": "L + PA3",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-212+A01-109",
+        "instructors": [
+          "Narayanan C Krishnan\nckn@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-212+A01-109",
+        "instructors": [
+          "Narayanan C Krishnan\nckn@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:50",
+        "room": "A01-212+A01-109",
+        "instructors": [
+          "Narayanan C Krishnan\nckn@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechDS_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechDS_DS5617",
+    "courseCode": "DS5617",
+    "courseName": "Generative Artificial Intelligence",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "X:X:X:20",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-001",
+        "instructors": [
+          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-001",
+        "instructors": [
+          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-001",
+        "instructors": [
+          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5618",
+    "courseCode": "DS5618",
+    "courseName": "Multi-Agent Systems",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech:DS:Sem 5/7:X,\nBTech:CS:Sem 7:05,\nMS/PhD:DS/CS:X:X, MTech:CaM:X:X",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-212",
+        "instructors": [
+          "Garima Shakya\ngarima@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-212",
+        "instructors": [
+          "Garima Shakya\ngarima@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5619",
+    "courseCode": "DS5619",
+    "courseName": "Machine Learning System Operations",
+    "credits": "2-0-2-3",
+    "category": "elective",
+    "rawAvailability": "X:X:X:20",
+    "rawSlot": "PM2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "11:45",
+        "room": "A01-109",
+        "instructors": [
+          "Abhinandan S P\nabhinandansp@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5622",
+    "courseCode": "DS5622",
+    "courseName": "Explainable AI",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "X:X:X:X",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-212",
+        "instructors": [
+          "Raghava Mutharaju\nraghava@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-212",
+        "instructors": [
+          "Raghava Mutharaju\nraghava@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-212",
+        "instructors": [
+          "Raghava Mutharaju\nraghava@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5603",
+    "courseCode": "DS5603",
+    "courseName": "Information Retrieval",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech:CS/DS: S5/S7: 30\nMTech: DS: S3/S1: 10",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-212",
+        "instructors": [
+          "Koninika Pal\nkpal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-212",
+        "instructors": [
+          "Koninika Pal\nkpal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS3601",
+    "courseCode": "DS3601",
+    "courseName": "C Programming",
+    "credits": "1-0-3-3",
+    "category": "elective",
+    "rawAvailability": "BTech:DS:S5/S7:X\nMTech:DS:S3:X",
+    "rawSlot": "E [Wed] + PA4",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-001 + A01-201",
+        "instructors": [
+          "Sahasranand K R \nsahasranand@iitpkd.ac.in",
+          "Abhinandan S P \nabhinandansp@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-001 + A01-201",
+        "instructors": [
+          "Sahasranand K R \nsahasranand@iitpkd.ac.in",
+          "Abhinandan S P \nabhinandansp@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-001 + A01-201",
+        "instructors": [
+          "Sahasranand K R \nsahasranand@iitpkd.ac.in",
+          "Abhinandan S P \nabhinandansp@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechDS_DS5602",
+    "courseCode": "DS5602",
+    "courseName": "Computer Vision",
+    "credits": " 3-1-0-4",
+    "category": "elective",
+    "rawAvailability": "X:X:X:X",
+    "rawSlot": "R5 + Sat morning",
+    "eligibility": {},
+    "meetings": []
+  }
+]

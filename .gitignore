@@ -28,3 +28,7 @@ dist-ssr
 
 # Raw source data (mess menu, timetable xlsx, etc.)
 raw_data/
+venv/
+
+# Project Memory
+.memories/
