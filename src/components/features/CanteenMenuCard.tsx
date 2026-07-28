@@ -64,10 +64,10 @@ export function CanteenMenuCard({ date }: CanteenMenuCardProps) {
   const isActive = hour >= section.startHour && hour < section.endHour;
 
   return (
-    <Card className="p-5 sm:p-6 bg-card hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
+    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="p-2 bg-primary/10 rounded-lg">
+        <div className="p-2 bg-primary/8 rounded-xl">
           <Coffee className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         </div>
         <div className="min-w-0 flex-1">

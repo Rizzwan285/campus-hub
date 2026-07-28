@@ -20,9 +20,9 @@ export function MessTimingsCard({ date }: MessTimingsCardProps) {
   ];
 
   return (
-    <Card className="p-6 bg-card hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 hover:scale-[1.02]">
+    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-primary/10 rounded-lg">
+        <div className="p-2 bg-primary/8 rounded-xl">
           <Clock className="h-6 w-6 text-primary" />
         </div>
         <div>

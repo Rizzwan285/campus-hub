@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, Moon, Sun, ChevronRight, RotateCcw, LogOut } from 'lucide-react';
+import { Moon, Sun, ChevronRight, RotateCcw, LogOut, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatTime, formatDate, getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { addDays } from 'date-fns';
@@ -56,16 +56,22 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
     <header className="mb-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            {firstName ? `Welcome, ${firstName} 👋` : 'Campus Companion'}
+          <div className="flex items-center gap-2.5 mb-1.5">
+            <div className="p-1.5 bg-primary/10 rounded-lg">
+              <Compass className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-sm font-semibold text-primary/80 tracking-wide uppercase">Campus Companion</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            {firstName ? `Hey, ${firstName} 👋` : 'Your Dashboard'}
           </h1>
-          <div className="flex items-center gap-2">
-            <p className="text-muted-foreground">
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-sm text-muted-foreground">
               {formatDate(displayDate)} • {formatTime(currentTime)}
             </p>
             {!isToday && (
-              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                Preview Mode
+              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Preview
               </span>
             )}
           </div>
@@ -76,7 +82,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
             variant="outline"
             size="icon"
             onClick={toggleDarkMode}
-            className="transition-transform hover:scale-105"
+            className="rounded-xl h-9 w-9 border-border/60 hover:bg-muted"
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
@@ -85,9 +91,9 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
             <Button
               variant="outline"
               onClick={handleToday}
-              className="transition-transform hover:scale-105"
+              className="rounded-xl h-9 border-border/60 hover:bg-muted text-xs"
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
+              <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
               Today
             </Button>
           )}
@@ -95,19 +101,10 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
           <Button
             variant="outline"
             onClick={handleNextDay}
-            className="transition-transform hover:scale-105"
+            className="rounded-xl h-9 border-border/60 hover:bg-muted text-xs"
           >
             Next Day
-            <ChevronRight className="h-4 w-4 ml-2" />
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onRefresh}
-            className="transition-transform hover:scale-105"
-          >
-            <RefreshCw className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5 ml-1" />
           </Button>
 
           {userName && (
@@ -115,7 +112,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
               variant="outline"
               size="icon"
               onClick={handleLogout}
-              className="transition-transform hover:scale-105"
+              className="rounded-xl h-9 w-9 border-border/60 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
               title="Logout"
             >
               <LogOut className="h-4 w-4" />
