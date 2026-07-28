@@ -148,6 +148,19 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-002",
+        "instructors": [
+          "Anju M A (anju@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
@@ -242,8 +255,21 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-109\n+\nA01-001",
+        "instructors": [
+          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-109\n+\nA01-001",
         "instructors": [
           "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
@@ -278,8 +304,8 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "",
         "instructors": [],
         "recurrence": {

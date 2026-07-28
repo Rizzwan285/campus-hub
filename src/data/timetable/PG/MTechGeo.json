@@ -34,6 +34,19 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-018",
+        "instructors": [
+          "divyapv@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
@@ -101,8 +114,19 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-018 + A01-109",
         "instructors": [],
         "recurrence": {

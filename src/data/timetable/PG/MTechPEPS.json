@@ -159,7 +159,19 @@
     "rawAvailability": "",
     "rawSlot": "M (Thu)",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "PG_MTechPEPS_EE5616",

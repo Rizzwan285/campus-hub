@@ -8,7 +8,21 @@
     "rawAvailability": "",
     "rawSlot": "CMNA/CMNB & R4",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-007",
+        "instructors": [
+          "reenu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "PG_InstCommonCourses_ID5002",

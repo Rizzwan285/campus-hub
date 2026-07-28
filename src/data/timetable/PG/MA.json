@@ -474,8 +474,19 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "N-306",
         "instructors": [],
         "recurrence": {

@@ -50,8 +50,21 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-102 + A01-201",
+        "instructors": [
+          "Koninika Pal\nkpal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-102 + A01-201",
         "instructors": [
           "Koninika Pal\nkpal@iitpkd.ac.in"
@@ -414,6 +427,20 @@
     "rawAvailability": "X:X:X:X",
     "rawSlot": "R5 + Sat morning",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-212",
+        "instructors": [
+          "Renu Rameshan"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   }
 ]
