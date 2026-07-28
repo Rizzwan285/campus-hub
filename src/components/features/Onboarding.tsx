@@ -64,7 +64,7 @@ export function Onboarding() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
       <Card className="w-full max-w-md p-6 bg-card shadow-2xl border-primary/20">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-foreground">Welcome to IIT Palakkad Dashboard</h2>
+          <h2 className="text-2xl font-bold text-foreground">Welcome to Campus Companion</h2>
           <p className="text-muted-foreground mt-2 text-sm">Please set up your profile to personalize your experience.</p>
         </div>
 
