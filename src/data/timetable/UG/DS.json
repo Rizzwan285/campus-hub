@@ -8,7 +8,19 @@
     "rawAvailability": "",
     "rawSlot": "R1",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-212",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "UG_DS_CS2020A",
@@ -241,8 +253,19 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-212 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-212 + A01-109",
         "instructors": [],
         "recurrence": {
@@ -319,8 +342,21 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-212 + Nila CS Lab",
+        "instructors": [
+          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-212 + Nila CS Lab",
         "instructors": [
           "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
@@ -579,7 +615,19 @@
     "rawAvailability": "X:X:X:X",
     "rawSlot": "R5 + Sat morning",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-212",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "UG_DS_CS5617",
@@ -596,6 +644,17 @@
         "day": "Friday",
         "startTime": "14:00",
         "endTime": "16:45",
+        "room": "Nila CS Lab+N203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "17:10",
+        "endTime": "18:00",
         "room": "Nila CS Lab+N203/204",
         "instructors": [],
         "recurrence": {

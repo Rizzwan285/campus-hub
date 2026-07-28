@@ -119,6 +119,17 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-102",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
@@ -160,6 +171,17 @@
         "day": "Tuesday",
         "startTime": "14:00",
         "endTime": "16:45",
+        "room": "A01-109 + A01-102",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
         "room": "A01-109 + A01-102",
         "instructors": [],
         "recurrence": {
@@ -339,6 +361,17 @@
         "day": "Thursday",
         "startTime": "10:00",
         "endTime": "10:50",
+        "room": "A01-002",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "17:10",
+        "endTime": "18:00",
         "room": "A01-002",
         "instructors": [],
         "recurrence": {
@@ -728,6 +761,17 @@
         "day": "Friday",
         "startTime": "14:00",
         "endTime": "16:45",
+        "room": "Nila CS Lab+N203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "17:10",
+        "endTime": "18:00",
         "room": "Nila CS Lab+N203/204",
         "instructors": [],
         "recurrence": {
