@@ -31,6 +31,7 @@ export function Onboarding() {
     if (!formData.rollNo) newErrors.rollNo = 'Roll No is required';
     if (!formData.mess) newErrors.mess = 'Mess preference is required';
     if (!formData.program) newErrors.program = 'Program is required';
+    if (!formData.branch) newErrors.branch = 'Branch is required';
     if (!formData.yearOfStudy) newErrors.yearOfStudy = 'Year of study is required';
     
     // Batch is only needed if 1st Year BTech (UG)
@@ -47,6 +48,10 @@ export function Onboarding() {
     e.preventDefault();
     if (validate()) {
       setProfile(formData as UserProfile);
+      // Initialize timetable store with selected program and branch
+      import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
+        useTimetableStore.getState().updateProfile(formData.program!, formData.branch!);
+      });
     }
   };
 
@@ -139,6 +144,51 @@ export function Onboarding() {
               {errors.batchNo && <p className="text-red-500 text-xs">{errors.batchNo}</p>}
             </div>
           )}
+
+          {/* Branch Selection */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Branch</label>
+            <select
+              name="branch"
+              value={formData.branch || ''}
+              onChange={handleChange}
+              className={`w-full p-2 rounded-md border bg-background ${errors.branch ? 'border-red-500' : 'border-input'}`}
+            >
+              <option value="">Select Branch...</option>
+              {formData.program === 'UG' && (
+                <>
+                  <option value="CSE">Computer Science & Engineering</option>
+                  <option value="EE">Electrical Engineering</option>
+                  <option value="ME">Mechanical Engineering</option>
+                  <option value="CE">Civil Engineering</option>
+                  <option value="DS">Data Science</option>
+                  <option value="CommonCourses">UG Common Courses</option>
+                </>
+              )}
+              {formData.program === 'PG' && (
+                <>
+                  <option value="CY">Chemistry (CY)</option>
+                  <option value="MA">Mathematics (MA)</option>
+                  <option value="PH">Physics (PH)</option>
+                  <option value="HSS">Humanities (HSS)</option>
+                  <option value="BSE">BSE</option>
+                  <option value="ESSENCE">ESSENCE</option>
+                  <option value="MTechCaM">MTech CaM</option>
+                  <option value="MTechDS">MTech Data Science</option>
+                  <option value="MTechDesignAutomation">MTech Design Automation</option>
+                  <option value="MTechGeo">MTech Geotechnical</option>
+                  <option value="MTechMME">MTech MME</option>
+                  <option value="MTechPEPS">MTech PEPS</option>
+                  <option value="MTechSOCD">MTech SOCD</option>
+                  <option value="MTechStructuralEngineering">MTech Structural Eng.</option>
+                  <option value="MTechThermofluidsEngineering">MTech Thermofluids Eng.</option>
+                  <option value="MTechWaterResourcesEngineering">MTech Water Resources Eng.</option>
+                  <option value="InstCommonCourses">PG Common Courses</option>
+                </>
+              )}
+            </select>
+            {errors.branch && <p className="text-red-500 text-xs">{errors.branch}</p>}
+          </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Mess</label>

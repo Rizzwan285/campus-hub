@@ -1,0 +1,1066 @@
+[
+  {
+    "id": "UG_CommonCourses_PH1030",
+    "courseCode": "PH1030",
+    "courseName": "Physics",
+    "credits": "2-1-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "G+E (Friday)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_MA1011A",
+    "courseCode": "MA1011A",
+    "courseName": "Linear Algebra and Series",
+    "credits": "3-1-0-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "F \n+\n R5",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_ES1010",
+    "courseCode": "ES1010",
+    "courseName": "Ecology and Environment",
+    "credits": "2-0-0-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "M \n(1 pm - 1:50 pm)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_ME1130",
+    "courseCode": "ME1130",
+    "courseName": "Engineering Drawing",
+    "credits": "1-0-3-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "A (Mon)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_ID1050A",
+    "courseCode": "ID1050A",
+    "courseName": "Engineering Design",
+    "credits": "1-0-3-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "C (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_ME1150",
+    "courseCode": "ME1150",
+    "courseName": "Mechanical Workshop",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PA2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_EE1110",
+    "courseCode": "EE1110",
+    "courseName": "Electrical Workshop",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PA2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_PH1130",
+    "courseCode": "PH1130",
+    "courseName": "Physics Lab",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PA1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_CY1140",
+    "courseCode": "CY1140",
+    "courseName": "Chemistry Lab",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PA1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_GN1003",
+    "courseCode": "GN1003",
+    "courseName": "Foundations of English",
+    "credits": "1-0-2-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "B (Tue)\n8-8:50 am\n+\nPA3",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_BT2010",
+    "courseCode": "BT2010",
+    "courseName": "Life Sciences",
+    "credits": "2-0-0-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "M",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_MA2020",
+    "courseCode": "MA2020",
+    "courseName": "Differential Equations",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-002\nA01-102",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-002\nA01-102",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_MA2041",
+    "courseCode": "MA2041",
+    "courseName": "Probability and Statistics",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_MA5619",
+    "courseCode": "MA5619",
+    "courseName": "Geometry of curves and surfaces",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "I",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_PH4602",
+    "courseCode": "PH4602",
+    "courseName": "Introduction to Special Relativity,",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS3627",
+    "courseCode": "HS3627",
+    "courseName": "Engineering Economics",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-212",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-212",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-212",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS5018",
+    "courseCode": "HS5018",
+    "courseName": "Sexualities and Mental Health",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H (1pm - 1:50 pm)",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "UG_CommonCourses_HS4609",
+    "courseCode": "HS4609",
+    "courseName": "India's villages: Change and Continuity",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-101",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS2310",
+    "courseCode": "HS2310",
+    "courseName": "Contemporary India: Society, Politics & Development",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS2304",
+    "courseCode": "HS2304",
+    "courseName": "Culture and Gender Performativity",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H (1pm - 1:50 pm)",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "UG_CommonCourses_HS5007",
+    "courseCode": "HS5007",
+    "courseName": "Gender, STEM and Culture",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS2303",
+    "courseCode": "HS2303",
+    "courseName": "Introduction to Philosophy: Indian and Western",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-002",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-002",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-002",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS4611",
+    "courseCode": "HS4611",
+    "courseName": "Ethics",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS2031",
+    "courseCode": "HS2031",
+    "courseName": "Principles of Economics",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-118",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS4605",
+    "courseCode": "HS4605",
+    "courseName": "Foundations of Linguistics",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-007",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-007",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS5020",
+    "courseCode": "HS5020",
+    "courseName": "Public Policy for Engineers",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS2334",
+    "courseCode": "HS2334",
+    "courseName": "Japanese",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "B3 (80 seater)",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "B3 (80 seater)",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_ES5608",
+    "courseCode": "ES5608",
+    "courseName": "Principles and Practices of Regenerative Agriculture",
+    "credits": "3-0-03",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_GN1006",
+    "courseCode": "GN1006",
+    "courseName": "Preparatory Mathematics I",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_GN1011",
+    "courseCode": "GN1011",
+    "courseName": "Preparatory Physics I",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "I (Mon)\n+\nQ+R3 (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_GN1008",
+    "courseCode": "GN1008",
+    "courseName": "Preparatory Chemistry I",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "C (Mon + Fri)\n+\nA (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CommonCourses_HS0001",
+    "courseCode": "HS0001",
+    "courseName": "Preparatory English I",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "B (Mon+Fri)\n+\nD (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  }
+]

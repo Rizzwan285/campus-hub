@@ -6,6 +6,7 @@ export interface UserProfile {
   rollNo: string;
   mess: 'Nila' | 'Kedaram' | '';
   program: 'UG' | 'PG' | '';
+  branch: string; // e.g., 'CSE', 'ME', 'CommonCourses'
   yearOfStudy: string;
   batchNo?: string; // Optional, only for 1st year BTech
 }
