@@ -134,13 +134,6 @@ export const useTimetableStore = create<TimetableState>()(
         error: null,
 
         initializeTimetable: async (program: string, branch: string) => {
-          const state = get();
-          // Avoid duplicate fetching if already loaded for the same program/branch
-          if (state.program === program && state.branch === branch && state.loadedCourses.length > 0) {
-            _recompute();
-            return;
-          }
-
           set({ isLoading: true, error: null, program, branch });
 
           try {
@@ -153,14 +146,15 @@ export const useTimetableStore = create<TimetableState>()(
             // Combine branch-specific and common courses
             const allCourses = [...branchData, ...commonData];
             
-            // Auto-populate logic for first-year BTech
             const userState = get();
             let newSelectedIds = userState.selectedCourseIds;
             
             // Evaluate auto-population and commit state in one go
             const profile = useUserStore.getState().profile;
             
-            if (program === 'UG' && profile?.yearOfStudy === '1' && newSelectedIds.length === 0) {
+            // If changing program or branch, we should probably reset courses if they are invalid,
+            // but the filtering naturally ignores invalid IDs. For 1st years, we actively manage their core courses.
+            if (program === 'UG' && profile?.yearOfStudy === '1') {
               const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
               let excludedCodes: string[] = ['BT2010']; // Life science not in this semester
               
@@ -180,7 +174,12 @@ export const useTimetableStore = create<TimetableState>()(
                 if (ds1010) extraIds.push(ds1010.id);
               }
               
-              newSelectedIds = [...commonCoreIds, ...extraIds];
+              // Keep previously selected electives so user doesn't lose GN1003 etc.
+              const previouslySelectedElectives = allCourses
+                .filter(c => c.category?.toLowerCase() !== 'core' && newSelectedIds.includes(c.id))
+                .map(c => c.id);
+              
+              newSelectedIds = Array.from(new Set([...commonCoreIds, ...extraIds, ...previouslySelectedElectives]));
             }
             
             set({ 
