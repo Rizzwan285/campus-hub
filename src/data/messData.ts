@@ -132,15 +132,15 @@ export interface MessTimings {
 }
 
 export const weekdayTimings: MessTimings = {
-  breakfast: "7:15am - 9:30am",
-  lunch: "12pm - 2:15pm",
-  snacks: "4:30pm - 6pm",
-  dinner: "7pm - 9pm"
+  breakfast: "7:20 AM - 9:30 AM",
+  lunch: "12:00 PM - 2:15 PM",
+  snacks: "4:30 PM - 6:00 PM",
+  dinner: "7:00 PM - 9:00 PM"
 };
 
 export const weekendTimings: MessTimings = {
-  breakfast: "8am - 10am",
-  lunch: "12:30pm - 2:30pm",
-  snacks: "4:30pm - 6pm",
-  dinner: "7pm - 9pm"
+  breakfast: "7:45 AM - 10:00 AM",
+  lunch: "12:30 PM - 2:30 PM",
+  snacks: "4:30 PM - 6:00 PM",
+  dinner: "7:00 PM - 9:00 PM"
 };
