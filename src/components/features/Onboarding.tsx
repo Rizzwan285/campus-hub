@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Compass } from 'lucide-react';
+import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles } from 'lucide-react';
 
 export function Onboarding() {
   const setProfile = useUserStore((state) => state.setProfile);
@@ -88,7 +88,7 @@ export function Onboarding() {
           <div className="relative px-8 pt-10 pb-6 text-center">
             {/* Logo / Icon */}
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 mb-5 shadow-lg shadow-primary/10">
-              <Compass className="w-8 h-8 text-primary" />
+              <Sparkles className="w-8 h-8 text-primary" />
             </div>
             
             <h1 className="text-3xl font-bold text-foreground tracking-tight">
@@ -167,7 +167,8 @@ export function Onboarding() {
                   name="batchNo"
                   value={formData.batchNo || ''}
                   onChange={handleChange}
-                  className={inputClass('batchNo')}
+                  className={`${inputClass('batchNo')} max-h-[140px]`}
+                  size={6}
                 >
                   <option value="">Select Batch...</option>
                   {batchOptions.map(b => (
@@ -242,7 +243,7 @@ export function Onboarding() {
                 className={inputClass('mess')}
               >
                 <option value="">Select Mess...</option>
-                <option value="Nila">Nila Mess (First Years)</option>
+                <option value="Nila">Nila Mess</option>
                 <option value="Kedaram">Kedaram Mess</option>
               </select>
               {errors.mess && <p className="text-red-400 text-[11px] mt-1.5 font-medium">{errors.mess}</p>}

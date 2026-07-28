@@ -54,7 +54,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
         <Header 
           onRefresh={handleRefresh}
           onDateChange={setSelectedDate}
@@ -62,29 +62,15 @@ const Index = () => {
           userName={profile.name}
         />
         
-        <div className="columns-1 lg:columns-2 gap-6 space-y-6 [column-fill:_balance]">
-          <div className="break-inside-avoid">
-            <MessMenuCard date={displayDate} />
-          </div>
-
-          <div className="break-inside-avoid">
-            <CanteenMenuCard date={displayDate} />
-          </div>
-          
-          <div className="break-inside-avoid">
-            <ClassTimetableCard date={displayDate} />
-          </div>
-          
-          <div className="break-inside-avoid">
-            <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
-          </div>
-          
-          <div className="break-inside-avoid">
-            <MessTimingsCard date={displayDate} />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <MessMenuCard date={displayDate} />
+          <ClassTimetableCard date={displayDate} />
+          <CanteenMenuCard date={displayDate} />
+          <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
+          <MessTimingsCard date={displayDate} />
         </div>
         
-        <div className="mt-8">
+        <div className="mt-6">
           <WeeklyTimetable />
         </div>
 

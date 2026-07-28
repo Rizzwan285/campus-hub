@@ -42,7 +42,7 @@ export function WeeklyTimetable() {
     <div className="w-full space-y-4">
       {collisions.length > 0 && <CollisionBanner collisions={collisions} />}
       
-      <Card className="w-full overflow-hidden bg-card border-border shadow-sm">
+      <Card className="w-full overflow-hidden bg-card border-border/50 shadow-[var(--shadow-card)] rounded-2xl">
         <div className="p-4 border-b border-border bg-muted/20 flex justify-between items-center">
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
