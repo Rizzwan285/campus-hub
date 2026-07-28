@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, Moon, Sun, ChevronRight, RotateCcw } from 'lucide-react';
+import { RefreshCw, Moon, Sun, ChevronRight, RotateCcw, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatTime, formatDate, getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { addDays } from 'date-fns';
+import { useUserStore } from '@/store/useUserStore';
 
 interface HeaderProps {
   onRefresh: () => void;
   onDateChange: (date: Date | null) => void;
   selectedDate: Date | null;
+  userName?: string;
 }
 
-export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
+export function Header({ onRefresh, onDateChange, selectedDate, userName }: HeaderProps) {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   const [isDark, setIsDark] = useState(false);
+  const logout = useUserStore((state) => state.logout);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -43,12 +46,18 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
     onDateChange(null);
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
+  const firstName = userName ? userName.split(' ')[0] : '';
+
   return (
     <header className="mb-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            IIT Palakkad Mess & Bus Info
+            {firstName ? `Welcome, ${firstName} 👋` : 'IIT Palakkad Dashboard'}
           </h1>
           <div className="flex items-center gap-2">
             <p className="text-muted-foreground">
@@ -100,6 +109,18 @@ export function Header({ onRefresh, onDateChange, selectedDate }: HeaderProps) {
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
+
+          {userName && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleLogout}
+              className="transition-transform hover:scale-105"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </header>
