@@ -12,6 +12,8 @@ const START_HOUR = 8;
 const END_HOUR = 18;
 const TOTAL_HOURS = END_HOUR - START_HOUR;
 
+import { stringToColorClass } from '@/utils/colorUtils';
+
 export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState(new Date());
@@ -38,6 +40,10 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
     return Math.max(0, Math.min(100, (durationMins / totalMinutes) * 100));
   };
 
+  const isCollision = (event: CalendarEvent) => {
+    return collisions.some(c => c.courseIdA === event.courseId || c.courseIdB === event.courseId);
+  };
+
   // Auto-scroll to current time on mount if within working hours
   useEffect(() => {
     if (scrollRef.current) {
@@ -60,8 +66,56 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
   const showCurrentTime = DAYS.includes(todayName) && isWorkingHours;
   const currentTimePercentage = getPercentage(now);
 
+  const formatTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
   return (
-    <div ref={scrollRef} className="w-full h-[600px] overflow-auto relative bg-background border rounded-md shadow-inner flex flex-col">
+    <>
+    {/* Mobile Agenda View */}
+    <div className="md:hidden flex flex-col w-full max-h-[600px] overflow-y-auto space-y-6 px-1">
+      {DAYS.map(dayName => {
+        const dayEvents = events
+          .filter(e => e.startTime.toLocaleDateString('en-US', { weekday: 'long' }) === dayName)
+          .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+          
+        const isToday = dayName === todayName;
+        
+        if (dayEvents.length === 0) return null;
+        
+        return (
+          <div key={dayName} className="flex flex-col space-y-3">
+            <div className="flex items-center gap-2 border-b border-border/50 pb-1">
+              <h3 className={`font-semibold ${isToday ? 'text-primary' : 'text-foreground'}`}>{dayName}</h3>
+              {isToday && <span className="text-[10px] uppercase bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">Today</span>}
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              {dayEvents.map(event => {
+                const baseColor = stringToColorClass(event.courseCode);
+                const hasCollision = isCollision(event);
+                return (
+                  <div key={event.id} className={`flex flex-col p-3 rounded-md border shadow-sm ${hasCollision ? 'border-destructive ring-1 ring-destructive' : ''} ${baseColor}`}>
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-bold text-sm">{event.courseCode}</span>
+                      <span className="text-xs font-semibold bg-background/50 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/20">
+                        {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                      </span>
+                    </div>
+                    <span className="text-xs opacity-90 mb-2 line-clamp-1">{event.courseName}</span>
+                    <div className="flex items-center justify-between text-[11px] mt-auto pt-2 border-t border-border/30 opacity-90">
+                      <span className="capitalize font-semibold">{event.type}</span>
+                      <span className="font-semibold">{event.room}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* Desktop Grid View */}
+    <div ref={scrollRef} className="hidden md:flex w-full h-[600px] overflow-auto relative bg-background border rounded-md shadow-inner flex-col">
       <div className="flex flex-col min-w-[1400px] w-full h-full relative">
         
         {/* Header Row: Sticky Top */}
@@ -140,5 +194,6 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }
