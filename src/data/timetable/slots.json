@@ -229,8 +229,13 @@
     "timings": [
       {
         "day": "Tuesday",
-        "startTime": "13:00",
-        "endTime": "13:50"
+        "startTime": "12:00",
+        "endTime": "12:50"
+      },
+      {
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50"
       }
     ]
   },
