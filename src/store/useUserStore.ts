@@ -3,10 +3,9 @@ import { persist } from 'zustand/middleware';
 
 export interface UserProfile {
   name: string;
-  rollNo: string;
   mess: 'Nila' | 'Kedaram' | '';
   program: 'UG' | 'PG' | '';
-  branch: string; // e.g., 'CSE', 'ME', 'CommonCourses'
+  branch: string; // e.g., 'CSE', 'ME'
   yearOfStudy: string;
   batchNo?: string; // Optional, only for 1st year BTech
 }

@@ -1,4 +1,5 @@
 import { useTimetableStore } from '@/store/useTimetableStore';
+import { useUserStore } from '@/store/useUserStore';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, Calendar } from 'lucide-react';
 import { WeeklyGrid } from './WeeklyGrid';
@@ -14,6 +15,9 @@ export function WeeklyTimetable() {
     selectedCourseIds,
     previewDate 
   } = useTimetableStore();
+
+  const profile = useUserStore(state => state.profile);
+  const isFirstYearUG = profile?.program === 'UG' && profile?.yearOfStudy === '1';
 
   if (isLoading) {
     return (
@@ -34,19 +38,6 @@ export function WeeklyTimetable() {
     );
   }
 
-  if (selectedCourseIds.length === 0) {
-    return (
-      <Card className="w-full h-[600px] flex flex-col items-center justify-center bg-card">
-        <Calendar className="h-12 w-12 text-muted-foreground/30 mb-4" />
-        <h3 className="text-xl font-medium text-foreground">No Courses Selected</h3>
-        <p className="text-muted-foreground mt-2 mb-6 max-w-sm text-center">
-          You haven't selected any courses yet. Choose your electives to build your timetable.
-        </p>
-        <CourseSelector />
-      </Card>
-    );
-  }
-
   return (
     <div className="w-full space-y-4">
       {collisions.length > 0 && <CollisionBanner collisions={collisions} />}
@@ -62,10 +53,20 @@ export function WeeklyTimetable() {
               Week of {new Date(previewDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </p>
           </div>
-          <CourseSelector />
+          {!isFirstYearUG && <CourseSelector />}
         </div>
         
-        <WeeklyGrid events={resolvedEvents} />
+        {selectedCourseIds.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[500px] bg-muted/10">
+            <Calendar className="h-12 w-12 text-muted-foreground/30 mb-4" />
+            <h3 className="text-xl font-medium text-foreground">No Courses Selected</h3>
+            <p className="text-muted-foreground mt-2 max-w-sm text-center">
+              Click "Manage Courses" above to choose your electives and build your timetable.
+            </p>
+          </div>
+        ) : (
+          <WeeklyGrid events={resolvedEvents} />
+        )}
       </Card>
     </div>
   );
