@@ -189,7 +189,7 @@ export const useTimetableStore = create<TimetableState>()(
               isLoading: false 
             });
             
-            get()._recompute();
+            _recompute();
           } catch (err) {
             set({ 
               isLoading: false, 
