@@ -88,8 +88,23 @@ def main():
             
             # Enrich meetings with room and instructor
             for m in meetings:
+                if rc["courseCode"] == "ES1010" and m["type"] == "lecture":
+                    # Ecology and Environment exception
+                    m["startTime"] = "13:00"
+                    m["endTime"] = "13:50"
                 m['room'] = rc['room']
                 m['instructors'] = [i for i in rc['instructors'] if i]
+                
+            if rc["courseCode"] == "GN1011":
+                meetings.append({
+                    "type": "lecture",
+                    "day": "Monday",
+                    "startTime": "14:00",
+                    "endTime": "15:15",
+                    "room": rc["room"],
+                    "instructors": [i for i in rc["instructors"] if i],
+                    "recurrence": {"type": "weekly"}
+                })
                 
             courseCode = rc["courseCode"]
             offeringId = f"{prog}_{branch}_{courseCode}"
@@ -99,12 +114,18 @@ def main():
                 continue
             seen_ids.add(offeringId)
             
+            category = rc["category"]
+            if rc["courseCode"] == "GN1003":
+                category = "elective"
+            if rc["courseCode"] == "DS1010":
+                category = "elective"
+                
             course_obj = {
                 "id": offeringId,
                 "courseCode": courseCode,
                 "courseName": rc["courseName"],
                 "credits": rc["credits"],
-                "category": rc["category"],
+                "category": category,
                 "rawAvailability": rc["rawAvailability"],
                 "rawSlot": rc["rawSlot"],
                 "eligibility": eligibility,

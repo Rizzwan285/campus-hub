@@ -75,6 +75,17 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
@@ -297,8 +308,19 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "",
         "instructors": [],
         "recurrence": {
@@ -976,6 +998,17 @@
         "day": "Wednesday",
         "startTime": "14:00",
         "endTime": "14:50",
+        "room": "N-305",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-305",
         "instructors": [],
         "recurrence": {
