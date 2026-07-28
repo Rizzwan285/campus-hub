@@ -6,12 +6,12 @@ import { toast } from 'sonner';
 
 interface EventCardProps {
   event: CalendarEvent;
-  top: number;    // percentage
-  height: number; // percentage
+  left: number;    // percentage
+  width: number; // percentage
   isCollision?: boolean;
 }
 
-export function EventCard({ event, top, height, isCollision }: EventCardProps) {
+export function EventCard({ event, left, width, isCollision }: EventCardProps) {
   const formatTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
   
   const baseColor = stringToColorClass(event.courseCode);
@@ -26,14 +26,14 @@ export function EventCard({ event, top, height, isCollision }: EventCardProps) {
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
         <div 
-          className={`absolute w-[calc(100%-8px)] mx-[4px] rounded-md border p-1.5 sm:p-2 overflow-hidden shadow-sm transition-all hover:z-20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer group
+          className={`absolute h-[calc(100%-8px)] my-[4px] rounded-md border p-1.5 sm:p-2 overflow-hidden shadow-sm transition-all hover:z-20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer group
             ${baseColor}
             ${isCollision ? 'ring-2 ring-destructive ring-offset-1 border-destructive' : ''}
           `}
           style={{
-            top: `${top}%`,
-            height: `${height}%`,
-            minHeight: '24px' // even shorter classes need to be clickable
+            left: `${left}%`,
+            width: `${width}%`,
+            minWidth: '24px' // even shorter classes need to be clickable
           }}
           tabIndex={0}
           aria-label={`${event.courseCode} ${event.type} from ${formatTime(event.startTime)} to ${formatTime(event.endTime)} in ${event.room}`}
@@ -44,13 +44,13 @@ export function EventCard({ event, top, height, isCollision }: EventCardProps) {
               {isCollision && <AlertTriangle className="h-3 w-3 text-destructive shrink-0" />}
             </div>
             
-            {/* Show name if height > 5% (~30 mins) */}
-            {height > 5 && (
+            {/* Show name if width > 5% (~30 mins) */}
+            {width > 5 && (
               <span className="hidden sm:inline opacity-80 truncate text-[10px] leading-tight mt-0.5">{event.courseName}</span>
             )}
             
             {/* Bottom metadata */}
-            {height > 7 && (
+            {width > 7 && (
               <div className="mt-auto pt-0.5 flex flex-wrap items-center gap-x-1.5 opacity-90 text-[10px]">
                 <span className="uppercase text-[9px] font-bold opacity-75">{event.type.slice(0, 3)}</span>
                 <span>• {event.room}</span>
