@@ -45,7 +45,7 @@ def parse_slots(docx_path):
         "L": {"type": "lecture", "timings": [{"day": "Tuesday", "startTime": "14:00", "endTime": "15:15"}, {"day": "Thursday", "startTime": "15:30", "endTime": "16:45"}]},
         "Q": {"type": "lecture", "timings": [{"day": "Wednesday", "startTime": "11:00", "endTime": "11:50"}]},
         "R3": {"type": "lecture", "timings": [{"day": "Wednesday", "startTime": "14:00", "endTime": "14:50"}]},
-        "M": {"type": "lecture", "timings": [{"day": "Tuesday", "startTime": "14:00", "endTime": "14:50"}]},
+        "M": {"type": "lecture", "timings": [{"day": "Tuesday", "startTime": "13:00", "endTime": "13:50"}]},
         "CMN-A": {"type": "lecture", "timings": [{"day": "Wednesday", "startTime": "16:00", "endTime": "16:50"}]},
         "CMN-B": {"type": "lecture", "timings": [{"day": "Wednesday", "startTime": "17:00", "endTime": "17:50"}]},
         "PM1": {"type": "lab", "timings": [{"day": "Monday", "startTime": "09:00", "endTime": "11:45"}]},
