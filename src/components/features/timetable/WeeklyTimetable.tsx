@@ -53,7 +53,7 @@ export function WeeklyTimetable() {
               Week of {new Date(previewDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </p>
           </div>
-          {!isFirstYearUG && <CourseSelector />}
+          <CourseSelector />
         </div>
         
         {selectedCourseIds.length === 0 ? (
