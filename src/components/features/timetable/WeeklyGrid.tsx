@@ -62,7 +62,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
 
   return (
     <div ref={scrollRef} className="w-full h-[600px] overflow-auto relative bg-background border rounded-md shadow-inner flex flex-col">
-      <div className="flex flex-col min-w-[800px] w-full h-full relative">
+      <div className="flex flex-col min-w-[1400px] w-full h-full relative">
         
         {/* Header Row: Sticky Top */}
         <div className="flex sticky top-0 z-40 bg-muted/80 backdrop-blur-sm border-b h-10 shadow-sm shrink-0">
