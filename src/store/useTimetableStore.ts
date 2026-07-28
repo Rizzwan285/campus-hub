@@ -9,6 +9,37 @@ import {
   Collision 
 } from '../engine/types';
 
+function getVenueForMeeting(courseCode: string, meetingType: string, batchNo: number): string | null {
+  if (courseCode === 'PH1030' || courseCode === 'MA1011A') {
+    if (batchNo <= 6) return 'C06-105';
+    if (batchNo <= 12) return 'C06-106';
+    if (batchNo <= 18) return 'C06-107';
+    return 'C06-104';
+  }
+  if (courseCode === 'ES1010') {
+    if (batchNo <= 11) return 'N203';
+    if (batchNo <= 18) return 'N305';
+    return 'C6-104';
+  }
+  if (courseCode === 'ME1130') {
+    if (meetingType === 'lab') return 'A01-112 (Drawing Hall)';
+    if (batchNo <= 5) return 'C06-105';
+    if (batchNo <= 10) return 'C06-106';
+    if (batchNo <= 15) return 'C06-107';
+    if (batchNo <= 20) return 'C06-104';
+    return 'N-305';
+  }
+  if (courseCode === 'ID1050A') {
+    return meetingType === 'lab' ? 'Nila CS-Lab' : 'A01-007';
+  }
+  if (courseCode === 'ME1150') return 'D-03 Workshop';
+  if (courseCode === 'EE1110') return 'Electrical Workshop';
+  if (courseCode === 'PH1130') return 'A01-Physics Lab';
+  if (courseCode === 'CY1140') return 'A01-Chemistry Lab';
+  if (courseCode === 'GN1003') return 'N-203/204 & Nila CS Lab';
+  return null;
+}
+
 interface TimetableState {
   // Config & Persistent State
   program: string | null;
@@ -51,25 +82,44 @@ export const useTimetableStore = create<TimetableState>()(
         // Actually, the engine assumes you pass ALL courses you are taking. 
         // We will pass only the selected courses.
         const selectedSet = new Set(selectedCourseIds);
-        const activeCourses = loadedCourses.filter(c => selectedSet.has(c.id));
+        let activeCourses = loadedCourses.filter(c => selectedSet.has(c.id));
 
-        try {
-          const result = TimetableEngine.resolveWeek(
-            activeCourses, 
-            loadedHolidays, 
-            { targetWeek: new Date(previewDate) }
-          );
+        import('./useUserStore').then(({ useUserStore }) => {
+          const profile = useUserStore.getState().profile;
+          if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
+            const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
+            if (batchNo > 0) {
+              activeCourses = activeCourses.map(course => {
+                const newMeetings = course.meetings.map(m => {
+                  const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
+                  if (customRoom) {
+                    return { ...m, room: customRoom };
+                  }
+                  return m;
+                });
+                return { ...course, meetings: newMeetings };
+              });
+            }
+          }
+          
+          try {
+            const result = TimetableEngine.resolveWeek(
+              activeCourses, 
+              loadedHolidays, 
+              { targetWeek: new Date(previewDate) }
+            );
 
-          set({
-            resolvedEvents: result.events,
-            collisions: result.collisions,
-            holidaysEncountered: result.holidaysEncountered,
-            error: null
-          });
-        } catch (err) {
-          set({ error: 'Failed to compute timetable events.', resolvedEvents: [], collisions: [] });
-          console.error(err);
-        }
+            set({
+              resolvedEvents: result.events,
+              collisions: result.collisions,
+              holidaysEncountered: result.holidaysEncountered,
+              error: null
+            });
+          } catch (err) {
+            set({ error: 'Failed to compute timetable events.', resolvedEvents: [], collisions: [] });
+            console.error(err);
+          }
+        });
       };
 
       return {
