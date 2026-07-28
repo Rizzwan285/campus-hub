@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TimetableLoader } from '../services/timetableLoader';
 import { TimetableEngine } from '../engine/timetableEngine';
+import { useUserStore } from './useUserStore';
 import { 
   CourseOffering, 
   Holiday, 
@@ -19,7 +20,7 @@ function getVenueForMeeting(courseCode: string, meetingType: string, batchNo: nu
   if (courseCode === 'ES1010') {
     if (batchNo <= 11) return 'N203';
     if (batchNo <= 18) return 'N305';
-    return 'C6-104';
+    return 'C06-104';
   }
   if (courseCode === 'ME1130') {
     if (meetingType === 'lab') return 'A01-112 (Drawing Hall)';
@@ -27,15 +28,15 @@ function getVenueForMeeting(courseCode: string, meetingType: string, batchNo: nu
     if (batchNo <= 10) return 'C06-106';
     if (batchNo <= 15) return 'C06-107';
     if (batchNo <= 20) return 'C06-104';
-    return 'N-305';
+    return 'N305';
   }
   if (courseCode === 'ID1050A') {
     return meetingType === 'lab' ? 'Nila CS-Lab' : 'A01-007';
   }
   if (courseCode === 'ME1150') return 'D-03 Workshop';
-  if (courseCode === 'EE1110') return 'Electrical Workshop';
-  if (courseCode === 'PH1130') return 'A01-Physics Lab';
-  if (courseCode === 'CY1140') return 'A01-Chemistry Lab';
+  if (courseCode === 'EE1110') return 'C06-105 + C06 Electronics Lab';
+  if (courseCode === 'PH1130') return 'A01 Physics Lab';
+  if (courseCode === 'CY1140') return 'A01 Chemistry Lab';
   if (courseCode === 'GN1003') return 'N-203/204 & Nila CS Lab';
   return null;
 }
@@ -77,49 +78,43 @@ export const useTimetableStore = create<TimetableState>()(
         
         if (!loadedCourses.length) return;
 
-        // Filter loaded courses down to only the selected ones
-        // If a student hasn't selected any, maybe we still want to show core courses?
-        // Actually, the engine assumes you pass ALL courses you are taking. 
-        // We will pass only the selected courses.
         const selectedSet = new Set(selectedCourseIds);
         let activeCourses = loadedCourses.filter(c => selectedSet.has(c.id));
 
-        import('./useUserStore').then(({ useUserStore }) => {
-          const profile = useUserStore.getState().profile;
-          if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
-            const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
-            if (batchNo > 0) {
-              activeCourses = activeCourses.map(course => {
-                const newMeetings = course.meetings.map(m => {
-                  const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
-                  if (customRoom) {
-                    return { ...m, room: customRoom };
-                  }
-                  return m;
-                });
-                return { ...course, meetings: newMeetings };
+        const profile = useUserStore.getState().profile;
+        if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
+          const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
+          if (batchNo > 0) {
+            activeCourses = activeCourses.map(course => {
+              const newMeetings = course.meetings.map(m => {
+                const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
+                if (customRoom) {
+                  return { ...m, room: customRoom };
+                }
+                return m;
               });
-            }
-          }
-          
-          try {
-            const result = TimetableEngine.resolveWeek(
-              activeCourses, 
-              loadedHolidays, 
-              { targetWeek: new Date(previewDate) }
-            );
-
-            set({
-              resolvedEvents: result.events,
-              collisions: result.collisions,
-              holidaysEncountered: result.holidaysEncountered,
-              error: null
+              return { ...course, meetings: newMeetings };
             });
-          } catch (err) {
-            set({ error: 'Failed to compute timetable events.', resolvedEvents: [], collisions: [] });
-            console.error(err);
           }
-        });
+        }
+        
+        try {
+          const result = TimetableEngine.resolveWeek(
+            activeCourses, 
+            loadedHolidays, 
+            { targetWeek: new Date(previewDate) }
+          );
+
+          set({
+            resolvedEvents: result.events,
+            collisions: result.collisions,
+            holidaysEncountered: result.holidaysEncountered,
+            error: null
+          });
+        } catch (err) {
+          set({ error: 'Failed to compute timetable events.', resolvedEvents: [], collisions: [] });
+          console.error(err);
+        }
       };
 
       return {
@@ -163,41 +158,39 @@ export const useTimetableStore = create<TimetableState>()(
             let newSelectedIds = userState.selectedCourseIds;
             
             // Evaluate auto-population and commit state in one go
-            import('./useUserStore').then(({ useUserStore }) => {
-              const profile = useUserStore.getState().profile;
+            const profile = useUserStore.getState().profile;
+            
+            if (program === 'UG' && profile?.yearOfStudy === '1' && newSelectedIds.length === 0) {
+              const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
+              let excludedCodes: string[] = ['BT2010']; // Life science not in this semester
               
-              if (program === 'UG' && profile?.yearOfStudy === '1' && newSelectedIds.length === 0) {
-                const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
-                let excludedCodes: string[] = ['BT2010']; // Life science not in this semester
-                
-                if (batchNo >= 1 && batchNo <= 12) {
-                  excludedCodes.push('CY1140', 'EE1110'); // B1-12 gets Physics/Mech, exclude Chem/Elec
-                } else if (batchNo >= 13 && batchNo <= 24) {
-                  excludedCodes.push('PH1130', 'ME1150'); // B13-24 gets Chem/Elec, exclude Physics/Mech
-                }
+              if (batchNo >= 1 && batchNo <= 12) {
+                excludedCodes.push('CY1140', 'EE1110'); // B1-12 gets Physics/Mech, exclude Chem/Elec
+              } else if (batchNo >= 13 && batchNo <= 24) {
+                excludedCodes.push('PH1130', 'ME1150'); // B13-24 gets Chem/Elec, exclude Physics/Mech
+              }
 
-                const commonCoreIds = commonData
-                  .filter(c => c.category?.toLowerCase() === 'core' && !excludedCodes.includes(c.courseCode))
-                  .map(c => c.id);
-                  
-                const extraIds = [];
-                if (branch === 'DS') {
-                  const ds1010 = branchData.find(c => c.courseCode === 'DS1010');
-                  if (ds1010) extraIds.push(ds1010.id);
-                }
+              const commonCoreIds = commonData
+                .filter(c => c.category?.toLowerCase() === 'core' && !excludedCodes.includes(c.courseCode))
+                .map(c => c.id);
                 
-                newSelectedIds = [...commonCoreIds, ...extraIds];
+              const extraIds = [];
+              if (branch === 'DS') {
+                const ds1010 = branchData.find(c => c.courseCode === 'DS1010');
+                if (ds1010) extraIds.push(ds1010.id);
               }
               
-              set({ 
-                loadedCourses: allCourses, 
-                loadedHolidays: holidays,
-                selectedCourseIds: newSelectedIds,
-                isLoading: false 
-              });
-              
-              get()._recompute();
+              newSelectedIds = [...commonCoreIds, ...extraIds];
+            }
+            
+            set({ 
+              loadedCourses: allCourses, 
+              loadedHolidays: holidays,
+              selectedCourseIds: newSelectedIds,
+              isLoading: false 
             });
+            
+            get()._recompute();
           } catch (err) {
             set({ 
               isLoading: false, 
