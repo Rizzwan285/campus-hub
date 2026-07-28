@@ -1,0 +1,678 @@
+[
+  {
+    "id": "UG_EE_EE2070",
+    "courseCode": "EE2070",
+    "courseName": "Digital Systems",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "(BTech:EE:S3)",
+    "rawSlot": "C + \nPA4 (alt weeks full batch)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-103+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-103+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-103+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE2030A",
+    "courseCode": "EE2030A",
+    "courseName": "Electrical and Magnetic Circuits",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE2050A",
+    "courseCode": "EE2050A",
+    "courseName": "Signals and Systems",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE3010A",
+    "courseCode": "EE3010A",
+    "courseName": "Solid State Devices",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE2060A",
+    "courseCode": "EE2060A",
+    "courseName": "Engineering Electromagnetics",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "BTech EE:S3",
+    "rawSlot": "A + \nPA4 (alt weeks full batch)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-103+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-103+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-103+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE3030A",
+    "courseCode": "EE3030A",
+    "courseName": "Measurements and Instrumentation",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "A + \nPA5 (alt weeks full batch)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-119 + NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-119 + NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-119 + NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE3050A",
+    "courseCode": "EE3050A",
+    "courseName": "Principles of Communication",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "(BTech:EE:S5)",
+    "rawSlot": "C + \nPA5  (alt weeks full batch)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-119+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-119+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-119+NIla Electronics Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE2020A",
+    "courseCode": "EE2020A",
+    "courseName": "Electrical Machines",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "(BTech:EE:S5)",
+    "rawSlot": "B + \nPA1 (alt weeks half batch",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-119+Machines Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-119+Machines Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-119+Machines Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-119+Machines Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE5007",
+    "courseCode": "EE5007",
+    "courseName": "Linear Algebra for Engineers",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech, MS, PhD",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE5630",
+    "courseCode": "EE5630",
+    "courseName": "Digital Communication Systems",
+    "credits": "3-1-0-4",
+    "category": "elective",
+    "rawAvailability": "BTech, MS, PhD",
+    "rawSlot": "D + R1 (Tutorial)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE5621",
+    "courseCode": "EE5621",
+    "courseName": "Antenna Theory and Techniques",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "B.Tech, MS, M.Tech (SoCD), PhD",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE5023",
+    "courseCode": "EE5023",
+    "courseName": "VLSI design",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech VII, MTech SoCD, MS, PhD",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE5603",
+    "courseCode": "EE5603",
+    "courseName": "Robot dynamics, control and motion planning",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech V, VII, MTech, MS, PhD",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-103",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE5531",
+    "courseCode": "EE5531",
+    "courseName": "Reinforcement learning based control",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech (s5 & S7) /MTech, MS/PhD",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-214",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-214",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE3601",
+    "courseCode": "EE3601",
+    "courseName": "CMOS analog and digital circuits",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "Btech (s5, s7)",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-214",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-214",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE4505",
+    "courseCode": "EE4505",
+    "courseName": "Robot Implementation Methods",
+    "credits": "2-0-2-3",
+    "category": "elective",
+    "rawAvailability": "BTech (S5, S7)",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-112",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-112",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_EE_EE4110",
+    "courseCode": "EE4110",
+    "courseName": "Project I",
+    "credits": "0-0-8-3",
+    "category": "project",
+    "rawAvailability": "BTech:EE:S7",
+    "rawSlot": "-",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "UG_EE_EE4130",
+    "courseCode": "EE4130",
+    "courseName": "Project II",
+    "credits": "0-0-15-6",
+    "category": "project",
+    "rawAvailability": "BTech:EE:S7",
+    "rawSlot": "-",
+    "eligibility": {},
+    "meetings": []
+  }
+]

@@ -1,0 +1,224 @@
+[
+  {
+    "id": "PG_MTechWaterResourcesEngineering_CE5514",
+    "courseCode": "CE5514",
+    "courseName": "Surface Water Hydrology",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "MTech:S1; PhD",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213",
+        "instructors": [
+          "smitra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-213",
+        "instructors": [
+          "smitra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-213",
+        "instructors": [
+          "smitra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_CE5021",
+    "courseCode": "CE5021",
+    "courseName": "Applied Hydraulic Engineering",
+    "credits": "4-0-0-4",
+    "category": "core",
+    "rawAvailability": "MTech:S1; PhD",
+    "rawSlot": "B,R1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-214",
+        "instructors": [
+          "sridhar@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-214",
+        "instructors": [
+          "sridhar@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-214",
+        "instructors": [
+          "sridhar@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_CE5118",
+    "courseCode": "CE5118",
+    "courseName": "Hydraulics and Water Resources\nEngineering Lab",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PA5",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "Civil Lab",
+        "instructors": [
+          "smitra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_CE5003",
+    "courseCode": "CE5003",
+    "courseName": "GIS and Remote Sensing",
+    "credits": "1-0-3-3",
+    "category": "elective",
+    "rawAvailability": "B.Tech:CE:S3:S5;S7.  M.Tech:WRE:S1:S3",
+    "rawSlot": "F+ PA4",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-120 + Nila CC Lab",
+        "instructors": [
+          "sarmistha@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-120 + Nila CC Lab",
+        "instructors": [
+          "sarmistha@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-120 + Nila CC Lab",
+        "instructors": [
+          "sarmistha@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_WE5110",
+    "courseCode": "WE5110",
+    "courseName": "Project phase 1",
+    "credits": "0-0-30-12",
+    "category": "project",
+    "rawAvailability": "MTech: S3",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechWaterResourcesEngineering_WE5190",
+    "courseCode": "WE5190",
+    "courseName": "Internship/Mini project",
+    "credits": "",
+    "category": "project",
+    "rawAvailability": "MTech: S3",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  }
+]

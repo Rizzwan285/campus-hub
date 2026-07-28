@@ -1,0 +1,1097 @@
+[
+  {
+    "id": "UG_CE_CE2080A",
+    "courseCode": "CE2080A",
+    "courseName": "Surveying Theory and Practice",
+    "credits": "2-0-2-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "E + PA1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-213 + Survey lab",
+        "instructors": [
+          "Subrat Kumar Mallick (subrat@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213 + Survey lab",
+        "instructors": [
+          "Subrat Kumar Mallick (subrat@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-213 + Survey lab",
+        "instructors": [
+          "Subrat Kumar Mallick (subrat@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE2010A",
+    "courseCode": "CE2010A",
+    "courseName": "Strength of Materials",
+    "credits": "2-1-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-213",
+        "instructors": [
+          "arunco@iitpkd.ac.in",
+          "gokul@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213",
+        "instructors": [
+          "arunco@iitpkd.ac.in",
+          "gokul@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-213",
+        "instructors": [
+          "arunco@iitpkd.ac.in",
+          "gokul@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE2030A",
+    "courseCode": "CE2030A",
+    "courseName": "Introduction to Civil Engineering Materials",
+    "credits": "2-0-2-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "A + PA2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-214 + Civil Engg Materials lab (lab component)",
+        "instructors": [
+          "athiragopinath@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-214 + Civil Engg Materials lab (lab component)",
+        "instructors": [
+          "athiragopinath@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-214 + Civil Engg Materials lab (lab component)",
+        "instructors": [
+          "athiragopinath@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-214 + Civil Engg Materials lab (lab component)",
+        "instructors": [
+          "athiragopinath@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE2150A",
+    "courseCode": "CE2150A",
+    "courseName": "Building Drawing and Modeling",
+    "credits": "0-0-2-1",
+    "category": "core",
+    "rawAvailability": "BTech:CE: S3",
+    "rawSlot": "PA5",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "Nila CC Lab",
+        "instructors": [
+          "naparna@iitpkd.ac.in",
+          "No"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE3050A",
+    "courseCode": "CE3050A",
+    "courseName": "Basic Reinforced Concrete Design",
+    "credits": "2-1-0-3",
+    "category": "core",
+    "rawAvailability": "BTech:CE: S5",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-120",
+        "instructors": [
+          "madhu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-120",
+        "instructors": [
+          "madhu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-120",
+        "instructors": [
+          "madhu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE3070A",
+    "courseCode": "CE3070A",
+    "courseName": "Geotechnical Engineering",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "BTech:CE: S5",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-120",
+        "instructors": [
+          "rakeshpilla@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-120",
+        "instructors": [
+          "rakeshpilla@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-120",
+        "instructors": [
+          "rakeshpilla@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE3011",
+    "courseCode": "CE3011",
+    "courseName": "Transportation Planning and Traffic Engineering",
+    "credits": "2-0-2-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "E + PA5 (F+PA4)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-120 + Traffic lab [workshop 8]",
+        "instructors": [
+          "bhavathrathan@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-120 + Traffic lab [workshop 8]",
+        "instructors": [
+          "bhavathrathan@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE3030",
+    "courseCode": "CE3030",
+    "courseName": "Environmental Engineering",
+    "credits": "3-0-2-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "C + PA1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-120 + Civil Environmental engg lab",
+        "instructors": [
+          "Praveena G (praveenag@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-120 + Civil Environmental engg lab",
+        "instructors": [
+          "Praveena G (praveenag@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-120 + Civil Environmental engg lab",
+        "instructors": [
+          "Praveena G (praveenag@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-120 + Civil Environmental engg lab",
+        "instructors": [
+          "Praveena G (praveenag@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE3090A",
+    "courseCode": "CE3090A",
+    "courseName": "Water Resources Engineering",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "BTech:CE: S5:S7",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-120",
+        "instructors": [
+          "athira@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-120",
+        "instructors": [
+          "athira@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-120",
+        "instructors": [
+          "athira@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE3013",
+    "courseCode": "CE3013",
+    "courseName": "Construction Contracts and Estimation",
+    "credits": "2-0-0-2",
+    "category": "core",
+    "rawAvailability": "Btech:CE:S5:S7",
+    "rawSlot": "M",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "A01-120",
+        "instructors": [
+          "Ram V G (ramvg@iitpkd.ac.in)"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5520",
+    "courseCode": "CE5520",
+    "courseName": "Scheduling Techniques in Projects",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "15",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5510",
+    "courseCode": "CE5510",
+    "courseName": "Advanced Concrete Technology",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "B.Tech:CE:S7, S5;",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5607",
+    "courseCode": "CE5607",
+    "courseName": "Ground Improvement",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; BTech:CE:S7; MS, PhD",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5521",
+    "courseCode": "CE5521",
+    "courseName": "Rock Engineering",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; BTech:CE:S7; MS, PhD",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5007",
+    "courseCode": "CE5007",
+    "courseName": "Soil Engineering",
+    "credits": "3-1-0-4",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; BTech:CE:S7; MS, PhD",
+    "rawSlot": "L + R2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5005",
+    "courseCode": "CE5005",
+    "courseName": "Geotechnical Investigations and Instrumentation",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; BTech:CE:S7; MS, PhD",
+    "rawSlot": "C",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5636",
+    "courseCode": "CE5636",
+    "courseName": "Chemistry of Water and Wastewater Treatment Processes",
+    "credits": "2-0-2-3",
+    "category": "elective",
+    "rawAvailability": "BTech: CE: S7, MS, PhD",
+    "rawSlot": "M + PA5",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "A01-018 + Environmental lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-018 + Environmental lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE4512",
+    "courseCode": "CE4512",
+    "courseName": "Airport and Railway Engineering",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "BTech: CE: S7",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5624",
+    "courseCode": "CE5624",
+    "courseName": "Stability and Strength of Structures",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "M.Tech_SE:S1 and S3; B.Tech:CE:S7",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5631",
+    "courseCode": "CE5631",
+    "courseName": "Analysis and Design of Presteressed Concrete Structures",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "B.Tech:CE:S7, M.Tech_SE:S1 and S3",
+    "rawSlot": "C",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5011A",
+    "courseCode": "CE5011A",
+    "courseName": "Finite Element Method in Structural\nMechanics",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:CE S1, BTech: CE S5, S7",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5515",
+    "courseCode": "CE5515",
+    "courseName": "Advanced Mechanics of Structures",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:CE S1, B.Tech:CE:S7",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5511",
+    "courseCode": "CE5511",
+    "courseName": "Advanced Design of Metal Structures",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:CE S1, B.Tech:CE:S7",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-018",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5513",
+    "courseCode": "CE5513",
+    "courseName": "Structural Dynamics",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:CE S1, B.Tech:CE:S5, BTech CE: S7",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-120",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE5003",
+    "courseCode": "CE5003",
+    "courseName": "GIS and Remote Sensing",
+    "credits": "1-0-3-3",
+    "category": "elective",
+    "rawAvailability": "B.Tech:CE:S5;S7.  M.Tech:WRE:S1:S3",
+    "rawSlot": "F + PA4",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-120 + Nila CC Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-120 + Nila CC Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-120 + Nila CC Lab",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "UG_CE_CE4110",
+    "courseCode": "CE4110",
+    "courseName": "Project I",
+    "credits": "0-0-0-3",
+    "category": "project",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "UG_CE_CE4130",
+    "courseCode": "CE4130",
+    "courseName": "Project II",
+    "credits": "0-0-0-6",
+    "category": "project",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "UG_CE_CE4140",
+    "courseCode": "CE4140",
+    "courseName": "Project III",
+    "credits": "0-0-0-6",
+    "category": "project",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  }
+]

@@ -1,0 +1,391 @@
+[
+  {
+    "id": "PG_MTechGeo_CE5007",
+    "courseCode": "CE5007",
+    "courseName": "Soil Engineering",
+    "credits": "3-1-0-4",
+    "category": "core",
+    "rawAvailability": "MTech:GTE:S1",
+    "rawSlot": "L+R2",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-018",
+        "instructors": [
+          "divyapv@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-018",
+        "instructors": [
+          "divyapv@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_CE5005",
+    "courseCode": "CE5005",
+    "courseName": "Geotechnical Investigations and Instrumentation",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "MTech:GTE:S1",
+    "rawSlot": "C",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [
+          "sudheesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [
+          "sudheesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018",
+        "instructors": [
+          "sudheesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_ME5011A",
+    "courseCode": "ME5011A",
+    "courseName": "Mathematics for Engineers",
+    "credits": "2-0-2-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "M + CMN-A + CMN-B \n(Exam Slot I)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "16:00",
+        "endTime": "16:50",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "17:00",
+        "endTime": "17:50",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-018 + A01-109",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechGeo_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechGeo_CE5101",
+    "courseCode": "CE5101",
+    "courseName": "Computational Geomechanics Lab",
+    "credits": "0-0-3-2",
+    "category": "core",
+    "rawAvailability": "MTech:GTE:S3",
+    "rawSlot": "PA1",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "Nila CC Lab",
+        "instructors": [
+          "sudheesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_CE5607",
+    "courseCode": "CE5607",
+    "courseName": "Ground Improvement",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; BTech:CE:S7; MS; PhD",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [
+          "divyapv@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018",
+        "instructors": [
+          "divyapv@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [
+          "divyapv@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_CE5521",
+    "courseCode": "CE5521",
+    "courseName": "Rock Engineering",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; BTech:CE:S7; MS; PhD",
+    "rawSlot": "B",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-018",
+        "instructors": [
+          "ankesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [
+          "ankesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [
+          "ankesh@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_CE5615",
+    "courseCode": "CE5615",
+    "courseName": "Finite Element Methods in Geotechnical Engineering",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "MTech:GTE:S1; MS; PhD",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "B03-013",
+        "instructors": [
+          "arunco@iitpkd.ac.in",
+          "rakeshpilla@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "B03-013",
+        "instructors": [
+          "arunco@iitpkd.ac.in",
+          "rakeshpilla@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechGeo_CE5100",
+    "courseCode": "CE5100",
+    "courseName": "Internship/Mini-Project",
+    "credits": "0",
+    "category": "project",
+    "rawAvailability": "MTech:GTE:S3",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechGeo_CE5110",
+    "courseCode": "CE5110",
+    "courseName": "Project I",
+    "credits": "0-0-0-9",
+    "category": "project",
+    "rawAvailability": "MTech:GTE:S3",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  }
+]

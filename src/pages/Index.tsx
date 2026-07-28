@@ -9,6 +9,7 @@ import { Footer } from '@/components/layout/Footer';
 import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 import { Onboarding } from '@/components/features/Onboarding';
+import { WeeklyTimetable } from '@/components/features/timetable/WeeklyTimetable';
 
 const Index = () => {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
@@ -22,12 +23,26 @@ const Index = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (profile && profile.program && profile.branch) {
+      import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
+        useTimetableStore.getState().initializeTimetable(profile.program, profile.branch);
+      });
+    }
+  }, [profile]);
+
   const handleRefresh = () => {
     setCurrentTime(getCurrentTimeInKolkata());
     setSelectedDate(null);
   };
 
   const displayDate = selectedDate || currentTime;
+
+  useEffect(() => {
+    import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
+      useTimetableStore.getState().updatePreviewDate(displayDate);
+    });
+  }, [displayDate]);
 
   if (!profile) {
     return (
@@ -67,6 +82,10 @@ const Index = () => {
           <div className="break-inside-avoid">
             <MessTimingsCard date={displayDate} />
           </div>
+        </div>
+        
+        <div className="mt-8">
+          <WeeklyTimetable />
         </div>
 
         <Footer />

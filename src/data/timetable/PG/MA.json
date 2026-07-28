@@ -1,0 +1,576 @@
+[
+  {
+    "id": "PG_MA_MA5001",
+    "courseCode": "MA5001",
+    "courseName": "Linear Algebra",
+    "credits": "4-0-0-4",
+    "category": "core",
+    "rawAvailability": "All UG, All PG",
+    "rawSlot": "J + D(wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5003",
+    "courseCode": "MA5003",
+    "courseName": "Real Analysis",
+    "credits": "4-0-0-4",
+    "category": "core",
+    "rawAvailability": "All UG, All PG",
+    "rawSlot": "I + A (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5005A",
+    "courseCode": "MA5005A",
+    "courseName": "Groups and Rings",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "All UG, All PG",
+    "rawSlot": "G+Q",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5007A",
+    "courseCode": "MA5007A",
+    "courseName": "Probability and Statistics",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "All PG",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5009A",
+    "courseCode": "MA5009A",
+    "courseName": "Ordinary Differential Equations",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "All PG",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5014",
+    "courseCode": "MA5014",
+    "courseName": "Fundamentals of Mathematics",
+    "credits": "2-0-0-2",
+    "category": "core",
+    "rawAvailability": "All UG, All PG",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-308",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MA_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MA_MA5008A",
+    "courseCode": "MA5008A",
+    "courseName": "Topology",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "All PG",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA6005A",
+    "courseCode": "MA6005A",
+    "courseName": "Functional Analysis",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "All PG",
+    "rawSlot": "G",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA6007A",
+    "courseCode": "MA6007A",
+    "courseName": "Partial Differential equations",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "All PG",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5601",
+    "courseCode": "MA5601",
+    "courseName": "Introduction to Commutative Algebra",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "All PG",
+    "rawSlot": "C (Mon+Fri) \n+ \n A (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5618",
+    "courseCode": "MA5618",
+    "courseName": "Differential Topology",
+    "credits": "4",
+    "category": "elective",
+    "rawAvailability": "All PG",
+    "rawSlot": "L, E (Wednesday)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5621",
+    "courseCode": "MA5621",
+    "courseName": "Introduction to Stochastic Processes",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "All PG",
+    "rawSlot": "M + Q (Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "N-306",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_MA5619",
+    "courseCode": "MA5619",
+    "courseName": "Geometry of curves and surfaces",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "All UG, All PG",
+    "rawSlot": "I",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-203/204",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MA_CS5613",
+    "courseCode": "CS5613",
+    "courseName": "Cryptography",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MA_CS5615",
+    "courseCode": "CS5615",
+    "courseName": "Coding Theory",
+    "credits": "3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MA_CS5021",
+    "courseCode": "CS5021",
+    "courseName": "Topics in Discrete Mathematics",
+    "credits": "4",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MA_MA5110",
+    "courseCode": "MA5110",
+    "courseName": "Project (Level 1)",
+    "credits": "3",
+    "category": "project",
+    "rawAvailability": "MSc: MA: S3",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  }
+]

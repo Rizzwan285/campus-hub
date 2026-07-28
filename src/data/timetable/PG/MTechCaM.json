@@ -1,0 +1,461 @@
+[
+  {
+    "id": "PG_MTechCaM_CS5021",
+    "courseCode": "CS5021",
+    "courseName": "Topics in Discrete Mathematics",
+    "credits": "3-1-0-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "L+I [Fri]",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-001",
+        "instructors": [
+          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-001",
+        "instructors": [
+          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-001",
+        "instructors": [
+          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-001",
+        "instructors": [
+          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "A01-001",
+        "instructors": [
+          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "A01-001",
+        "instructors": [
+          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechCaM_CS5009",
+    "courseCode": "CS5009",
+    "courseName": "Algorithms",
+    "credits": "3-1-0-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "K+R3",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "A01-001",
+        "instructors": [
+          "Jasine Babu (jasine@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-001",
+        "instructors": [
+          "Jasine Babu (jasine@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "A01-001",
+        "instructors": [
+          "Jasine Babu (jasine@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechCaM_CS5107",
+    "courseCode": "CS5107",
+    "courseName": "Programming Lab",
+    "credits": "1-0-3-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "PM1+H[Mon]",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lab",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "11:45",
+        "room": "A01-109\n+\nA01-001",
+        "instructors": [
+          "Vivek Chaturvedi (vivek@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-109\n+\nA01-001",
+        "instructors": [
+          "Vivek Chaturvedi (vivek@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-109\n+\nA01-001",
+        "instructors": [
+          "Vivek Chaturvedi (vivek@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-109\n+\nA01-001",
+        "instructors": [
+          "Vivek Chaturvedi (vivek@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "A01-109\n+\nA01-001",
+        "instructors": [
+          "Vivek Chaturvedi (vivek@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechCaM_CS3050",
+    "courseCode": "CS3050",
+    "courseName": "Theory of Computation**",
+    "credits": "3-1-0-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "B+Q+E [Wed]",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-002",
+        "instructors": [
+          "Albert Sunny (albert@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-002",
+        "instructors": [
+          "Albert Sunny (albert@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-002",
+        "instructors": [
+          "Albert Sunny (albert@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-002",
+        "instructors": [
+          "Albert Sunny (albert@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-002",
+        "instructors": [
+          "Albert Sunny (albert@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-002",
+        "instructors": [
+          "Albert Sunny (albert@iitpkd.ac.in)",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechCaM_MA5001",
+    "courseCode": "MA5001",
+    "courseName": "Linear Algebra*",
+    "credits": "4-0-0-4",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "J+D(Wed)",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "N-308",
+        "instructors": [
+          "Rohith Varma, rvarma@iitpkd.ac.in",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "N-308",
+        "instructors": [
+          "Rohith Varma, rvarma@iitpkd.ac.in",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-308",
+        "instructors": [
+          "Rohith Varma, rvarma@iitpkd.ac.in",
+          "-"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "PG_MTechCaM_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechCaM_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechCaM_CS5010",
+    "courseCode": "CS5010",
+    "courseName": "Graph Theory and Combinatorics",
+    "credits": "Refer UG CSE sheet for details of the courses ",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechCaM_CS6002",
+    "courseCode": "CS6002",
+    "courseName": "Combinatorial Optimization",
+    "credits": "",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechCaM_CS5615",
+    "courseCode": "CS5615",
+    "courseName": "Coding Theory",
+    "credits": "",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechCaM_CS5627",
+    "courseCode": "CS5627",
+    "courseName": "Proofs, Programs, Types",
+    "credits": "",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_MTechCaM_CM5110A",
+    "courseCode": "CM5110A",
+    "courseName": "Project/Dissertation Phase 1",
+    "credits": "11",
+    "category": "project",
+    "rawAvailability": "-",
+    "rawSlot": "-",
+    "eligibility": {},
+    "meetings": []
+  }
+]
