@@ -225,6 +225,19 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "17:10",
+        "endTime": "18:00",
+        "room": "Nila Mech lab\nN-305",
+        "instructors": [
+          "kaliprasad@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
@@ -496,8 +509,21 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "14:50",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-202 + A01-109",
+        "instructors": [
+          "kvns@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-202 + A01-109",
         "instructors": [
           "kvns@iitpkd.ac.in"
