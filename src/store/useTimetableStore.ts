@@ -117,8 +117,17 @@ export const useTimetableStore = create<TimetableState>()(
               const profile = useUserStore.getState().profile;
               
               if (program === 'UG' && profile?.yearOfStudy === '1' && newSelectedIds.length === 0) {
+                const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
+                let excludedCodes: string[] = ['BT2010']; // Life science not in this semester
+                
+                if (batchNo >= 1 && batchNo <= 12) {
+                  excludedCodes.push('CY1140', 'EE1110'); // B1-12 gets Physics/Mech, exclude Chem/Elec
+                } else if (batchNo >= 13 && batchNo <= 24) {
+                  excludedCodes.push('PH1130', 'ME1150'); // B13-24 gets Chem/Elec, exclude Physics/Mech
+                }
+
                 const commonCoreIds = commonData
-                  .filter(c => c.category?.toLowerCase() === 'core')
+                  .filter(c => c.category?.toLowerCase() === 'core' && !excludedCodes.includes(c.courseCode))
                   .map(c => c.id);
                   
                 const extraIds = [];
