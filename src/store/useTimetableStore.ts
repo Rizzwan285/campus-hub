@@ -162,7 +162,7 @@ export const useTimetableStore = create<TimetableState>()(
             const userState = get();
             let newSelectedIds = userState.selectedCourseIds;
             
-            // Safe to access useUserStore state directly here since it's already mounted
+            // Evaluate auto-population and commit state in one go
             import('./useUserStore').then(({ useUserStore }) => {
               const profile = useUserStore.getState().profile;
               
@@ -186,39 +186,18 @@ export const useTimetableStore = create<TimetableState>()(
                   if (ds1010) extraIds.push(ds1010.id);
                 }
                 
-                const initialSelected = [...commonCoreIds, ...extraIds];
-                set({ selectedCourseIds: initialSelected });
-                
-                // Recompute since we updated selected courses asynchronously
-                const { loadedCourses, loadedHolidays, previewDate } = get();
-                const selectedSet = new Set(initialSelected);
-                const activeCourses = loadedCourses.filter(c => selectedSet.has(c.id));
-                
-                try {
-                  const result = TimetableEngine.resolveWeek(
-                    activeCourses, 
-                    loadedHolidays, 
-                    { targetWeek: new Date(previewDate) }
-                  );
-                  set({
-                    resolvedEvents: result.events,
-                    collisions: result.collisions,
-                    holidaysEncountered: result.holidaysEncountered,
-                  });
-                } catch (e) {
-                  console.error(e);
-                }
+                newSelectedIds = [...commonCoreIds, ...extraIds];
               }
+              
+              set({ 
+                loadedCourses: allCourses, 
+                loadedHolidays: holidays,
+                selectedCourseIds: newSelectedIds,
+                isLoading: false 
+              });
+              
+              get()._recompute();
             });
-            
-            set({ 
-              loadedCourses: allCourses, 
-              loadedHolidays: holidays,
-              selectedCourseIds: newSelectedIds,
-              isLoading: false 
-            });
-            
-            _recompute();
           } catch (err) {
             set({ 
               isLoading: false, 
