@@ -1,0 +1,47 @@
+[
+  {
+    "id": "PG_InstCommonCourses_GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1",
+    "category": "common",
+    "rawAvailability": "",
+    "rawSlot": "CMNA/CMNB & R4",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "PG_InstCommonCourses_ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing",
+    "credits": "",
+    "category": "common",
+    "rawAvailability": "",
+    "rawSlot": "Faculty from each dept",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "10:00",
+        "endTime": "11:15",
+        "room": "To be decided by the department",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "11:30",
+        "endTime": "12:45",
+        "room": "To be decided by the department",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  }
+]

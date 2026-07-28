@@ -1,0 +1,53 @@
+[
+  {
+    "id": "PG_ESSENCE_ES5608",
+    "courseCode": "ES5608",
+    "courseName": "Principles and Practices of Regenerative Agriculture",
+    "credits": "3-0-0-3",
+    "category": "elective",
+    "rawAvailability": "",
+    "rawSlot": "H",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-018",
+        "instructors": [
+          "agnihotri.richa@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-018",
+        "instructors": [
+          "agnihotri.richa@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "A01-018",
+        "instructors": [
+          "agnihotri.richa@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  }
+]
