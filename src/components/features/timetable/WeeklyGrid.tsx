@@ -68,26 +68,28 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
   };
 
   return (
-    <div ref={scrollRef} className="flex w-full h-[600px] sm:h-[700px] overflow-y-auto bg-background relative">
+    <div ref={scrollRef} className="flex w-full h-[800px] bg-background relative">
       {/* Time Column (Sticky) */}
       <div className="w-12 sm:w-16 border-r border-border shrink-0 bg-muted/30 sticky left-0 z-20">
-        {hoursList.map(hour => (
-          <div 
-            key={hour} 
-            className="absolute w-full border-t border-border/50 flex justify-center -translate-y-1/2"
-            style={{ top: `${((hour - START_HOUR) / TOTAL_HOURS) * 100}%` }}
-          >
-            <span className="text-[10px] sm:text-xs text-muted-foreground bg-background px-1">
-              {hour}:00
-            </span>
-          </div>
-        ))}
+        <div className="absolute top-[40px] bottom-0 left-0 right-0">
+          {hoursList.map(hour => (
+            <div 
+              key={hour} 
+              className="absolute w-full border-t border-border/50 flex justify-center -translate-y-1/2"
+              style={{ top: `${((hour - START_HOUR) / TOTAL_HOURS) * 100}%` }}
+            >
+              <span className="text-[10px] sm:text-xs text-muted-foreground bg-background px-1">
+                {hour}:00
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Days Grid */}
       <div className="flex-1 flex relative overflow-x-auto">
         {/* Horizontal grid lines */}
-        <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-[40px] bottom-0 left-0 right-0 pointer-events-none z-0">
           {hoursList.map(hour => (
             <div 
               key={hour} 
@@ -99,11 +101,13 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
 
         {/* Current Time Indicator */}
         {showCurrentTime && (
-          <div 
-            className="absolute left-0 right-0 border-t-2 border-red-500 z-30 pointer-events-none flex items-center"
-            style={{ top: `${currentTimeTop}%` }}
-          >
-            <div className="w-2 h-2 rounded-full bg-red-500 -ml-1 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+          <div className="absolute top-[40px] bottom-0 left-0 right-0 pointer-events-none z-30">
+            <div 
+              className="absolute left-0 right-0 border-t-2 border-red-500 flex items-center"
+              style={{ top: `${currentTimeTop}%` }}
+            >
+              <div className="w-2 h-2 rounded-full bg-red-500 -ml-1 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+            </div>
           </div>
         )}
 
@@ -117,8 +121,8 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
               key={dayName} 
               className={`flex-1 min-w-[120px] border-r border-border/50 relative ${isToday ? 'bg-primary/5' : ''}`}
             >
-              {/* Day Header (Sticky) */}
-              <div className="sticky top-0 w-full bg-muted/80 backdrop-blur-md border-b border-border/50 text-center py-2 z-10 shadow-sm">
+              {/* Day Header */}
+              <div className="absolute top-0 w-full h-[40px] bg-muted/80 backdrop-blur-md border-b border-border/50 flex flex-col items-center justify-center z-10 shadow-sm">
                 <span className={`text-xs sm:text-sm font-semibold ${isToday ? 'text-primary' : ''}`}>
                   {dayName.slice(0, 3)}
                   {isToday && <span className="ml-1 text-[10px] uppercase bg-primary/20 text-primary px-1 rounded">Today</span>}

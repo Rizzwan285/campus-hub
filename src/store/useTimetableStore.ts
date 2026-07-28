@@ -108,9 +108,54 @@ export const useTimetableStore = create<TimetableState>()(
             // Combine branch-specific and common courses
             const allCourses = [...branchData, ...commonData];
             
+            // Auto-populate logic for first-year BTech
+            const userState = get();
+            let newSelectedIds = userState.selectedCourseIds;
+            
+            // Safe to access useUserStore state directly here since it's already mounted
+            import('./useUserStore').then(({ useUserStore }) => {
+              const profile = useUserStore.getState().profile;
+              
+              if (program === 'UG' && profile?.yearOfStudy === '1' && newSelectedIds.length === 0) {
+                const commonCoreIds = commonData
+                  .filter(c => c.category?.toLowerCase() === 'core')
+                  .map(c => c.id);
+                  
+                const extraIds = [];
+                if (branch === 'DS') {
+                  const ds1010 = branchData.find(c => c.courseCode === 'DS1010');
+                  if (ds1010) extraIds.push(ds1010.id);
+                }
+                
+                const initialSelected = [...commonCoreIds, ...extraIds];
+                set({ selectedCourseIds: initialSelected });
+                
+                // Recompute since we updated selected courses asynchronously
+                const { loadedCourses, loadedHolidays, previewDate } = get();
+                const selectedSet = new Set(initialSelected);
+                const activeCourses = loadedCourses.filter(c => selectedSet.has(c.id));
+                
+                try {
+                  const result = TimetableEngine.resolveWeek(
+                    activeCourses, 
+                    loadedHolidays, 
+                    { targetWeek: new Date(previewDate) }
+                  );
+                  set({
+                    resolvedEvents: result.events,
+                    collisions: result.collisions,
+                    holidaysEncountered: result.holidaysEncountered,
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+              }
+            });
+            
             set({ 
               loadedCourses: allCourses, 
               loadedHolidays: holidays,
+              selectedCourseIds: newSelectedIds,
               isLoading: false 
             });
             
