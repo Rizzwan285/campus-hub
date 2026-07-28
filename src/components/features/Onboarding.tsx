@@ -8,34 +8,35 @@ export function Onboarding() {
 
   const [formData, setFormData] = useState<Partial<UserProfile>>({
     name: '',
-    rollNo: '',
     mess: '',
     program: '',
+    branch: '',
     yearOfStudy: '',
     batchNo: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const isFirstYearUG = formData.program === 'UG' && formData.yearOfStudy === '1';
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    // clear error
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: '' });
+    const { name, value } = e.target;
+    
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
     }
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name) newErrors.name = 'Name is required';
-    if (!formData.rollNo) newErrors.rollNo = 'Roll No is required';
     if (!formData.mess) newErrors.mess = 'Mess preference is required';
     if (!formData.program) newErrors.program = 'Program is required';
     if (!formData.branch) newErrors.branch = 'Branch is required';
     if (!formData.yearOfStudy) newErrors.yearOfStudy = 'Year of study is required';
     
-    // Batch is only needed if 1st Year BTech (UG)
-    const isFirstYearUG = formData.program === 'UG' && formData.yearOfStudy === '1';
     if (isFirstYearUG && !formData.batchNo) {
       newErrors.batchNo = 'Batch No is required for first year BTech';
     }
@@ -47,15 +48,17 @@ export function Onboarding() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      setProfile(formData as UserProfile);
-      // Initialize timetable store with selected program and branch
+      const finalProfile = { ...formData } as UserProfile;
+      setProfile(finalProfile);
+      
       import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
-        useTimetableStore.getState().updateProfile(formData.program!, formData.branch!);
+        useTimetableStore.getState().updateProfile(finalProfile.program!, finalProfile.branch!);
       });
     }
   };
 
-  const isFirstYearUG = formData.program === 'UG' && formData.yearOfStudy === '1';
+  // Generate batch options B1 to B24
+  const batchOptions = Array.from({ length: 24 }, (_, i) => `B${i + 1}`);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
@@ -77,19 +80,6 @@ export function Onboarding() {
               placeholder="e.g. John Doe"
             />
             {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Roll No</label>
-            <input
-              type="text"
-              name="rollNo"
-              value={formData.rollNo || ''}
-              onChange={handleChange}
-              className={`w-full p-2 rounded-md border bg-background ${errors.rollNo ? 'border-red-500' : 'border-input'}`}
-              placeholder="e.g. 112001001"
-            />
-            {errors.rollNo && <p className="text-red-500 text-xs">{errors.rollNo}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -136,16 +126,15 @@ export function Onboarding() {
                 className={`w-full p-2 rounded-md border bg-background ${errors.batchNo ? 'border-red-500' : 'border-input'}`}
               >
                 <option value="">Select Batch...</option>
-                <option value="1">Batch 1</option>
-                <option value="2">Batch 2</option>
-                <option value="3">Batch 3</option>
-                <option value="4">Batch 4</option>
+                {batchOptions.map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
               </select>
               {errors.batchNo && <p className="text-red-500 text-xs">{errors.batchNo}</p>}
+              <p className="text-xs text-muted-foreground mt-1">Your core timetable will be automatically loaded based on your batch.</p>
             </div>
           )}
 
-          {/* Branch Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Branch</label>
             <select
@@ -162,7 +151,6 @@ export function Onboarding() {
                   <option value="ME">Mechanical Engineering</option>
                   <option value="CE">Civil Engineering</option>
                   <option value="DS">Data Science</option>
-                  <option value="CommonCourses">UG Common Courses</option>
                 </>
               )}
               {formData.program === 'PG' && (
@@ -183,7 +171,6 @@ export function Onboarding() {
                   <option value="MTechStructuralEngineering">MTech Structural Eng.</option>
                   <option value="MTechThermofluidsEngineering">MTech Thermofluids Eng.</option>
                   <option value="MTechWaterResourcesEngineering">MTech Water Resources Eng.</option>
-                  <option value="InstCommonCourses">PG Common Courses</option>
                 </>
               )}
             </select>
