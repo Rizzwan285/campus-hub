@@ -46,11 +46,6 @@ export function CourseSelector() {
     }
   };
 
-  const selectAllCore = () => {
-    const coreIds = loadedCourses.filter(c => c.category?.toLowerCase() === 'core').map(c => c.id);
-    const newSelection = Array.from(new Set([...selectedCourseIds, ...coreIds]));
-    updateSelectedCourses(newSelection);
-  };
 
   const clearAll = () => updateSelectedCourses([]);
 
@@ -73,8 +68,7 @@ export function CourseSelector() {
           <div className="flex items-center justify-between mt-1">
             <DialogTitle>Manage Courses</DialogTitle>
             <div className="flex gap-2 mr-6 text-sm">
-              <button onClick={selectAllCore} className="text-primary hover:underline font-medium">Select All Core</button>
-              <span className="text-muted-foreground">•</span>
+
               <button onClick={clearAll} className="text-destructive hover:underline font-medium">Clear All</button>
             </div>
           </div>
