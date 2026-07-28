@@ -98,6 +98,17 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "13:00",
+        "endTime": "13:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
