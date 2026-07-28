@@ -7,6 +7,7 @@ import {
   weekdayTimings, weekendTimings,
   type WeekMenu,
 } from '@/data/messData';
+import { useUserStore } from '@/store/useUserStore';
 
 interface MessMenuCardProps {
   date: Date;
@@ -112,8 +113,11 @@ function getCurrentMealIndex(date: Date): number {
 
 export function MessMenuCard({ date }: MessMenuCardProps) {
   const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+  const profile = useUserStore((state) => state.profile);
 
-  const [campus, setCampus] = useState<Campus>('kedaram');
+  // Initialize with profile's mess if available, otherwise 'kedaram'
+  const initialCampus = profile?.mess ? (profile.mess.toLowerCase() as Campus) : 'kedaram';
+  const [campus, setCampus] = useState<Campus>(initialCampus);
   const config = CAMPUS_CONFIG[campus];
   const dayMenu = config.menu[dayName];
 
