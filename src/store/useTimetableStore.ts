@@ -193,7 +193,7 @@ export const useTimetableStore = create<TimetableState>()(
           } catch (err) {
             set({ 
               isLoading: false, 
-              error: 'Failed to initialize timetable datasets.' 
+              error: err instanceof Error ? err.message : 'Failed to initialize timetable datasets.' 
             });
             console.error(err);
           }

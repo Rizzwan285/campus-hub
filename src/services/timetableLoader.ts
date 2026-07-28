@@ -18,16 +18,11 @@ export class TimetableLoader {
 
     const loadPromise = (async () => {
       try {
-        // Since Vite needs statically analyzable imports, we can use a switch or glob
-        // For dynamic imports in Vite, you usually need to construct the path so Rollup can resolve it.
-        // A common pattern is `import.meta.glob` or explicit template literals.
-        // If the path is highly dynamic, a generic dynamic import might fail in production build.
-        // Assuming data is in src/data/timetable:
         const module = await import(`../data/timetable/${program}/${branch}.json`);
         return module.default as CourseOffering[];
       } catch (error) {
-        console.warn(`Failed to load timetable data for ${program}/${branch}`, error);
-        return [];
+        console.error(`Failed to load timetable data for ${program}/${branch}`, error);
+        throw new Error(`Failed to load timetable data for ${program}/${branch}. Please refresh the page.`);
       }
     })();
 
