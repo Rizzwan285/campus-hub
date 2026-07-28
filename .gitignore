@@ -32,3 +32,6 @@ venv/
 
 # Project Memory
 .memories/
+
+# Temp scripts
+tmp/
