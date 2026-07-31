@@ -163,18 +163,21 @@ export function Onboarding() {
             {isFirstYearUG && (
               <div className="animate-in slide-in-from-top-2 fade-in duration-300">
                 <label className={labelClass}>Batch No</label>
-                <select
+                <input
+                  type="number"
+                  min="1"
+                  max="24"
                   name="batchNo"
-                  value={formData.batchNo || ''}
-                  onChange={handleChange}
-                  className={`${inputClass('batchNo')} max-h-[140px]`}
-                  size={6}
-                >
-                  <option value="">Select Batch...</option>
-                  {batchOptions.map(b => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
+                  value={formData.batchNo?.replace('B', '') || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange({
+                      target: { name: 'batchNo', value: val ? `B${val}` : '' }
+                    } as any);
+                  }}
+                  className={inputClass('batchNo')}
+                  placeholder="Enter batch (1-24)"
+                />
                 {errors.batchNo && <p className="text-red-400 text-[11px] mt-1.5 font-medium">{errors.batchNo}</p>}
                 <p className="text-[11px] text-muted-foreground/70 mt-1.5 leading-relaxed">
                   Your core timetable will be automatically loaded based on your batch.

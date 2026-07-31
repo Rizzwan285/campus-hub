@@ -79,7 +79,7 @@ export const useTimetableStore = create<TimetableState>()(
         if (!loadedCourses.length) return;
 
         const selectedSet = new Set(selectedCourseIds);
-        let activeCourses = loadedCourses.filter(c => selectedSet.has(c.id));
+        let activeCourses = loadedCourses.filter(c => selectedSet.has(c.courseCode));
 
         const profile = useUserStore.getState().profile;
         if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
@@ -143,8 +143,15 @@ export const useTimetableStore = create<TimetableState>()(
               TimetableLoader.loadHolidays()
             ]);
 
-            // Combine branch-specific and common courses
-            const allCourses = [...branchData, ...commonData];
+            // Combine branch-specific and common courses and deduplicate by courseCode
+            const rawAllCourses = [...branchData, ...commonData];
+            const courseMap = new Map<string, typeof rawAllCourses[0]>();
+            rawAllCourses.forEach(c => {
+              if (!courseMap.has(c.courseCode)) {
+                courseMap.set(c.courseCode, c);
+              }
+            });
+            const allCourses = Array.from(courseMap.values());
             
             const userState = get();
             let newSelectedIds = userState.selectedCourseIds;
@@ -166,27 +173,27 @@ export const useTimetableStore = create<TimetableState>()(
 
               const commonCoreIds = commonData
                 .filter(c => c.category?.toLowerCase() === 'core' && !excludedCodes.includes(c.courseCode))
-                .map(c => c.id);
+                .map(c => c.courseCode);
                 
               const extraIds = [];
               if (branch === 'DS') {
                 const ds1010 = branchData.find(c => c.courseCode === 'DS1010');
-                if (ds1010) extraIds.push(ds1010.id);
+                if (ds1010) extraIds.push(ds1010.courseCode);
               }
               
               // Keep previously selected electives so user doesn't lose GN1003 etc.
               const previouslySelectedElectives = allCourses
-                .filter(c => c.category?.toLowerCase() !== 'core' && newSelectedIds.includes(c.id))
-                .map(c => c.id);
+                .filter(c => c.category?.toLowerCase() !== 'core' && newSelectedIds.includes(c.courseCode))
+                .map(c => c.courseCode);
               
               newSelectedIds = Array.from(new Set([...commonCoreIds, ...extraIds, ...previouslySelectedElectives]));
             }
             
-            set({ 
-              loadedCourses: allCourses, 
+            set({
+              loadedCourses: allCourses,
               loadedHolidays: holidays,
               selectedCourseIds: newSelectedIds,
-              isLoading: false 
+              isLoading: false
             });
             
             _recompute();

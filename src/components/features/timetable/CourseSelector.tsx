@@ -38,11 +38,11 @@ export function CourseSelector() {
     }, {} as Record<string, typeof loadedCourses>);
   }, [filteredCourses]);
 
-  const toggleCourse = (id: string) => {
-    if (selectedCourseIds.includes(id)) {
-      updateSelectedCourses(selectedCourseIds.filter(cId => cId !== id));
+  const toggleCourse = (code: string) => {
+    if (selectedCourseIds.includes(code)) {
+      updateSelectedCourses(selectedCourseIds.filter(cId => cId !== code));
     } else {
-      updateSelectedCourses([...selectedCourseIds, id]);
+      updateSelectedCourses([...selectedCourseIds, code]);
     }
   };
 
@@ -114,11 +114,11 @@ export function CourseSelector() {
                   </h3>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {courses.map(course => {
-                      const isSelected = selectedCourseIds.includes(course.id);
+                      const isSelected = selectedCourseIds.includes(course.courseCode);
                       return (
                         <div 
-                          key={course.id}
-                          onClick={() => toggleCourse(course.id)}
+                          key={course.courseCode}
+                          onClick={() => toggleCourse(course.courseCode)}
                           className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                             isSelected 
                               ? 'bg-primary/5 border-primary shadow-[0_2px_10px_rgba(var(--primary),0.1)]' 
