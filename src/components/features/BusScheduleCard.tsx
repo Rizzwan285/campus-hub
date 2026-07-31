@@ -112,7 +112,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           // Highlight times in the text (e.g., 8:25 AM)
           const timeMatch = step.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
           const time = timeMatch ? timeMatch[0] : null;
-          const text = step.replace(time || '', '').trim();
+          const text = step.replace(time || '', '').replace(/\(\s*\)/g, '').trim();
 
           return (
             <div key={idx} className="relative">
@@ -148,10 +148,10 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     const startTime = timeMatch ? timeMatch[0] : '';
 
     // Clean up locations by removing times
-    const startLoc = startStep.replace(startTime, '').trim();
+    const startLoc = startStep.replace(startTime, '').replace(/\(\s*\)/g, '').trim();
     // For end location, removing time if present at the end
     const endTimeMatch = endStep.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
-    const endLoc = endStep.replace(endTimeMatch ? endTimeMatch[0] : '', '').trim();
+    const endLoc = endStep.replace(endTimeMatch ? endTimeMatch[0] : '', '').replace(/\(\s*\)/g, '').trim();
 
     return {
       time: startTime,
