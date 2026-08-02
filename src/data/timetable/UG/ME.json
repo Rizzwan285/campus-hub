@@ -1,21 +1,23 @@
 [
   {
-    "id": "UG_ME_ME1020",
+    "id": "ME1020",
     "courseCode": "ME1020",
     "courseName": "Engineering Thermodynamics",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "BTech:ME:S3:50",
+    "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "n.ganesh@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -23,10 +25,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "n.ganesh@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -34,22 +38,24 @@
     ]
   },
   {
-    "id": "UG_ME_ME2070",
+    "id": "ME2070",
     "courseCode": "ME2070",
     "courseName": "Dynamics",
     "credits": "2-0-0-2",
     "category": "core",
-    "rawAvailability": "50",
+    "rawAvailability": "",
     "rawSlot": "E (exam slot: J)",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "sovan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -60,7 +66,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "sovan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -68,12 +76,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME2080A",
+    "id": "ME2080A",
     "courseCode": "ME2080A",
     "courseName": "Materials Science and Engineering",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "B.Tech: ME",
+    "rawAvailability": "",
     "rawSlot": "D",
     "eligibility": {},
     "meetings": [
@@ -83,7 +91,9 @@
         "startTime": "11:00",
         "endTime": "11:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "kesavan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -91,10 +101,12 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "kesavan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -105,7 +117,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "kesavan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -113,22 +127,24 @@
     ]
   },
   {
-    "id": "UG_ME_ME2090",
+    "id": "ME2090",
     "courseCode": "ME2090",
     "courseName": "Mechanical Measurements: Theory and Practice",
     "credits": "1-0-2-2",
     "category": "core",
-    "rawAvailability": "B.Tech: ME",
+    "rawAvailability": "",
     "rawSlot": "Q+PA2",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
+        "startTime": "14:00",
+        "endTime": "14:50",
         "room": "A01-202+Mechanical Lab + C06 Electronic Lab",
-        "instructors": [],
+        "instructors": [
+          "pramodkuntikana@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -139,7 +155,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-202+Mechanical Lab + C06 Electronic Lab",
-        "instructors": [],
+        "instructors": [
+          "pramodkuntikana@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -147,12 +165,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME3050A",
+    "id": "ME3050A",
     "courseCode": "ME3050A",
     "courseName": "Heat and Mass Transfer",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "B.Tech: ME",
+    "rawAvailability": "",
     "rawSlot": "D",
     "eligibility": {},
     "meetings": [
@@ -162,7 +180,9 @@
         "startTime": "11:00",
         "endTime": "11:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "tsundar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -170,10 +190,12 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "tsundar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -184,7 +206,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "tsundar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -192,12 +216,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME3070A",
+    "id": "ME3070A",
     "courseCode": "ME3070A",
     "courseName": "Design of Machine Elements",
     "credits": "3-0-2-4",
     "category": "core",
-    "rawAvailability": "BTech:ME:S5:50",
+    "rawAvailability": "",
     "rawSlot": "C+PA3",
     "eligibility": {},
     "meetings": [
@@ -207,7 +231,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "A01-118+A01-112",
-        "instructors": [],
+        "instructors": [
+          "akkoorath@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -218,7 +244,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-118+A01-112",
-        "instructors": [],
+        "instructors": [
+          "akkoorath@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -226,10 +254,12 @@
       {
         "type": "lecture",
         "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-118+A01-112",
-        "instructors": [],
+        "instructors": [
+          "akkoorath@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -240,7 +270,9 @@
         "startTime": "14:00",
         "endTime": "15:50",
         "room": "A01-118+A01-112",
-        "instructors": [],
+        "instructors": [
+          "akkoorath@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -248,12 +280,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME3011",
+    "id": "ME3011",
     "courseCode": "ME3011",
     "courseName": "Manufacturing Processes-II",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "BTech:ME:S5:50",
+    "rawAvailability": "",
     "rawSlot": "A",
     "eligibility": {},
     "meetings": [
@@ -263,7 +295,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "sksubbu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -271,21 +305,25 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "sksubbu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "sksubbu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -293,12 +331,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME2060A",
+    "id": "ME2060A",
     "courseCode": "ME2060A",
     "courseName": "Mechanisms and Machines: Theory and Practice",
     "credits": "2-0-2-3",
     "category": "core",
-    "rawAvailability": "B.Tech: ME",
+    "rawAvailability": "",
     "rawSlot": "H+PA1",
     "eligibility": {},
     "meetings": [
@@ -308,7 +346,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "A01-118+A01-201",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -319,7 +359,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "A01-118+A01-201",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -330,7 +372,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "A01-118+A01-201",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -341,7 +385,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-118+A01-201",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -349,12 +395,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME3013",
+    "id": "ME3013",
     "courseCode": "ME3013",
     "courseName": "Energy Conversion Systems",
     "credits": "3-1-0-4",
     "category": "core",
-    "rawAvailability": "BTech: ME",
+    "rawAvailability": "",
     "rawSlot": "B+K (Tuesday)",
     "eligibility": {},
     "meetings": [
@@ -364,7 +410,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "krishna.s@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -375,7 +423,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "krishna.s@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -386,7 +436,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "A01-118",
-        "instructors": [],
+        "instructors": [
+          "krishna.s@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -394,33 +446,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
-        "room": "A01-118",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      }
-    ]
-  },
-  {
-    "id": "UG_ME_ME4607",
-    "courseCode": "ME4607",
-    "courseName": "Introduction to Automotive Systems",
-    "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "",
-    "rawSlot": "I",
-    "eligibility": {},
-    "meetings": [
-      {
-        "type": "lecture",
-        "day": "Tuesday",
         "startTime": "14:00",
         "endTime": "15:15",
-        "room": "A01-202",
-        "instructors": [],
+        "room": "A01-118",
+        "instructors": [
+          "krishna.s@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -430,8 +461,10 @@
         "day": "Thursday",
         "startTime": "15:30",
         "endTime": "16:45",
-        "room": "A01-202",
-        "instructors": [],
+        "room": "A01-118",
+        "instructors": [
+          "krishna.s@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -439,11 +472,49 @@
     ]
   },
   {
-    "id": "UG_ME_ME5639",
+    "id": "ME4607",
+    "courseCode": "ME4607",
+    "courseName": "Introduction to Automotive Systems",
+    "credits": "3-0-0-3",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "I",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-202",
+        "instructors": [
+          "anand@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-202",
+        "instructors": [
+          "anand@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ME5639",
     "courseCode": "ME5639",
     "courseName": "Principles of Product Design",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
@@ -451,10 +522,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "as_sekhar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -462,10 +535,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "as_sekhar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -473,12 +548,12 @@
     ]
   },
   {
-    "id": "UG_ME_ME5650",
+    "id": "ME5650",
     "courseCode": "ME5650",
     "courseName": "Precision Machine Design",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "Open to all",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "B",
     "eligibility": {},
     "meetings": [
@@ -488,7 +563,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "mayank@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -499,7 +576,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "mayank@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -510,7 +589,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "mayank@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -518,22 +599,24 @@
     ]
   },
   {
-    "id": "UG_ME_ME5649",
+    "id": "ME5649",
     "courseCode": "ME5649",
     "courseName": "Design for Additive Manufacturing",
     "credits": "2-0-2-3",
-    "category": "elective",
-    "rawAvailability": "Open to all",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "buchibabu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -541,10 +624,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "buchibabu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -552,11 +637,11 @@
     ]
   },
   {
-    "id": "UG_ME_ME5007",
+    "id": "ME5007",
     "courseCode": "ME5007",
     "courseName": "Advanced Engineering Materials",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "C",
     "eligibility": {},
@@ -567,7 +652,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "c.paramatmuni@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -578,7 +665,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "c.paramatmuni@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -586,10 +675,12 @@
       {
         "type": "lecture",
         "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "c.paramatmuni@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -597,11 +688,11 @@
     ]
   },
   {
-    "id": "UG_ME_ME5005",
+    "id": "ME5005",
     "courseCode": "ME5005",
     "courseName": "Modern Manufacturing Processes",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "A",
     "eligibility": {},
@@ -612,7 +703,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "kaliprasad@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -620,21 +713,25 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "kaliprasad@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-202",
-        "instructors": [],
+        "instructors": [
+          "kaliprasad@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -642,11 +739,11 @@
     ]
   },
   {
-    "id": "UG_ME_ME5013",
+    "id": "ME5013",
     "courseCode": "ME5013",
     "courseName": "Mechanics of Machining",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "D",
     "eligibility": {},
@@ -657,52 +754,9 @@
         "startTime": "11:00",
         "endTime": "11:50",
         "room": "A01-101",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
-        "room": "A01-101",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "A01-101",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      }
-    ]
-  },
-  {
-    "id": "UG_ME_ME5016",
-    "courseCode": "ME5016",
-    "courseName": "Incompressible Fluid Flows",
-    "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "MTech:TF:S1",
-    "rawSlot": "A",
-    "eligibility": {},
-    "meetings": [
-      {
-        "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "afzaal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -713,7 +767,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "afzaal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -721,10 +777,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "startTime": "08:00",
+        "endTime": "08:50",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "afzaal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -732,22 +790,75 @@
     ]
   },
   {
-    "id": "UG_ME_ME5023",
+    "id": "ME5016",
+    "courseCode": "ME5016",
+    "courseName": "Incompressible Fluid Flows",
+    "credits": "3-0-0-3",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "A",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-101",
+        "instructors": [
+          "ahazra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-101",
+        "instructors": [
+          "ahazra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-101",
+        "instructors": [
+          "ahazra@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ME5023",
     "courseCode": "ME5023",
     "courseName": "Numerical Methods in Heat Transfer & Fluid Flow",
     "credits": "2-0-3-4",
-    "category": "elective",
-    "rawAvailability": "MTech:TF:S1",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "G+PA3",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-202+Nila Electronics Lab",
-        "instructors": [],
+        "instructors": [
+          "anand@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -755,10 +866,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-202+Nila Electronics Lab",
-        "instructors": [],
+        "instructors": [
+          "anand@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -769,7 +882,9 @@
         "startTime": "14:00",
         "endTime": "15:50",
         "room": "A01-202+Nila Electronics Lab",
-        "instructors": [],
+        "instructors": [
+          "anand@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -777,22 +892,24 @@
     ]
   },
   {
-    "id": "UG_ME_ME5015",
+    "id": "ME5015",
     "courseCode": "ME5015",
     "courseName": "Mechanical Vibrations",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "MTech:DA:S1:16;   MTech:Any Specialization:S1+S3:14;     MS+PhD:ME+CE:S1+S2+S3+S4: 20 BTech: ME+CE:S6+S7:20",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "sagi@iitm.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -800,10 +917,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "sagi@iitm.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -811,22 +930,24 @@
     ]
   },
   {
-    "id": "UG_ME_ME5501",
+    "id": "ME5501",
     "courseCode": "ME5501",
     "courseName": "Finite Element Methods",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "MTech:DA:S1:16;   MTech:AnySpecialization:S1+S3:15;     MS+PhD:ME+CE:S1+S2+S3+S4: 20 BTech: ME+CE:S6+S7:20",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "G",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "nelsonm@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -834,10 +955,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-101",
-        "instructors": [],
+        "instructors": [
+          "nelsonm@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -845,22 +968,24 @@
     ]
   },
   {
-    "id": "UG_ME_ME5623",
+    "id": "ME5623",
     "courseCode": "ME5623",
     "courseName": "Mechanics and Control of Robotic Manipulators",
     "credits": "2-1-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech: EE or ME\nMTech: all",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "E+ K (Thursday)",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
         "room": "A01-007",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -871,7 +996,22 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-007",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-007",
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -879,10 +1019,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-007",
-        "instructors": [],
+        "instructors": [
+          "santhakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }

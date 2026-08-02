@@ -1,10 +1,10 @@
 [
   {
-    "id": "UG_DS_DS1010",
+    "id": "DS1010",
     "courseCode": "DS1010",
     "courseName": "Introduction to Data Science and Engineering",
     "credits": "1-0-0-1",
-    "category": "elective",
+    "category": "core",
     "rawAvailability": "",
     "rawSlot": "R1",
     "eligibility": {},
@@ -15,7 +15,9 @@
         "startTime": "17:10",
         "endTime": "18:00",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Abhinandan S P abhinandansp@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -23,7 +25,7 @@
     ]
   },
   {
-    "id": "UG_DS_CS2020A",
+    "id": "CS2020A",
     "courseCode": "CS2020A",
     "courseName": "Discrete Mathematics",
     "credits": "3-1-0-4",
@@ -35,8 +37,8 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-002",
         "instructors": [],
         "recurrence": {
@@ -46,8 +48,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-002",
         "instructors": [],
         "recurrence": {
@@ -56,7 +58,7 @@
       },
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "14:00",
         "endTime": "15:15",
         "room": "A01-002",
@@ -67,31 +69,9 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
+        "day": "Friday",
         "startTime": "15:30",
         "endTime": "16:45",
-        "room": "A01-002",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
-        "room": "A01-002",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
         "room": "A01-002",
         "instructors": [],
         "recurrence": {
@@ -101,12 +81,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS2010",
+    "id": "DS2010",
     "courseCode": "DS2010",
     "courseName": "Introduction to Optimization",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "BTech:ALL:SX:XX",
+    "rawAvailability": "",
     "rawSlot": "C",
     "eligibility": {},
     "meetings": [
@@ -117,7 +97,7 @@
         "endTime": "10:50",
         "room": "A01-002",
         "instructors": [
-          "-"
+          "Sahasranand K R  sahasranand@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -130,7 +110,7 @@
         "endTime": "08:50",
         "room": "A01-002",
         "instructors": [
-          "-"
+          "Sahasranand K R  sahasranand@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -139,11 +119,11 @@
       {
         "type": "lecture",
         "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-002",
         "instructors": [
-          "-"
+          "Sahasranand K R  sahasranand@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -152,12 +132,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS2030",
+    "id": "DS2030",
     "courseCode": "DS2030",
     "courseName": "Data Structures and Algorithms for Data Science",
     "credits": "3-0-3-5",
     "category": "core",
-    "rawAvailability": "BTech:ALL:SX:20",
+    "rawAvailability": "",
     "rawSlot": "B + PA1",
     "eligibility": {},
     "meetings": [
@@ -167,7 +147,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "A01-212 + Nila CS Lab",
-        "instructors": [],
+        "instructors": [
+          "Sahely Bhadra sahely@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -178,7 +160,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-212 + Nila CS Lab",
-        "instructors": [],
+        "instructors": [
+          "Sahely Bhadra sahely@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -189,7 +173,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "A01-212 + Nila CS Lab",
-        "instructors": [],
+        "instructors": [
+          "Sahely Bhadra sahely@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -200,7 +186,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-212 + Nila CS Lab",
-        "instructors": [],
+        "instructors": [
+          "Sahely Bhadra sahely@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -208,121 +196,24 @@
     ]
   },
   {
-    "id": "UG_DS_DS3010",
+    "id": "DS3010",
     "courseCode": "DS3010",
     "courseName": "Introduction to Machine Learning",
     "credits": "3-0-3-5",
     "category": "core",
-    "rawAvailability": "BTech:ALL:SX:20",
+    "rawAvailability": "",
     "rawSlot": "D [Mon,Wed], E [Fri] + PA5",
     "eligibility": {},
     "meetings": [
-      {
-        "type": "lecture",
-        "day": "Monday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
-        "room": "A01-212 + A01-109",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
       {
         "type": "lab",
         "day": "Friday",
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-212 + A01-109",
-        "instructors": [],
+        "instructors": [
+          "Swapnil Hingmire swapnilh@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -330,12 +221,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS3030",
+    "id": "DS3030",
     "courseCode": "DS3030",
     "courseName": "Data Analytics",
     "credits": "2-0-3-4",
     "category": "core",
-    "rawAvailability": "BTech:ALL:SX:10",
+    "rawAvailability": "",
     "rawSlot": "M + PA2",
     "eligibility": {},
     "meetings": [
@@ -346,7 +237,7 @@
         "endTime": "12:50",
         "room": "A01-212 + Nila CS Lab",
         "instructors": [
-          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+          "Garima Shakya garima@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -359,7 +250,7 @@
         "endTime": "12:50",
         "room": "A01-212 + Nila CS Lab",
         "instructors": [
-          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+          "Garima Shakya garima@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -372,7 +263,7 @@
         "endTime": "16:45",
         "room": "A01-212 + Nila CS Lab",
         "instructors": [
-          "Mrinal Kanti Das\nmrinal@iitpkd.ac.in"
+          "Garima Shakya garima@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -381,12 +272,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS5617",
+    "id": "DS5617",
     "courseCode": "DS5617",
     "courseName": "Generative Artificial Intelligence",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "X:X:X:20",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "B",
     "eligibility": {},
     "meetings": [
@@ -396,7 +287,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "A01-001",
-        "instructors": [],
+        "instructors": [
+          "Mrinal Kanti Das mrinal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -407,7 +300,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-001",
-        "instructors": [],
+        "instructors": [
+          "Mrinal Kanti Das mrinal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -418,7 +313,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "A01-001",
-        "instructors": [],
+        "instructors": [
+          "Mrinal Kanti Das mrinal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -426,22 +323,24 @@
     ]
   },
   {
-    "id": "UG_DS_DS5618",
+    "id": "DS5618",
     "courseCode": "DS5618",
     "courseName": "Multi-Agent Systems",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech:DS:Sem 5/7:X,\nBTech:CS:Sem 7:05,\nMS/PhD:DS/CS:X:X, MTech:CaM:X:X",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "F",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Garima Shakya garima@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -449,10 +348,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Garima Shakya garima@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -460,12 +361,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS5619",
+    "id": "DS5619",
     "courseCode": "DS5619",
     "courseName": "Machine Learning System Operations",
     "credits": "2-0-2-3",
-    "category": "elective",
-    "rawAvailability": "X:X:X:20",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "PM2",
     "eligibility": {},
     "meetings": [
@@ -475,7 +376,9 @@
         "startTime": "09:00",
         "endTime": "11:45",
         "room": "A01-109",
-        "instructors": [],
+        "instructors": [
+          "Abhinandan S P abhinandansp@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -483,22 +386,24 @@
     ]
   },
   {
-    "id": "UG_DS_DS3601",
+    "id": "DS3601",
     "courseCode": "DS3601",
     "courseName": "C Programming",
     "credits": "1-0-3-3",
-    "category": "elective",
-    "rawAvailability": "BTech:DS:S5/S7:X\nMTech:DS:S3:X",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "E [Wed] + PA4",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
         "room": "A01-001 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Sahasranand K R  sahasranand@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -509,7 +414,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-001 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Sahasranand K R  sahasranand@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -520,7 +427,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-001 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Sahasranand K R  sahasranand@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -528,12 +437,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS5622",
+    "id": "DS5622",
     "courseCode": "DS5622",
     "courseName": "Explainable AI",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "X:X:X:X",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "A",
     "eligibility": {},
     "meetings": [
@@ -543,7 +452,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Raghava Mutharaju raghava@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -551,21 +462,25 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Raghava Mutharaju raghava@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Raghava Mutharaju raghava@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -573,22 +488,24 @@
     ]
   },
   {
-    "id": "UG_DS_DS5603",
+    "id": "DS5603",
     "courseCode": "DS5603",
     "courseName": "Information Retrieval",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech:CS/DS: S5/S7: 30\nMTech: DS: S3/S1: 10",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "G",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Koninika Pal kpal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -596,10 +513,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Koninika Pal kpal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -607,12 +526,12 @@
     ]
   },
   {
-    "id": "UG_DS_DS5602",
+    "id": "DS5602",
     "courseCode": "DS5602",
     "courseName": "Computer Vision",
-    "credits": " 3-1-0-4",
-    "category": "elective",
-    "rawAvailability": "X:X:X:X",
+    "credits": "3-1-0-4",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "R5 + Sat morning",
     "eligibility": {},
     "meetings": [
@@ -622,7 +541,9 @@
         "startTime": "17:10",
         "endTime": "18:00",
         "room": "A01-212",
-        "instructors": [],
+        "instructors": [
+          "Renu Rameshan"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -630,12 +551,12 @@
     ]
   },
   {
-    "id": "UG_DS_CS5617",
+    "id": "CS5617",
     "courseCode": "CS5617",
     "courseName": "Software Engineering",
     "credits": "1-0-3-3",
-    "category": "elective",
-    "rawAvailability": "BTech:CSE:S7",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "PA5+R5",
     "eligibility": {},
     "meetings": [
@@ -645,7 +566,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "Nila CS Lab+N203/204",
-        "instructors": [],
+        "instructors": [
+          "Ramaswamy Krishnan Chittur (chittur@iitpkd.ac.in )"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -656,7 +579,9 @@
         "startTime": "17:10",
         "endTime": "18:00",
         "room": "Nila CS Lab+N203/204",
-        "instructors": [],
+        "instructors": [
+          "Ramaswamy Krishnan Chittur (chittur@iitpkd.ac.in )"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -664,22 +589,24 @@
     ]
   },
   {
-    "id": "UG_DS_EE5007",
+    "id": "EE5007",
     "courseCode": "EE5007",
     "courseName": "Linear Algebra for Engineers",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech, MS, PhD",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-103",
-        "instructors": [],
+        "instructors": [
+          "biren@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -687,10 +614,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-103",
-        "instructors": [],
+        "instructors": [
+          "biren@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
