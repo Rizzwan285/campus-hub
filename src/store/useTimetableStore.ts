@@ -143,11 +143,25 @@ export const useTimetableStore = create<TimetableState>()(
               TimetableLoader.loadHolidays()
             ]);
 
-            // Combine branch-specific and common courses and deduplicate by courseCode
+            // Deduplicate by courseCode with smart merging:
+            // When the same course appears in multiple sheets, prefer the entry
+            // with actual data (real meetings, credits, etc.) and fill in gaps.
             const courseMap = new Map<string, typeof allCoursesRaw[0]>();
             allCoursesRaw.forEach(c => {
-              if (!courseMap.has(c.courseCode)) {
+              const existing = courseMap.get(c.courseCode);
+              if (!existing) {
                 courseMap.set(c.courseCode, c);
+              } else {
+                // Merge: prefer whichever has real data for each field
+                const isPlaceholder = (val: string) => !val || val.toLowerCase().includes('check') || val.toLowerCase().includes('sheet');
+                const merged = { ...existing };
+
+                if (isPlaceholder(existing.credits) && !isPlaceholder(c.credits)) merged.credits = c.credits;
+                if (isPlaceholder(existing.courseName) && !isPlaceholder(c.courseName)) merged.courseName = c.courseName;
+                if ((!existing.meetings || existing.meetings.length === 0) && c.meetings?.length > 0) merged.meetings = c.meetings;
+                if (existing.meetings?.length > 0 && c.meetings?.length > 0 && existing.meetings.length < c.meetings.length) merged.meetings = c.meetings;
+
+                courseMap.set(c.courseCode, merged);
               }
             });
             const allCourses = Array.from(courseMap.values());
