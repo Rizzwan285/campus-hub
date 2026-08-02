@@ -296,9 +296,9 @@
       },
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "08:00",
-        "endTime": "08:50",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
         "room": "A01-001",
         "instructors": [
           "Mrinal Kanti Das mrinal@iitpkd.ac.in"
