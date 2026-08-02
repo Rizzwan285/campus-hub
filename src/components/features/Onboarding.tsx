@@ -216,16 +216,16 @@ export function Onboarding() {
                     <option value="HSS">Humanities (HSS)</option>
                     <option value="BSE">BSE</option>
                     <option value="ESSENCE">ESSENCE</option>
-                    <option value="MTechCaM">MTech CaM</option>
-                    <option value="MTechDS">MTech Data Science</option>
-                    <option value="MTechDesignAutomation">MTech Design Automation</option>
-                    <option value="MTechGeo">MTech Geotechnical</option>
-                    <option value="MTechMME">MTech MME</option>
-                    <option value="MTechPEPS">MTech PEPS</option>
-                    <option value="MTechSOCD">MTech SOCD</option>
-                    <option value="MTechStructuralEngineering">MTech Structural Eng.</option>
-                    <option value="MTechThermofluidsEngineering">MTech Thermofluids Eng.</option>
-                    <option value="MTechWaterResourcesEngineering">MTech Water Resources Eng.</option>
+                    <option value="CAM">MTech CaM</option>
+                    <option value="DS">MTech Data Science</option>
+                    <option value="Design_Automation">MTech Design Automation</option>
+                    <option value="Geo">MTech Geotechnical</option>
+                    <option value="MME">MTech MME</option>
+                    <option value="PEPS">MTech PEPS</option>
+                    <option value="SOCD">MTech SOCD</option>
+                    <option value="Structural_Engineering">MTech Structural Eng.</option>
+                    <option value="Thermofluids_Engineering">MTech Thermofluids Eng.</option>
+                    <option value="Water_Resources_Engineering">MTech Water Resources Eng.</option>
                   </>
                 )}
               </select>
