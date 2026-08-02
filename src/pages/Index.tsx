@@ -10,6 +10,7 @@ import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 import { Onboarding } from '@/components/features/Onboarding';
 import { WeeklyTimetable } from '@/components/features/timetable/WeeklyTimetable';
+import { useTimetableStore } from '@/store/useTimetableStore';
 
 const Index = () => {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
@@ -25,9 +26,7 @@ const Index = () => {
 
   useEffect(() => {
     if (profile && profile.program && profile.branch) {
-      import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
-        useTimetableStore.getState().initializeTimetable(profile.program, profile.branch);
-      });
+      useTimetableStore.getState().initializeTimetable(profile.program, profile.branch);
     }
   }, [profile]);
 
@@ -39,9 +38,7 @@ const Index = () => {
   const displayDate = selectedDate || currentTime;
 
   useEffect(() => {
-    import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
-      useTimetableStore.getState().updatePreviewDate(displayDate);
-    });
+    useTimetableStore.getState().updatePreviewDate(displayDate);
   }, [displayDate]);
 
   if (!profile) {

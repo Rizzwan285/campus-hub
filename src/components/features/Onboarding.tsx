@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles } from 'lucide-react';
+import { useTimetableStore } from '@/store/useTimetableStore';
 
 export function Onboarding() {
   const setProfile = useUserStore((state) => state.setProfile);
@@ -51,9 +52,7 @@ export function Onboarding() {
       const finalProfile = { ...formData } as UserProfile;
       setProfile(finalProfile);
       
-      import('@/store/useTimetableStore').then(({ useTimetableStore }) => {
-        useTimetableStore.getState().updateProfile(finalProfile.program!, finalProfile.branch!);
-      });
+      useTimetableStore.getState().updateProfile(finalProfile.program!, finalProfile.branch!);
     }
   };
 
