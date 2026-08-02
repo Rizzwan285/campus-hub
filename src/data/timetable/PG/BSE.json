@@ -1,10 +1,10 @@
 [
   {
-    "id": "PG_BSE_BS6001",
+    "id": "BS6001",
     "courseCode": "BS6001",
     "courseName": "Fundamental and Applied Immunology",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "erc/src",
     "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
@@ -12,8 +12,8 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "B03-028",
         "instructors": [
           "bayry@iitpkd.ac.in"
@@ -25,8 +25,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "B03-028",
         "instructors": [
           "bayry@iitpkd.ac.in"
@@ -38,11 +38,11 @@
     ]
   },
   {
-    "id": "PG_BSE_BS5004",
+    "id": "BS5004",
     "courseCode": "BS5004",
     "courseName": "Advanced Molecular Biology",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "erc/src",
     "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
@@ -50,8 +50,8 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "B03-028",
         "instructors": [
           "sivavg@iitpkd.ac.in"
@@ -63,8 +63,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "B03-028",
         "instructors": [
           "sivavg@iitpkd.ac.in"

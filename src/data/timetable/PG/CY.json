@@ -1,6 +1,6 @@
 [
   {
-    "id": "PG_CY_CY5018",
+    "id": "CY5018",
     "courseCode": "CY5018",
     "courseName": "Basic Quantum Chemistry",
     "credits": "3-0-0-3",
@@ -12,10 +12,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Rositha,rosithak@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -23,10 +25,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Rositha,rosithak@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -34,7 +38,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5022",
+    "id": "CY5022",
     "courseCode": "CY5022",
     "courseName": "Symmetry and Group Theory",
     "credits": "3-0-0-3",
@@ -46,10 +50,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Padmesh, padmesh@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -57,10 +63,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Padmesh, padmesh@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -68,7 +76,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5021",
+    "id": "CY5021",
     "courseCode": "CY5021",
     "courseName": "Stereochemistry & Physical Organic Chemistry",
     "credits": "3-0-0-3",
@@ -79,22 +87,26 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "14:00",
         "endTime": "15:15",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. Haridas, haridasv@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
+        "day": "Friday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. Haridas, haridasv@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -102,7 +114,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5019",
+    "id": "CY5019",
     "courseCode": "CY5019",
     "courseName": "Main Group Chemistry",
     "credits": "3-0-0-3",
@@ -114,10 +126,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Debabrata, debabratadhara@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -125,10 +139,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Debabrata, debabratadhara@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -136,7 +152,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5020",
+    "id": "CY5020",
     "courseCode": "CY5020",
     "courseName": "Organic Reaction Mechanisms",
     "credits": "3-0-0-3",
@@ -147,22 +163,26 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Mintu,mintu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Dr. Mintu,mintu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -170,7 +190,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5106",
+    "id": "CY5106",
     "courseCode": "CY5106",
     "courseName": "Inorganic Chemistry Lab",
     "credits": "0-0-3-2",
@@ -185,7 +205,9 @@
         "startTime": "09:00",
         "endTime": "11:45",
         "room": "A01-CY lab",
-        "instructors": [],
+        "instructors": [
+          "Dr. Dinesh Jagadeesan, d.jagadeesan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -193,29 +215,29 @@
     ]
   },
   {
-    "id": "PG_CY_GN5005",
+    "id": "GN5005",
     "courseCode": "GN5005",
     "courseName": "Communication Skills",
     "credits": "1-0-0-1",
     "category": "core",
     "rawAvailability": "",
-    "rawSlot": "",
+    "rawSlot": "TBD",
     "eligibility": {},
     "meetings": []
   },
   {
-    "id": "PG_CY_ID5002",
+    "id": "ID5002",
     "courseCode": "ID5002",
     "courseName": "Technical Writing Skills",
     "credits": "1-0-0-1",
     "category": "core",
     "rawAvailability": "",
-    "rawSlot": "",
+    "rawSlot": "TBD",
     "eligibility": {},
     "meetings": []
   },
   {
-    "id": "PG_CY_CY5031",
+    "id": "CY5031",
     "courseCode": "CY5031",
     "courseName": "Classical and Statistical Thermodynamics",
     "credits": "3-0-0-3",
@@ -227,10 +249,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Debarati, debarati@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -238,10 +262,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Debarati, debarati@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -249,7 +275,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5030",
+    "id": "CY5030",
     "courseCode": "CY5030",
     "courseName": "Biochemistry",
     "credits": "3-0-0-3",
@@ -260,22 +286,26 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Sushbhan Sadhukhan, sushabhan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Sushbhan Sadhukhan, sushabhan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -283,7 +313,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5029",
+    "id": "CY5029",
     "courseCode": "CY5029",
     "courseName": "Basic Organometallic Chemistry",
     "credits": "3-0-0-3",
@@ -295,10 +325,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Yuvaraj K, yuvaraj@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -306,10 +338,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Yuvaraj K, yuvaraj@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -317,7 +351,7 @@
     ]
   },
   {
-    "id": "PG_CY_CY5028",
+    "id": "CY5028",
     "courseCode": "CY5028",
     "courseName": "Applications of Spectroscopy Techniques in Structure Elucidation",
     "credits": "3-0-0-3",
@@ -329,10 +363,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Shanmugaraju, shanmugam@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -340,10 +376,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Dr. Shanmugaraju, shanmugam@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -351,10 +389,10 @@
     ]
   },
   {
-    "id": "PG_CY_CY5614",
+    "id": "CY5614",
     "courseCode": "CY5614",
     "courseName": "Electroanalytical Methods and Applications",
-    "credits": "",
+    "credits": "N/A",
     "category": "elective",
     "rawAvailability": "",
     "rawSlot": "L",
@@ -363,10 +401,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "N-307",
-        "instructors": [],
+        "instructors": [
+          "Dr. Yugender Goud Kotagiri, yugenderkotagiri@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -374,10 +414,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-307",
-        "instructors": [],
+        "instructors": [
+          "Dr. Yugender Goud Kotagiri, yugenderkotagiri@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -385,10 +427,10 @@
     ]
   },
   {
-    "id": "PG_CY_CY5622",
+    "id": "CY5622",
     "courseCode": "CY5622",
     "courseName": "Physical and Chemical Adsorption at Surfaces and Interfaces",
-    "credits": "",
+    "credits": "N/A",
     "category": "elective",
     "rawAvailability": "",
     "rawSlot": "D",
@@ -400,7 +442,9 @@
         "startTime": "11:00",
         "endTime": "11:50",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. Gopinath,csgopinath@iitpkd.ac.in, Dr. Dinesh Jagadeesan, d.jagadeesan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -408,10 +452,12 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. Gopinath,csgopinath@iitpkd.ac.in, Dr. Dinesh Jagadeesan, d.jagadeesan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -422,7 +468,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. Gopinath,csgopinath@iitpkd.ac.in, Dr. Dinesh Jagadeesan, d.jagadeesan@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -430,10 +478,10 @@
     ]
   },
   {
-    "id": "PG_CY_CY5623",
+    "id": "CY5623",
     "courseCode": "CY5623",
     "courseName": "Advanced Functional Materials",
-    "credits": "",
+    "credits": "N/A",
     "category": "elective",
     "rawAvailability": "",
     "rawSlot": "H",
@@ -445,7 +493,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. V. Kumar, vkumar@iitpkd.ac.in, Dr. Shanmugaraju, shanmugam@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -456,7 +506,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. V. Kumar, vkumar@iitpkd.ac.in, Dr. Shanmugaraju, shanmugam@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -467,7 +519,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "N-303",
-        "instructors": [],
+        "instructors": [
+          "Prof. V. Kumar, vkumar@iitpkd.ac.in, Dr. Shanmugaraju, shanmugam@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -475,13 +529,13 @@
     ]
   },
   {
-    "id": "PG_CY_CY5130",
+    "id": "CY5130",
     "courseCode": "CY5130",
     "courseName": "Project I",
     "credits": "2 credits",
     "category": "project",
     "rawAvailability": "",
-    "rawSlot": "",
+    "rawSlot": "TBD",
     "eligibility": {},
     "meetings": []
   }

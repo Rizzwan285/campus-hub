@@ -1,11 +1,11 @@
 [
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5016",
+    "id": "ME5016",
     "courseCode": "ME5016",
     "courseName": "Incompressible Fluid Flows",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MTech:TF:S1",
+    "rawAvailability": "",
     "rawSlot": "A",
     "eligibility": {},
     "meetings": [
@@ -16,8 +16,7 @@
         "endTime": "08:50",
         "room": "A01-101",
         "instructors": [
-          "ahazra@iitpkd.ac.in",
-          "tsundar@iitpkd.ac.in"
+          "ahazra@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -26,12 +25,11 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-101",
         "instructors": [
-          "ahazra@iitpkd.ac.in",
-          "tsundar@iitpkd.ac.in"
+          "ahazra@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -39,13 +37,12 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-101",
         "instructors": [
-          "ahazra@iitpkd.ac.in",
-          "tsundar@iitpkd.ac.in"
+          "ahazra@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -54,12 +51,12 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5017",
+    "id": "ME5017",
     "courseCode": "ME5017",
     "courseName": "Advanced Heat & Mass Transfer",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MTech:TF:S1:30",
+    "rawAvailability": "",
     "rawSlot": "H",
     "eligibility": {},
     "meetings": [
@@ -105,12 +102,12 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5024",
+    "id": "ME5024",
     "courseCode": "ME5024",
     "courseName": "Advanced Thermodynamics",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MTech: TF:S1:40",
+    "rawAvailability": "",
     "rawSlot": "B",
     "eligibility": {},
     "meetings": [
@@ -156,24 +153,23 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5023",
+    "id": "ME5023",
     "courseCode": "ME5023",
     "courseName": "Numerical Methods in Heat Transfer & Fluid Flow",
     "credits": "2-0-3-4",
     "category": "core",
-    "rawAvailability": "MTech:TF:S1",
+    "rawAvailability": "",
     "rawSlot": "G+PA3",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-202 + Nila Electronics Lab",
         "instructors": [
-          "anand@iitpkd.ac.in",
-          "krishna.s@iitpkd.ac.in"
+          "anand@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -182,12 +178,11 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-202 + Nila Electronics Lab",
         "instructors": [
-          "anand@iitpkd.ac.in",
-          "krishna.s@iitpkd.ac.in"
+          "anand@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -200,8 +195,7 @@
         "endTime": "15:50",
         "room": "A01-202 + Nila Electronics Lab",
         "instructors": [
-          "anand@iitpkd.ac.in",
-          "krishna.s@iitpkd.ac.in"
+          "anand@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -210,7 +204,7 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_GN5005",
+    "id": "GN5005",
     "courseCode": "GN5005",
     "courseName": "Communication Skills",
     "credits": "1-0-0-1",
@@ -221,18 +215,18 @@
     "meetings": []
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5641",
+    "id": "ME5641",
     "courseCode": "ME5641",
     "courseName": "Fire Dynamics",
     "credits": "3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "J",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "A01-101",
@@ -245,9 +239,9 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-101",
         "instructors": [
           "pramodkuntikana@iitpkd.ac.in"
@@ -259,11 +253,11 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5639",
+    "id": "ME5639",
     "courseCode": "ME5639",
     "courseName": "Principles of Product Design",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
@@ -271,12 +265,11 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-202",
         "instructors": [
-          "as_sekhar@iitpkd.ac.in",
-          "santhakumar@iitpkd.ac.in"
+          "as_sekhar@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -285,12 +278,11 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-202",
         "instructors": [
-          "as_sekhar@iitpkd.ac.in",
-          "santhakumar@iitpkd.ac.in"
+          "as_sekhar@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -299,11 +291,11 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5007",
+    "id": "ME5007",
     "courseCode": "ME5007",
     "courseName": "Advanced Engineering Materials",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "C",
     "eligibility": {},
@@ -337,8 +329,8 @@
       {
         "type": "lecture",
         "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-101",
         "instructors": [
           "c.paramatmuni@iitpkd.ac.in"
@@ -350,11 +342,11 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5005",
+    "id": "ME5005",
     "courseCode": "ME5005",
     "courseName": "Modern Manufacturing Processes",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "A",
     "eligibility": {},
@@ -375,8 +367,8 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-202",
         "instructors": [
           "kaliprasad@iitpkd.ac.in"
@@ -387,9 +379,9 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-202",
         "instructors": [
           "kaliprasad@iitpkd.ac.in"
@@ -401,11 +393,11 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5013",
+    "id": "ME5013",
     "courseCode": "ME5013",
     "courseName": "Mechanics of Machining",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "D",
     "eligibility": {},
@@ -426,8 +418,8 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-101",
         "instructors": [
           "afzaal@iitpkd.ac.in"
@@ -452,11 +444,11 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5009",
+    "id": "ME5009",
     "courseCode": "ME5009",
     "courseName": "Digital Manufacturing",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "H",
     "eligibility": {},
@@ -503,31 +495,18 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5015",
+    "id": "ME5015",
     "courseCode": "ME5015",
     "courseName": "Mechanical Vibrations",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "MTech:DA:S1:16;   MTech:AnySpecialization:S1+S3:14;     MS+PhD:ME+CE:S1+S2+S3+S4: 20 BTech: ME+CE:S6+S7:20",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
-        "room": "A01-101",
-        "instructors": [
-          "sagi@iitm.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
         "startTime": "14:00",
         "endTime": "15:15",
         "room": "A01-101",
@@ -537,24 +516,37 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-101",
+        "instructors": [
+          "sagi@iitm.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5501",
+    "id": "ME5501",
     "courseCode": "ME5501",
     "courseName": "Finite Element Methods",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "MTech:DA:S1:16;   MTech:AnySpecialization:S1+S3:15;     MS+PhD:ME+CE:S1+S2+S3+S4: 20 BTech: ME+CE:S6+S7:20",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "G",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-101",
         "instructors": [
           "nelsonm@iitpkd.ac.in"
@@ -566,8 +558,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-101",
         "instructors": [
           "nelsonm@iitpkd.ac.in"
@@ -579,12 +571,12 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5021",
+    "id": "ME5021",
     "courseCode": "ME5021",
     "courseName": "Solid Mechanics & Simulation Laboratory",
     "credits": "0-0-2-2",
-    "category": "elective",
-    "rawAvailability": "MTech:DA:S1:16;   MS+PhD:ME:S1+S2: 4",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "PA1",
     "eligibility": {},
     "meetings": [
@@ -595,8 +587,7 @@
         "endTime": "16:45",
         "room": "A01-201",
         "instructors": [
-          "nelsonm@iitpkd.ac.in",
-          "kvns@iitpkd.ac.in"
+          "nelsonm@iitpkd.ac.in"
         ],
         "recurrence": {
           "type": "weekly"
@@ -605,13 +596,13 @@
     ]
   },
   {
-    "id": "PG_MTechThermofluidsEngineering_ME5011A",
+    "id": "ME5011A",
     "courseCode": "ME5011A",
     "courseName": "Mathematics for Engineers",
     "credits": "2-0-2-3",
-    "category": "elective",
-    "rawAvailability": "MTech:DA:S1:16;   MTech:AnySpecialization:S1+S3:14;     MS+PhD:ME+CE:S1+S2+S3+S4: 20",
-    "rawSlot": "M + CMN-A + CMN-B\n (Exam slot: I)",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "M + CMN-A + CMN-B  (Exam slot: I)",
     "eligibility": {},
     "meetings": [
       {
@@ -667,16 +658,5 @@
         }
       }
     ]
-  },
-  {
-    "id": "PG_MTechThermofluidsEngineering_TE5110",
-    "courseCode": "TE5110",
-    "courseName": "MTech Project (MTP) Stage 1",
-    "credits": "",
-    "category": "project",
-    "rawAvailability": "",
-    "rawSlot": "",
-    "eligibility": {},
-    "meetings": []
   }
 ]
