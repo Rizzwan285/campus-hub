@@ -6,6 +6,7 @@ import { TimetableLoader } from '../services/timetableLoader';
 vi.mock('../services/timetableLoader', () => ({
   TimetableLoader: {
     loadBranchData: vi.fn(),
+    loadAllCourses: vi.fn(),
     loadCommonData: vi.fn(),
     loadHolidays: vi.fn(),
     clearCache: vi.fn()
@@ -53,7 +54,7 @@ describe('useTimetableStore', () => {
     };
 
     // Setup mocks
-    (TimetableLoader.loadBranchData as any).mockResolvedValue([mockCourse]);
+    (TimetableLoader.loadAllCourses as any).mockResolvedValue([mockCourse]);
     (TimetableLoader.loadCommonData as any).mockResolvedValue([]);
     (TimetableLoader.loadHolidays as any).mockResolvedValue([]);
 
@@ -67,7 +68,7 @@ describe('useTimetableStore', () => {
     expect(state.loadedCourses).toHaveLength(1);
     expect(state.resolvedEvents).toHaveLength(1); // Because it was selected
     expect(state.resolvedEvents[0].courseCode).toBe('CS101');
-    expect(TimetableLoader.loadBranchData).toHaveBeenCalledWith('UG', 'CSE');
+    expect(TimetableLoader.loadAllCourses).toHaveBeenCalled();
   });
 
   it('should not duplicate fetch if already initialized with same program/branch', async () => {
@@ -80,7 +81,7 @@ describe('useTimetableStore', () => {
     await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
 
     // It should have called loader because the store delegates caching to the TimetableLoader service
-    expect(TimetableLoader.loadBranchData).toHaveBeenCalled();
+    expect(TimetableLoader.loadAllCourses).toHaveBeenCalled();
   });
 
   it('should update selected courses and trigger recompute', () => {
