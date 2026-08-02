@@ -34,11 +34,10 @@ export class TimetableLoader {
    * Loads common course data
    */
   static async loadCommonData(program: string): Promise<CourseOffering[]> {
-    // Usually UG_CommonCourses, etc. Let's map it based on the generated files.
-    // As per the generator, we might have CommonCourses or similar branch names.
-    // The implementation can assume branch = 'CommonCourses' or similar.
+    if (program === 'PG') {
+      return this.loadBranchData(program, 'InstCommonCourses');
+    }
     return this.loadBranchData(program, 'CommonCourses'); 
-    // Note: Adjust the 'CommonCourses' string to match the actual generated file name if needed.
   }
 
   /**

@@ -1,11 +1,11 @@
 [
   {
-    "id": "PG_PH_PH5007",
+    "id": "PH5007",
     "courseCode": "PH5007",
     "courseName": "Quantum Mechanics",
     "credits": "3-1-0-4",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "A + H (Fri)",
     "eligibility": {},
     "meetings": [
@@ -15,7 +15,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Uma Divakaran, uma@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -23,21 +25,51 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Uma Divakaran, uma@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Uma Divakaran, uma@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-301",
+        "instructors": [
+          "Uma Divakaran, uma@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "12:05",
+        "endTime": "12:55",
+        "room": "N-301",
+        "instructors": [
+          "Uma Divakaran, uma@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -48,7 +80,9 @@
         "startTime": "12:05",
         "endTime": "12:55",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Uma Divakaran, uma@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -56,12 +90,12 @@
     ]
   },
   {
-    "id": "PG_PH_PH5005",
+    "id": "PH5005",
     "courseCode": "PH5005",
     "courseName": "Applicable Mathematics",
     "credits": "3-0-2-4",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "B + PA2",
     "eligibility": {},
     "meetings": [
@@ -71,7 +105,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "N-301 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Manoj Gopalakrishnan,  manojgopal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -82,7 +118,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-301 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Manoj Gopalakrishnan,  manojgopal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -93,7 +131,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "N-301 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Manoj Gopalakrishnan,  manojgopal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -104,7 +144,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "N-301 + A01-201",
-        "instructors": [],
+        "instructors": [
+          "Manoj Gopalakrishnan,  manojgopal@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -112,12 +154,12 @@
     ]
   },
   {
-    "id": "PG_PH_PH5001",
+    "id": "PH5001",
     "courseCode": "PH5001",
     "courseName": "Classical Mechanics",
     "credits": "3-1-0-4",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "C + E (Wed)",
     "eligibility": {},
     "meetings": [
@@ -127,7 +169,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Resmi P K resmipk@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -138,7 +182,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Resmi P K resmipk@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -146,10 +192,38 @@
       {
         "type": "lecture",
         "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Resmi P K resmipk@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-301",
+        "instructors": [
+          "Resmi P K resmipk@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "N-301",
+        "instructors": [
+          "Resmi P K resmipk@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -157,12 +231,12 @@
     ]
   },
   {
-    "id": "PG_PH_PH5003",
+    "id": "PH5003",
     "courseCode": "PH5003",
     "courseName": "Electromagnetic Theory",
     "credits": "3-1-0-4",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "D + E (Fri)",
     "eligibility": {},
     "meetings": [
@@ -172,7 +246,9 @@
         "startTime": "11:00",
         "endTime": "11:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -180,10 +256,12 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -194,7 +272,22 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "N-301",
+        "instructors": [
+          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -205,7 +298,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -213,12 +308,12 @@
     ]
   },
   {
-    "id": "PG_PH_PH5103",
+    "id": "PH5103",
     "courseCode": "PH5103",
     "courseName": "Mechanics and Electromagnetic Theory Lab",
     "credits": "0-0-3-2",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "PA5",
     "eligibility": {},
     "meetings": [
@@ -228,7 +323,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-Physics Lab",
-        "instructors": [],
+        "instructors": [
+          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -236,79 +333,45 @@
     ]
   },
   {
-    "id": "PG_PH_GN5005",
+    "id": "GN5005",
     "courseCode": "GN5005",
     "courseName": "Communication Skills",
     "credits": "",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "",
     "eligibility": {},
     "meetings": []
   },
   {
-    "id": "PG_PH_ID5002",
+    "id": "ID5002",
     "courseCode": "ID5002",
     "courseName": "Technical Writing Skills",
     "credits": "",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S1",
+    "rawAvailability": "",
     "rawSlot": "",
     "eligibility": {},
     "meetings": []
   },
   {
-    "id": "PG_PH_PH5009",
+    "id": "PH5009",
     "courseCode": "PH5009",
     "courseName": "Condensed Matter Physics",
     "credits": "3-1-0-4",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S3",
+    "rawAvailability": "",
     "rawSlot": "F, Q",
     "eligibility": {},
-    "meetings": [
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
-        "room": "N-301",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
-        "room": "N-301",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "N-301",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      }
-    ]
+    "meetings": []
   },
   {
-    "id": "PG_PH_PH5011",
+    "id": "PH5011",
     "courseCode": "PH5011",
     "courseName": "Nuclear & Particle Physics",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S3",
+    "rawAvailability": "",
     "rawSlot": "C",
     "eligibility": {},
     "meetings": [
@@ -318,7 +381,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Akanksha Bhardwaj akankshab@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -329,7 +394,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Akanksha Bhardwaj akankshab@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -337,10 +404,12 @@
       {
         "type": "lecture",
         "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Akanksha Bhardwaj akankshab@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -348,12 +417,12 @@
     ]
   },
   {
-    "id": "PG_PH_PH5105",
+    "id": "PH5105",
     "courseCode": "PH5105",
     "courseName": "Advanced Physics Lab",
     "credits": "0-0-5-3",
     "category": "core",
-    "rawAvailability": "MSc: Physics: S3",
+    "rawAvailability": "",
     "rawSlot": "PA4",
     "eligibility": {},
     "meetings": [
@@ -363,7 +432,9 @@
         "startTime": "14:00",
         "endTime": "16:45",
         "room": "A01-Physics Lab",
-        "instructors": [],
+        "instructors": [
+          "Soham Manni smanni@itpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -371,11 +442,11 @@
     ]
   },
   {
-    "id": "PG_PH_PH5606",
+    "id": "PH5606",
     "courseCode": "PH5606",
     "courseName": "Quantum Information and Computation",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "G",
     "eligibility": {},
@@ -383,10 +454,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Amit K Pal amit@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -394,10 +467,12 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Amit K Pal amit@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -405,11 +480,11 @@
     ]
   },
   {
-    "id": "PG_PH_PH6008",
+    "id": "PH6008",
     "courseCode": "PH6008",
     "courseName": "Monte Carlo Methods in Statistical Physics",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "B",
     "eligibility": {},
@@ -420,7 +495,9 @@
         "startTime": "09:00",
         "endTime": "09:50",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Vishwas V vishwas@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -431,7 +508,9 @@
         "startTime": "08:00",
         "endTime": "08:50",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Vishwas V vishwas@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -442,7 +521,9 @@
         "startTime": "10:00",
         "endTime": "10:50",
         "room": "N-306",
-        "instructors": [],
+        "instructors": [
+          "Vishwas V vishwas@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -450,11 +531,11 @@
     ]
   },
   {
-    "id": "PG_PH_PH5631",
+    "id": "PH5631",
     "courseCode": "PH5631",
     "courseName": "Light microscopy and image processing",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
@@ -462,10 +543,12 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Bibhu Ranjan Sarangi bibhu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
@@ -473,25 +556,16 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "N-301",
-        "instructors": [],
+        "instructors": [
+          "Bibhu Ranjan Sarangi bibhu@iitpkd.ac.in"
+        ],
         "recurrence": {
           "type": "weekly"
         }
       }
     ]
-  },
-  {
-    "id": "PG_PH_PH5110",
-    "courseCode": "PH5110",
-    "courseName": "Project 1",
-    "credits": "",
-    "category": "project",
-    "rawAvailability": "",
-    "rawSlot": "",
-    "eligibility": {},
-    "meetings": []
   }
 ]

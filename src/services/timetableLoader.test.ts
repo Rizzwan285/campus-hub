@@ -26,15 +26,16 @@ describe('TimetableLoader', () => {
   });
 
   it('should handle missing branch data gracefully', async () => {
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     
-    // Missing branch data throws import error in mock, handled by catch
-    const data = await TimetableLoader.loadBranchData('UG', 'MissingBranch');
+    // Missing branch data throws import error in mock, caught and rethrown by loader
+    await expect(TimetableLoader.loadBranchData('UG', 'MissingBranch')).rejects.toThrow(
+      'Failed to load timetable data for UG/MissingBranch'
+    );
     
-    expect(data).toEqual([]);
-    expect(consoleWarnSpy).toHaveBeenCalled();
+    expect(consoleErrorSpy).toHaveBeenCalled();
     
-    consoleWarnSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
   it('should load holidays and cache the result', async () => {

@@ -1,19 +1,19 @@
 [
   {
-    "id": "PG_MTechSOCD_EE5023",
+    "id": "EE5023",
     "courseCode": "EE5023",
     "courseName": "VLSI design",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MTech SoCD, BTech EE VII",
+    "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-119",
         "instructors": [
           "svmula@iitpkd.ac.in"
@@ -25,8 +25,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-119",
         "instructors": [
           "svmula@iitpkd.ac.in"
@@ -38,12 +38,12 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_EE5123",
+    "id": "EE5123",
     "courseCode": "EE5123",
     "courseName": "VLSI design lab",
     "credits": "0-0-3-2",
     "category": "core",
-    "rawAvailability": "MTech SoCD",
+    "rawAvailability": "",
     "rawSlot": "PM4",
     "eligibility": {},
     "meetings": [
@@ -63,20 +63,20 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_EE5009",
+    "id": "EE5009",
     "courseCode": "EE5009",
     "courseName": "Nanoelectronics for Circuits and Systems",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MTech SoCD, MS, PhD",
+    "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-119",
         "instructors": [
           "revathyp@iitpkd.ac.in"
@@ -88,8 +88,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-119",
         "instructors": [
           "revathyp@iitpkd.ac.in"
@@ -101,7 +101,7 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_CS3060",
+    "id": "CS3060",
     "courseCode": "CS3060",
     "courseName": "Computer Architecture",
     "credits": "3-0-0-3",
@@ -126,8 +126,8 @@
       {
         "type": "lecture",
         "day": "Wednesday",
-        "startTime": "09:00",
-        "endTime": "09:50",
+        "startTime": "11:00",
+        "endTime": "11:50",
         "room": "A01-002",
         "instructors": [
           "Anju M A (anju@iitpkd.ac.in)"
@@ -138,9 +138,9 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:00",
-        "endTime": "10:50",
+        "day": "Friday",
+        "startTime": "09:00",
+        "endTime": "09:50",
         "room": "A01-002",
         "instructors": [
           "Anju M A (anju@iitpkd.ac.in)"
@@ -165,7 +165,7 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_CS3160",
+    "id": "CS3160",
     "courseCode": "CS3160",
     "courseName": "Computer Architecture Lab",
     "credits": "0-0-3-2",
@@ -181,8 +181,7 @@
         "endTime": "16:45",
         "room": "A01-109",
         "instructors": [
-          "Anju M A (anju@iitpkd.ac.in)",
-          "Sandeep Chandran (sandeepchandran@iitpkd.ac.in)"
+          "Anju M A (anju@iitpkd.ac.in)"
         ],
         "recurrence": {
           "type": "weekly"
@@ -191,7 +190,7 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_CS5107",
+    "id": "CS5107",
     "courseCode": "CS5107",
     "courseName": "Programming Lab",
     "credits": "1-0-3-3",
@@ -205,7 +204,7 @@
         "day": "Monday",
         "startTime": "09:00",
         "endTime": "11:45",
-        "room": "A01-109\n+\nA01-001",
+        "room": "A01-109 + A01-001",
         "instructors": [
           "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
         ],
@@ -218,7 +217,7 @@
         "day": "Monday",
         "startTime": "12:05",
         "endTime": "12:55",
-        "room": "A01-109\n+\nA01-001",
+        "room": "A01-109 + A01-001",
         "instructors": [
           "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
         ],
@@ -231,7 +230,7 @@
         "day": "Wednesday",
         "startTime": "12:05",
         "endTime": "12:55",
-        "room": "A01-109\n+\nA01-001",
+        "room": "A01-109 + A01-001",
         "instructors": [
           "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
         ],
@@ -244,33 +243,7 @@
         "day": "Friday",
         "startTime": "12:05",
         "endTime": "12:55",
-        "room": "A01-109\n+\nA01-001",
-        "instructors": [
-          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-109\n+\nA01-001",
-        "instructors": [
-          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-109\n+\nA01-001",
+        "room": "A01-109 + A01-001",
         "instructors": [
           "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
         ],
@@ -281,7 +254,7 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_GN5005",
+    "id": "GN5005",
     "courseCode": "GN5005",
     "courseName": "Communication Skills",
     "credits": "1-0-0-1",
@@ -292,7 +265,7 @@
     "meetings": []
   },
   {
-    "id": "PG_MTechSOCD_ID5002",
+    "id": "ID5002",
     "courseCode": "ID5002",
     "courseName": "Technical Writing Skills",
     "credits": "1-0-0-1",
@@ -311,24 +284,35 @@
         "recurrence": {
           "type": "weekly"
         }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
       }
     ]
   },
   {
-    "id": "PG_MTechSOCD_EE5621",
+    "id": "EE5621",
     "courseCode": "EE5621",
     "courseName": "Antenna Theory and Techniques",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "B.Tech, MS, M.Tech (SoCD), PhD",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "F",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "A01-103",
         "instructors": [
           "sdey28@iitpkd.ac.in"
@@ -340,8 +324,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "A01-103",
         "instructors": [
           "sdey28@iitpkd.ac.in"
@@ -353,49 +337,11 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_EE5603",
+    "id": "EE5603",
     "courseCode": "EE5603",
     "courseName": "Robot dynamics, control and motion planning",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech V, VII, MTech, MS, PhD",
-    "rawSlot": "K",
-    "eligibility": {},
-    "meetings": [
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
-        "room": "A01-103",
-        "instructors": [
-          "snehagajbhiye@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
-        "room": "A01-103",
-        "instructors": [
-          "snehagajbhiye@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      }
-    ]
-  },
-  {
-    "id": "PG_MTechSOCD_CS5628",
-    "courseCode": "CS5628",
-    "courseName": "Runtime Verification",
-    "credits": " 3-0-0-3",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
@@ -403,8 +349,46 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-103",
+        "instructors": [
+          "snehagajbhiye@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-103",
+        "instructors": [
+          "snehagajbhiye@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "CS5628",
+    "courseCode": "CS5628",
+    "courseName": "Runtime Verification",
+    "credits": "3-0-0-3",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-102",
         "instructors": [
           "sandeepchandran@iitpkd.ac.in"
@@ -416,8 +400,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-102",
         "instructors": [
           "sandeepchandran@iitpkd.ac.in"
@@ -429,11 +413,11 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_CS5658",
+    "id": "CS5658",
     "courseCode": "CS5658",
     "courseName": "GPU Programming",
     "credits": "3-1-0-4",
-    "category": "elective",
+    "category": "electives",
     "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
@@ -441,8 +425,8 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-102",
         "instructors": [
           "unnikrishnan@iitpkd.ac.in"
@@ -454,8 +438,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-102",
         "instructors": [
           "unnikrishnan@iitpkd.ac.in"
@@ -467,20 +451,20 @@
     ]
   },
   {
-    "id": "PG_MTechSOCD_EE5007",
+    "id": "EE5007",
     "courseCode": "EE5007",
     "courseName": "Linear Algebra for Engineers",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech, MS, PhD",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-103",
         "instructors": [
           "biren@iitpkd.ac.in"
@@ -492,8 +476,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-103",
         "instructors": [
           "biren@iitpkd.ac.in"
@@ -503,16 +487,5 @@
         }
       }
     ]
-  },
-  {
-    "id": "PG_MTechSOCD_SD5110",
-    "courseCode": "SD5110",
-    "courseName": "M.Tech Thesis/\nProject Phase 1",
-    "credits": "0-0-14-9",
-    "category": "project",
-    "rawAvailability": "",
-    "rawSlot": "",
-    "eligibility": {},
-    "meetings": []
   }
 ]

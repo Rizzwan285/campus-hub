@@ -1,10 +1,10 @@
 [
   {
-    "id": "PG_ESSENCE_ES5608",
+    "id": "ES5608",
     "courseCode": "ES5608",
     "courseName": "Principles and Practices of Regenerative Agriculture",
     "credits": "3-0-0-3",
-    "category": "elective",
+    "category": "ercsrc",
     "rawAvailability": "",
     "rawSlot": "H",
     "eligibility": {},

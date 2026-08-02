@@ -1,90 +1,44 @@
 [
   {
-    "id": "PG_HSS_HS6601",
+    "id": "HS6601",
     "courseCode": "HS6601",
     "courseName": "Approaches to Historical Research",
     "credits": "3",
-    "category": "elective",
+    "category": "hrc",
     "rawAvailability": "",
     "rawSlot": "Not required",
     "eligibility": {},
     "meetings": []
   },
   {
-    "id": "PG_HSS_HS7010",
+    "id": "HS7010",
     "courseCode": "HS7010",
     "courseName": "Qualitative Methods in Mental Health Research",
     "credits": "3",
-    "category": "elective",
-    "rawAvailability": "PhD in HSS (Psychology)",
+    "category": "hrc",
+    "rawAvailability": "",
     "rawSlot": "I don't require slots",
     "eligibility": {},
-    "meetings": [
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
-        "room": "",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
-        "room": "",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      }
-    ]
+    "meetings": []
   },
   {
-    "id": "PG_HSS_HS7011",
+    "id": "HS7011",
     "courseCode": "HS7011",
     "courseName": "Clinical Psychology, Culture & Mental Health",
     "credits": "3",
-    "category": "elective",
-    "rawAvailability": "PHD in HSS (Psychology)",
+    "category": "hrc",
+    "rawAvailability": "",
     "rawSlot": "I don't require slots",
     "eligibility": {},
-    "meetings": [
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
-        "room": "",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
-        "room": "",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      }
-    ]
+    "meetings": []
   },
   {
-    "id": "PG_HSS_HS6009",
+    "id": "HS6009",
     "courseCode": "HS6009",
     "courseName": "The Gender Question in India",
     "credits": "3",
-    "category": "elective",
-    "rawAvailability": "PHD in HSS (English-Culture Studies)",
+    "category": "hrc",
+    "rawAvailability": "",
     "rawSlot": "Not required",
     "eligibility": {},
     "meetings": []

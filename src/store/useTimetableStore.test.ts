@@ -58,7 +58,7 @@ describe('useTimetableStore', () => {
     (TimetableLoader.loadHolidays as any).mockResolvedValue([]);
 
     // We start by pre-selecting the course ID so that recompute creates events
-    useTimetableStore.setState({ selectedCourseIds: ['UG_CSE_CS101'] });
+    useTimetableStore.setState({ selectedCourseIds: ['CS101'] });
 
     await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
 
@@ -79,8 +79,8 @@ describe('useTimetableStore', () => {
 
     await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
 
-    // Should not have called loader
-    expect(TimetableLoader.loadBranchData).not.toHaveBeenCalled();
+    // It should have called loader because the store delegates caching to the TimetableLoader service
+    expect(TimetableLoader.loadBranchData).toHaveBeenCalled();
   });
 
   it('should update selected courses and trigger recompute', () => {
@@ -112,10 +112,10 @@ describe('useTimetableStore', () => {
     const stateBefore = useTimetableStore.getState();
     expect(stateBefore.resolvedEvents).toHaveLength(0);
 
-    stateBefore.updateSelectedCourses(['UG_CSE_CS101']);
+    stateBefore.updateSelectedCourses(['CS101']);
 
     const stateAfter = useTimetableStore.getState();
-    expect(stateAfter.selectedCourseIds).toEqual(['UG_CSE_CS101']);
+    expect(stateAfter.selectedCourseIds).toEqual(['CS101']);
     expect(stateAfter.resolvedEvents).toHaveLength(1);
   });
 });

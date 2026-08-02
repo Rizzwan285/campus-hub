@@ -1,0 +1,322 @@
+[
+  {
+    "id": "CE5515",
+    "courseCode": "CE5515",
+    "courseName": "Advanced Mechanics of Structures",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "D",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-213",
+        "instructors": [
+          "gokul@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "09:50",
+        "room": "A01-213",
+        "instructors": [
+          "gokul@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213",
+        "instructors": [
+          "gokul@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "CE5511",
+    "courseCode": "CE5511",
+    "courseName": "Advanced Design of Metal Structures",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "F",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "10:15",
+        "room": "A01-018",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:30",
+        "endTime": "11:45",
+        "room": "A01-018",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "CE5513",
+    "courseCode": "CE5513",
+    "courseName": "Structural Dynamics",
+    "credits": "3-0-0-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "L",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-120",
+        "instructors": [
+          "sanjukta@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-120",
+        "instructors": [
+          "sanjukta@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "GN5005",
+    "courseCode": "GN5005",
+    "courseName": "Communication Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "ID5002",
+    "courseCode": "ID5002",
+    "courseName": "Technical Writing Skills",
+    "credits": "1-0-0-1",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "SE5191",
+    "courseCode": "SE5191",
+    "courseName": "Comprehensive Viva",
+    "credits": "0",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "CE5017",
+    "courseCode": "CE5017",
+    "courseName": "Structural Design Practice",
+    "credits": "1-0-3-3",
+    "category": "core",
+    "rawAvailability": "",
+    "rawSlot": "E,PA5",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "CE5624",
+    "courseCode": "CE5624",
+    "courseName": "Stability and Strength of Structures",
+    "credits": "3",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "B03 (40 seater)",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "B03 (40 seater)",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "CE5510",
+    "courseCode": "CE5510",
+    "courseName": "Advanced Concrete Technology",
+    "credits": "3",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "K",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "A01-120",
+        "instructors": [
+          "naparna@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "A01-120",
+        "instructors": [
+          "naparna@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "CE5631",
+    "courseCode": "CE5631",
+    "courseName": "Analysis and Design of Presteressed Concrete Structures",
+    "credits": "3",
+    "category": "electives",
+    "rawAvailability": "",
+    "rawSlot": "C",
+    "eligibility": {},
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-213",
+        "instructors": [
+          "madhu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-213",
+        "instructors": [
+          "madhu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "11:00",
+        "endTime": "11:50",
+        "room": "A01-213",
+        "instructors": [
+          "madhu@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
+  },
+  {
+    "id": "SE5110",
+    "courseCode": "SE5110",
+    "courseName": "Project",
+    "credits": "0-0-20-8",
+    "category": "project",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  },
+  {
+    "id": "SE5190",
+    "courseCode": "SE5190",
+    "courseName": "Internship/Mini project",
+    "credits": "0",
+    "category": "project",
+    "rawAvailability": "",
+    "rawSlot": "",
+    "eligibility": {},
+    "meetings": []
+  }
+]

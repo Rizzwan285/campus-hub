@@ -1,6 +1,6 @@
 [
   {
-    "id": "PG_MTechPEPS_EE5024",
+    "id": "EE5024",
     "courseCode": "EE5024",
     "courseName": "DC-DC Power Converters - Analysis and Simulation",
     "credits": "3-0-2-4",
@@ -11,7 +11,7 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "14:00",
         "endTime": "15:15",
         "room": "A01-103 + A01-201 Computer Lab",
@@ -24,7 +24,7 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
+        "day": "Friday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "A01-103 + A01-201 Computer Lab",
@@ -51,20 +51,20 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_EE5017",
+    "id": "EE5017",
     "courseCode": "EE5017",
     "courseName": "Power System Analysis And Operation",
     "credits": "3-0-0-3",
     "category": "core",
-    "rawAvailability": "MTech:PEPS:S1:16\nMS/PhD:EE:",
+    "rawAvailability": "",
     "rawSlot": "L",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-214",
         "instructors": [
           "bharath_attoti@iitpkd.ac.in"
@@ -76,8 +76,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-214",
         "instructors": [
           "bharath_attoti@iitpkd.ac.in"
@@ -89,18 +89,18 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_EE5026",
+    "id": "EE5026",
     "courseCode": "EE5026",
     "courseName": "Modeling, Analysis and Simulation of Electrical Machines",
     "credits": "3-0-2-4",
     "category": "core",
-    "rawAvailability": "MTech:PEPS:S1:16\nMS/PhD:EE: 4\nBtech: EE: 5",
+    "rawAvailability": "",
     "rawSlot": "J+PM3",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "A01-119 + A01-201 Computer Lab",
@@ -113,9 +113,9 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-119 + A01-201 Computer Lab",
         "instructors": [
           "aguha@iitpkd.ac.in"
@@ -140,7 +140,7 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_GN5005",
+    "id": "GN5005",
     "courseCode": "GN5005",
     "courseName": "Communication Skills",
     "credits": "1-0-0-1",
@@ -151,7 +151,7 @@
     "meetings": []
   },
   {
-    "id": "PG_MTechPEPS_ID5002",
+    "id": "ID5002",
     "courseCode": "ID5002",
     "courseName": "Technical Writing Skills",
     "credits": "1-0-0-1",
@@ -160,6 +160,17 @@
     "rawSlot": "M (Thu)",
     "eligibility": {},
     "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "12:00",
+        "endTime": "12:50",
+        "room": "A01-119",
+        "instructors": [],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
       {
         "type": "lecture",
         "day": "Thursday",
@@ -174,18 +185,18 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_EE5616",
+    "id": "EE5616",
     "courseCode": "EE5616",
     "courseName": "Isolated DC-DC Converters",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "MTech: PEPS-S3\nMS/PhD: EE",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "I",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
+        "day": "Monday",
         "startTime": "14:00",
         "endTime": "15:15",
         "room": "A01-119",
@@ -198,7 +209,7 @@
       },
       {
         "type": "lecture",
-        "day": "Thursday",
+        "day": "Friday",
         "startTime": "15:30",
         "endTime": "16:45",
         "room": "A01-119",
@@ -212,12 +223,12 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_EE5624",
+    "id": "EE5624",
     "courseCode": "EE5624",
     "courseName": "Electronic Circuits for Power Applications",
     "credits": "2-0-2-3",
-    "category": "elective",
-    "rawAvailability": "MTech:PEPS:S1\nMS/PhD:EE",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "PM1+F",
     "eligibility": {},
     "meetings": [
@@ -237,8 +248,8 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "10:00",
-        "endTime": "11:15",
+        "startTime": "09:00",
+        "endTime": "10:15",
         "room": "Nila Electronics Lab + A01-119",
         "instructors": [
           "nagabrahmendra.g@iitpkd.ac.in"
@@ -250,8 +261,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "11:30",
-        "endTime": "12:45",
+        "startTime": "10:30",
+        "endTime": "11:45",
         "room": "Nila Electronics Lab + A01-119",
         "instructors": [
           "nagabrahmendra.g@iitpkd.ac.in"
@@ -263,20 +274,20 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_EE5013",
+    "id": "EE5013",
     "courseCode": "EE5013",
     "courseName": "Power System Dynamics",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "PhD:EE:S2:01",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-214",
         "instructors": [
           "mkj@iitpkd.ac.in"
@@ -288,8 +299,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-214",
         "instructors": [
           "mkj@iitpkd.ac.in"
@@ -301,20 +312,20 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_EE5603",
+    "id": "EE5603",
     "courseCode": "EE5603",
     "courseName": "Robot dynamics, control and motion planning",
     "credits": "3-0-0-3",
-    "category": "elective",
-    "rawAvailability": "BTech V, VII, MTech, MS, PhD",
+    "category": "electives",
+    "rawAvailability": "",
     "rawSlot": "K",
     "eligibility": {},
     "meetings": [
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "17:10",
-        "endTime": "18:00",
+        "startTime": "14:00",
+        "endTime": "15:15",
         "room": "A01-103",
         "instructors": [
           "snehagajbhiye@iitpkd.ac.in"
@@ -326,8 +337,8 @@
       {
         "type": "lecture",
         "day": "Thursday",
-        "startTime": "14:00",
-        "endTime": "15:15",
+        "startTime": "15:30",
+        "endTime": "16:45",
         "room": "A01-103",
         "instructors": [
           "snehagajbhiye@iitpkd.ac.in"
@@ -339,23 +350,23 @@
     ]
   },
   {
-    "id": "PG_MTechPEPS_PE5190",
+    "id": "PE5190",
     "courseCode": "PE5190",
     "courseName": "Internship/Mini-project",
     "credits": "0 (CWC)",
     "category": "project",
-    "rawAvailability": "MTech:PEPS:S3",
+    "rawAvailability": "",
     "rawSlot": "",
     "eligibility": {},
     "meetings": []
   },
   {
-    "id": "PG_MTechPEPS_PE5110",
+    "id": "PE5110",
     "courseCode": "PE5110",
     "courseName": "Professional Major Project Phase -1",
     "credits": "11",
     "category": "project",
-    "rawAvailability": "MTech:PEPS:S3",
+    "rawAvailability": "",
     "rawSlot": "",
     "eligibility": {},
     "meetings": []

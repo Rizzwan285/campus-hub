@@ -14,7 +14,7 @@
         "day": "Tuesday",
         "startTime": "10:30",
         "endTime": "11:45",
-        "room": "C06-105 (B1-B6)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [],
         "recurrence": {
           "type": "weekly"
@@ -25,7 +25,7 @@
         "day": "Thursday",
         "startTime": "09:00",
         "endTime": "10:15",
-        "room": "C06-105 (B1-B6)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [],
         "recurrence": {
           "type": "weekly"
@@ -36,7 +36,7 @@
         "day": "Wednesday",
         "startTime": "10:00",
         "endTime": "10:50",
-        "room": "C06-105 (B1-B6)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [],
         "recurrence": {
           "type": "weekly"
@@ -47,139 +47,7 @@
         "day": "Friday",
         "startTime": "08:00",
         "endTime": "08:50",
-        "room": "C06-105 (B1-B6)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "10:30",
-        "endTime": "11:45",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "09:00",
-        "endTime": "10:15",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "10:30",
-        "endTime": "11:45",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "09:00",
-        "endTime": "10:15",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "10:30",
-        "endTime": "11:45",
-        "room": "C06-104 (B19-B24)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "09:00",
-        "endTime": "10:15",
-        "room": "C06-104 (B19-B24)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
-        "room": "C06-104 (B19-B24)",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "C06-104 (B19-B24)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [],
         "recurrence": {
           "type": "weekly"
@@ -202,7 +70,7 @@
         "day": "Tuesday",
         "startTime": "09:00",
         "endTime": "10:15",
-        "room": "C06-105 (B1-B6)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [
           "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
         ],
@@ -215,7 +83,7 @@
         "day": "Thursday",
         "startTime": "10:30",
         "endTime": "11:45",
-        "room": "C06-105 (B1-B6)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [
           "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
         ],
@@ -228,124 +96,7 @@
         "day": "Friday",
         "startTime": "17:10",
         "endTime": "18:00",
-        "room": "C06-105 (B1-B6)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "10:15",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:30",
-        "endTime": "11:45",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "17:10",
-        "endTime": "18:00",
-        "room": "C06-106 (B7-B12)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "10:15",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:30",
-        "endTime": "11:45",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "17:10",
-        "endTime": "18:00",
-        "room": "C06-107 (B13-B18)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "09:00",
-        "endTime": "10:15",
-        "room": "C06-104 (B19-B24)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "10:30",
-        "endTime": "11:45",
-        "room": "C06-104 (B19-B24)",
-        "instructors": [
-          "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "17:10",
-        "endTime": "18:00",
-        "room": "C06-104 (B19-B24)",
+        "room": "C06-105 (B1-B6) | C06-106 (B7-B12) | C06-107 (B13-B18) | C06-104 (B19-B24)",
         "instructors": [
           "Dr. Srijan Sarkar, srijans@iitpkd.ac.in"
         ],
@@ -370,7 +121,7 @@
         "day": "Tuesday",
         "startTime": "12:00",
         "endTime": "12:50",
-        "room": "N203 (B1-B11)  (~132 students)",
+        "room": "N203 (B1-B11)  (~132 students) | N305 (B12-B18) (~84 students) | C6-104 (B19-B24)  (~72 students)",
         "instructors": [
           "Deepak Jaiswal (dj@iitpkd.ac.in)"
         ],
@@ -383,59 +134,7 @@
         "day": "Thursday",
         "startTime": "12:00",
         "endTime": "12:50",
-        "room": "N203 (B1-B11)  (~132 students)",
-        "instructors": [
-          "Deepak Jaiswal (dj@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "N305 (B12-B18) (~84 students)",
-        "instructors": [
-          "Deepak Jaiswal (dj@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "N305 (B12-B18) (~84 students)",
-        "instructors": [
-          "Deepak Jaiswal (dj@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "C6-104 (B19-B24)  (~72 students)",
-        "instructors": [
-          "Deepak Jaiswal (dj@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "C6-104 (B19-B24)  (~72 students)",
+        "room": "N203 (B1-B11)  (~132 students) | N305 (B12-B18) (~84 students) | C6-104 (B19-B24)  (~72 students)",
         "instructors": [
           "Deepak Jaiswal (dj@iitpkd.ac.in)"
         ],
@@ -460,7 +159,7 @@
         "day": "Monday",
         "startTime": "08:00",
         "endTime": "08:50",
-        "room": "C06-105(B1-B5)",
+        "room": "C06-105(B1-B5) | C06-106(B6-B10) | C06-107(B11-B15) | C06-104(B16-B20) | N-305(B21-B24)",
         "instructors": [
           "dinesh@iitpkd.ac.in"
         ],
@@ -473,7 +172,7 @@
         "day": "Wednesday",
         "startTime": "11:00",
         "endTime": "11:50",
-        "room": "C06-105(B1-B5)",
+        "room": "C06-105(B1-B5) | C06-106(B6-B10) | C06-107(B11-B15) | C06-104(B16-B20) | N-305(B21-B24)",
         "instructors": [
           "dinesh@iitpkd.ac.in"
         ],
@@ -486,163 +185,7 @@
         "day": "Friday",
         "startTime": "09:00",
         "endTime": "09:50",
-        "room": "C06-105(B1-B5)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "C06-106(B6-B10)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "C06-106(B6-B10)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
-        "room": "C06-106(B6-B10)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "C06-107(B11-B15)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "C06-107(B11-B15)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
-        "room": "C06-107(B11-B15)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "C06-104(B16-B20)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "C06-104(B16-B20)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
-        "room": "C06-104(B16-B20)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "N-305(B21-B24)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "N-305(B21-B24)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
-        "room": "N-305(B21-B24)",
+        "room": "C06-105(B1-B5) | C06-106(B6-B10) | C06-107(B11-B15) | C06-104(B16-B20) | N-305(B21-B24)",
         "instructors": [
           "dinesh@iitpkd.ac.in"
         ],
@@ -1040,17 +583,6 @@
         "startTime": "14:00",
         "endTime": "15:50",
         "room": "N-203/204 (theory) Nila-computer labs",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lab",
-        "day": "Wednesday",
-        "startTime": "14:00",
-        "endTime": "15:50",
-        "room": "N-203/204 (theory) Nila-computer labs",
         "instructors": [
           "Dr. Abdul Rasheed P., abdulrasheed@iitpkd.ac.in"
         ],
@@ -1075,7 +607,7 @@
         "day": "Tuesday",
         "startTime": "12:00",
         "endTime": "12:50",
-        "room": "A01-007 (DS+ME+CE )",
+        "room": "A01-007 (DS+ME+CE ) | A01-002 (EE+CS)",
         "instructors": [
           "prasannabhat@iitpkd.ac.in"
         ],
@@ -1088,33 +620,7 @@
         "day": "Thursday",
         "startTime": "12:00",
         "endTime": "12:50",
-        "room": "A01-007 (DS+ME+CE )",
-        "instructors": [
-          "prasannabhat@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-002 (EE+CS)",
-        "instructors": [
-          "prasannabhat@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-002 (EE+CS)",
+        "room": "A01-007 (DS+ME+CE ) | A01-002 (EE+CS)",
         "instructors": [
           "prasannabhat@iitpkd.ac.in"
         ],
