@@ -3,6 +3,7 @@ import { CourseOffering, Holiday } from '../engine/types';
 export class TimetableLoader {
   private static courseCache: Map<string, Promise<CourseOffering[]>> = new Map();
   private static holidayCache: Promise<Holiday[]> | null = null;
+  private static allCoursesCache: Promise<CourseOffering[]> | null = null;
 
   /**
    * Loads branch-specific timetable data asynchronously.
@@ -63,10 +64,43 @@ export class TimetableLoader {
   }
 
   /**
+   * Loads ALL courses across all branches and programs (UG & PG)
+   * This is useful so students can select cross-listed or PG electives.
+   */
+  static async loadAllCourses(): Promise<CourseOffering[]> {
+    if (this.allCoursesCache) {
+      return this.allCoursesCache;
+    }
+
+    const loadPromise = (async () => {
+      const modules = import.meta.glob('../data/timetable/*/*.json');
+      const allCourses: CourseOffering[] = [];
+      
+      for (const path in modules) {
+        // Glob includes PG/..., UG/..., but let's be safe
+        if (path.includes('slots.json') || path.includes('holidays.json')) continue;
+        
+        try {
+          const module = await modules[path]() as { default: CourseOffering[] };
+          allCourses.push(...module.default);
+        } catch (error) {
+          console.warn(`Failed to load ${path}`, error);
+        }
+      }
+      
+      return allCourses;
+    })();
+
+    this.allCoursesCache = loadPromise;
+    return loadPromise;
+  }
+
+  /**
    * Clears the in-memory cache
    */
   static clearCache(): void {
     this.courseCache.clear();
     this.holidayCache = null;
+    this.allCoursesCache = null;
   }
 }

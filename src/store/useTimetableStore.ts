@@ -137,16 +137,15 @@ export const useTimetableStore = create<TimetableState>()(
           set({ isLoading: true, error: null, program, branch });
 
           try {
-            const [branchData, commonData, holidays] = await Promise.all([
-              TimetableLoader.loadBranchData(program, branch),
+            const [allCoursesRaw, commonData, holidays] = await Promise.all([
+              TimetableLoader.loadAllCourses(),
               TimetableLoader.loadCommonData(program),
               TimetableLoader.loadHolidays()
             ]);
 
             // Combine branch-specific and common courses and deduplicate by courseCode
-            const rawAllCourses = [...branchData, ...commonData];
-            const courseMap = new Map<string, typeof rawAllCourses[0]>();
-            rawAllCourses.forEach(c => {
+            const courseMap = new Map<string, typeof allCoursesRaw[0]>();
+            allCoursesRaw.forEach(c => {
               if (!courseMap.has(c.courseCode)) {
                 courseMap.set(c.courseCode, c);
               }
@@ -177,7 +176,8 @@ export const useTimetableStore = create<TimetableState>()(
                 
               const extraIds = [];
               if (branch === 'DS') {
-                const ds1010 = branchData.find(c => c.courseCode === 'DS1010');
+                // Since we load all courses now, find DS1010 safely
+                const ds1010 = allCourses.find(c => c.courseCode === 'DS1010');
                 if (ds1010) extraIds.push(ds1010.courseCode);
               }
               
