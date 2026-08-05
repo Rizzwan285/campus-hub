@@ -168,32 +168,6 @@
         }
       },
       {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "C06-105(B1-B5) | C06-106(B6-B10) | C06-107(B11-B15) | C06-104(B16-B20) | N-305(B21-B24)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
-        "room": "C06-105(B1-B5) | C06-106(B6-B10) | C06-107(B11-B15) | C06-104(B16-B20) | N-305(B21-B24)",
-        "instructors": [
-          "dinesh@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
         "type": "lab",
         "day": "Monday",
         "startTime": "09:00",
@@ -272,35 +246,9 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "10:00",
-        "endTime": "10:50",
-        "room": "A01-007(B1-B24)",
-        "instructors": [
-          "mayank@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "08:00",
         "endTime": "08:50",
-        "room": "A01-007(B1-B24)",
-        "instructors": [
-          "mayank@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "11:00",
-        "endTime": "11:50",
         "room": "A01-007(B1-B24)",
         "instructors": [
           "mayank@iitpkd.ac.in"
