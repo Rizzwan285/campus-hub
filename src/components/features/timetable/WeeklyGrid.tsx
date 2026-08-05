@@ -129,9 +129,9 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
       <div className="flex flex-col min-w-[1400px] w-full h-full relative">
         
         {/* Header Row: Sticky Top */}
-        <div className="flex sticky top-0 z-40 bg-muted/80 backdrop-blur-sm border-b h-10 shadow-sm shrink-0">
+        <div className="flex sticky top-0 z-10 bg-muted/80 backdrop-blur-sm border-b h-10 shadow-sm shrink-0">
           {/* Corner */}
-          <div className="w-20 shrink-0 border-r sticky left-0 z-50 bg-muted/90" />
+          <div className="w-20 shrink-0 border-r sticky left-0 z-20 bg-muted/90" />
           
           {/* Time Axis */}
           <div className="flex-1 relative">
