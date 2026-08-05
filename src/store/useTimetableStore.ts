@@ -86,13 +86,33 @@ export const useTimetableStore = create<TimetableState>()(
           const batchNo = parseInt(profile.batchNo?.replace(/[^0-9]/g, '') || '0', 10);
           if (batchNo > 0) {
             activeCourses = activeCourses.map(course => {
-              const newMeetings = course.meetings.map(m => {
-                const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
-                if (customRoom) {
-                  return { ...m, room: customRoom };
-                }
-                return m;
-              });
+              const newMeetings = course.meetings
+                .filter(m => {
+                  const regex = /\bB(\d+)\s*-\s*B(\d+)\b/gi;
+                  let match;
+                  let hasRestriction = false;
+                  let allowed = false;
+                  
+                  while ((match = regex.exec(m.room)) !== null) {
+                    hasRestriction = true;
+                    const start = parseInt(match[1], 10);
+                    const end = parseInt(match[2], 10);
+                    if (batchNo >= start && batchNo <= end) {
+                      allowed = true;
+                    }
+                  }
+                  
+                  // If no batch restriction is mentioned, it's for everyone.
+                  return !hasRestriction || allowed;
+                })
+                .map(m => {
+                  const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
+                  if (customRoom) {
+                    return { ...m, room: customRoom };
+                  }
+                  return m;
+                });
+                
               return { ...course, meetings: newMeetings };
             });
           }
