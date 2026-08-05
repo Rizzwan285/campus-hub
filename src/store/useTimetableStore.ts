@@ -106,11 +106,41 @@ export const useTimetableStore = create<TimetableState>()(
                   return !hasRestriction || allowed;
                 })
                 .map(m => {
+                  let finalRoom = m.room;
+                  
+                  if (m.room.includes('|') || /\bB\d+/.test(m.room)) {
+                    const parts = m.room.split('|').map(p => p.trim());
+                    const validParts = parts.filter(part => {
+                      const regex = /\bB(\d+)\s*-\s*B(\d+)\b/gi;
+                      let match;
+                      let hasRestriction = false;
+                      let allowed = false;
+                      while ((match = regex.exec(part)) !== null) {
+                        hasRestriction = true;
+                        const start = parseInt(match[1], 10);
+                        const end = parseInt(match[2], 10);
+                        if (batchNo >= start && batchNo <= end) {
+                          allowed = true;
+                        }
+                      }
+                      return !hasRestriction || allowed;
+                    });
+                    
+                    if (validParts.length > 0) {
+                      finalRoom = validParts.join(' | ')
+                        .replace(/\(?\bB\d+\s*-\s*B\d+\b\)?/gi, '')
+                        .replace(/\(~\d+\s*students\)/gi, '')
+                        .replace(/\s+/g, ' ')
+                        .replace(/\s+\|\s+/g, ' | ')
+                        .trim();
+                    }
+                  }
+
                   const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
                   if (customRoom) {
-                    return { ...m, room: customRoom };
+                    finalRoom = customRoom;
                   }
-                  return m;
+                  return { ...m, room: finalRoom };
                 });
                 
               return { ...course, meetings: newMeetings };
