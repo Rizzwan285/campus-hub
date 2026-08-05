@@ -74,21 +74,20 @@ export class TimetableLoader {
 
     const loadPromise = (async () => {
       const modules = import.meta.glob('../data/timetable/*/*.json');
-      const allCourses: CourseOffering[] = [];
       
-      for (const path in modules) {
-        // Glob includes PG/..., UG/..., but let's be safe
-        if (path.includes('slots.json') || path.includes('holidays.json')) continue;
-        
-        try {
-          const module = await modules[path]() as { default: CourseOffering[] };
-          allCourses.push(...module.default);
-        } catch (error) {
-          console.warn(`Failed to load ${path}`, error);
-        }
-      }
+      const fetchPromises = Object.entries(modules)
+        .filter(([path]) => !path.includes('slots.json') && !path.includes('holidays.json'))
+        .map(([path, importFn]) => 
+          (importFn() as Promise<{ default: CourseOffering[] }>)
+            .then(module => module.default)
+            .catch(error => {
+              console.warn(`Failed to load ${path}`, error);
+              return [] as CourseOffering[];
+            })
+        );
       
-      return allCourses;
+      const results = await Promise.all(fetchPromises);
+      return results.flat();
     })();
 
     this.allCoursesCache = loadPromise;

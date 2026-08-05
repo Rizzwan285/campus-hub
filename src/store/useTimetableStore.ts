@@ -83,7 +83,7 @@ export const useTimetableStore = create<TimetableState>()(
 
         const profile = useUserStore.getState().profile;
         if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
-          const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
+          const batchNo = parseInt(profile.batchNo?.replace(/[^0-9]/g, '') || '0', 10);
           if (batchNo > 0) {
             activeCourses = activeCourses.map(course => {
               const newMeetings = course.meetings.map(m => {
@@ -175,7 +175,7 @@ export const useTimetableStore = create<TimetableState>()(
             // If changing program or branch, we should probably reset courses if they are invalid,
             // but the filtering naturally ignores invalid IDs. For 1st years, we actively manage their core courses.
             if (program === 'UG' && profile?.yearOfStudy === '1') {
-              const batchNo = parseInt(profile.batchNo?.replace('B', '') || '0', 10);
+              const batchNo = parseInt(profile.batchNo?.replace(/[^0-9]/g, '') || '0', 10);
               let excludedCodes: string[] = ['BT2010']; // Life science not in this semester
               
               if (batchNo >= 1 && batchNo <= 12) {
@@ -185,7 +185,7 @@ export const useTimetableStore = create<TimetableState>()(
               }
 
               const commonCoreIds = commonData
-                .filter(c => c.category?.toLowerCase() === 'core' && !excludedCodes.includes(c.courseCode))
+                .filter(c => c.category?.toLowerCase().includes('core') && !excludedCodes.includes(c.courseCode))
                 .map(c => c.courseCode);
                 
               const extraIds = [];
