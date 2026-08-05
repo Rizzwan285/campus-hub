@@ -24,12 +24,16 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
     return () => clearInterval(timer);
   }, []);
 
+  const PADDING_PCT = 2.5;
+  const SCALE_PCT = 100 - (PADDING_PCT * 2);
+
   const getPercentage = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const minutesFromStart = (hours - START_HOUR) * 60 + minutes;
     const totalMinutes = TOTAL_HOURS * 60;
-    return Math.max(0, Math.min(100, (minutesFromStart / totalMinutes) * 100));
+    const raw = Math.max(0, Math.min(100, (minutesFromStart / totalMinutes) * 100));
+    return PADDING_PCT + (raw * (SCALE_PCT / 100));
   };
 
   const getDurationPercentage = (start: Date, end: Date) => {
@@ -37,7 +41,8 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
     const endMins = end.getHours() * 60 + end.getMinutes();
     const durationMins = endMins - startMins;
     const totalMinutes = TOTAL_HOURS * 60;
-    return Math.max(0, Math.min(100, (durationMins / totalMinutes) * 100));
+    const raw = Math.max(0, Math.min(100, (durationMins / totalMinutes) * 100));
+    return raw * (SCALE_PCT / 100);
   };
 
   const isCollision = (event: CalendarEvent) => {
@@ -129,7 +134,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
               <div 
                 key={hour}
                 className="absolute h-full border-l border-border/50 flex justify-center -translate-x-1/2"
-                style={{ left: `${((hour - START_HOUR) / TOTAL_HOURS) * 100}%` }}
+                style={{ left: `${PADDING_PCT + (((hour - START_HOUR) / TOTAL_HOURS) * 100) * (SCALE_PCT / 100)}%` }}
               >
                 <span className="text-xs text-muted-foreground pt-1">{hour}:00</span>
               </div>
@@ -143,19 +148,19 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
             <div 
               key={hour} 
               className="absolute h-full border-l border-border/20"
-              style={{ left: `${((hour - START_HOUR) / TOTAL_HOURS) * 100}%` }}
+              style={{ left: `${PADDING_PCT + (((hour - START_HOUR) / TOTAL_HOURS) * 100) * (SCALE_PCT / 100)}%` }}
             />
           ))}
         </div>
 
         {/* Current Time Line */}
         {showCurrentTime && (
-          <div className="absolute top-10 bottom-0 left-20 right-0 pointer-events-none z-20">
+          <div className="absolute top-10 bottom-0 left-20 right-0 pointer-events-none z-0">
             <div 
-              className="absolute top-0 bottom-0 border-l-2 border-red-500 flex justify-center"
+              className="absolute top-0 bottom-0 border-l-2 border-dashed border-primary/50 flex justify-center"
               style={{ left: `${currentTimePercentage}%` }}
             >
-              <div className="w-2 h-2 rounded-full bg-red-500 -mt-1 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-primary/80 -mt-1 shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
             </div>
           </div>
         )}
@@ -169,11 +174,14 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
             return (
               <div key={dayName} className="flex-1 flex border-b border-border/50 relative group min-h-[80px]">
                 {/* Day Header (Sticky Left) */}
-                <div className={`w-20 shrink-0 border-r flex flex-col justify-center items-center sticky left-0 z-30 transition-colors ${isToday ? 'bg-primary/10' : 'bg-background group-hover:bg-muted/30'}`}>
-                  <span className={`text-sm font-semibold ${isToday ? 'text-primary' : ''}`}>
-                    {dayName.slice(0, 3)}
-                  </span>
-                  {isToday && <span className="text-[9px] uppercase bg-primary/20 text-primary px-1 mt-1 rounded">Today</span>}
+                <div className="w-20 shrink-0 border-r sticky left-0 z-30 bg-background">
+                  <div className={`absolute inset-0 transition-colors ${isToday ? 'bg-primary/10' : 'group-hover:bg-muted/30'}`} />
+                  <div className="relative h-full w-full flex flex-col justify-center items-center">
+                    <span className={`text-sm font-semibold ${isToday ? 'text-primary' : ''}`}>
+                      {dayName.slice(0, 3)}
+                    </span>
+                    {isToday && <span className="text-[9px] uppercase bg-primary/20 text-primary px-1 mt-1 rounded">Today</span>}
+                  </div>
                 </div>
 
                 {/* Events Row */}

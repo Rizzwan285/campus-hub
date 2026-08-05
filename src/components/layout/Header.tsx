@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, ChevronRight, RotateCcw, LogOut, Compass } from 'lucide-react';
+import { Moon, Sun, ChevronRight, RotateCcw, LogOut, Stars } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatTime, formatDate, getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { addDays } from 'date-fns';
@@ -58,7 +58,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
         <div>
           <div className="flex items-center gap-2.5 mb-1.5">
             <div className="p-1.5 bg-primary/10 rounded-lg">
-              <Compass className="h-5 w-5 text-primary" />
+              <Stars className="h-5 w-5 text-primary" />
             </div>
             <span className="text-sm font-semibold text-primary/80 tracking-wide uppercase">Campus Companion</span>
           </div>
