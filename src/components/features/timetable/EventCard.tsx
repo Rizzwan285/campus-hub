@@ -26,9 +26,8 @@ export function EventCard({ event, left, width, isCollision }: EventCardProps) {
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
         <div 
-          className={`absolute h-[calc(100%-8px)] my-[4px] rounded-md border p-1.5 sm:p-2 overflow-hidden shadow-sm transition-all hover:z-20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer group
-            ${baseColor}
-            ${isCollision ? 'ring-2 ring-destructive ring-offset-1 border-destructive' : ''}
+          className={`absolute h-[calc(100%-8px)] my-[4px] rounded-md border overflow-hidden shadow-sm transition-all hover:z-20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer group bg-background
+            ${isCollision ? 'ring-2 ring-destructive ring-offset-1 border-destructive' : 'border-primary/15'}
           `}
           style={{
             left: `${left}%`,
@@ -38,7 +37,10 @@ export function EventCard({ event, left, width, isCollision }: EventCardProps) {
           tabIndex={0}
           aria-label={`${event.courseCode} ${event.type} from ${formatTime(event.startTime)} to ${formatTime(event.endTime)} in ${event.room}`}
         >
-          <div className="flex flex-col h-full text-xs relative">
+          {/* Tint overlay so the card is opaque but looks colored */}
+          <div className={`absolute inset-0 pointer-events-none ${baseColor.split(' ').filter(c => c.startsWith('bg-')).join(' ')}`} />
+          
+          <div className={`flex flex-col h-full text-xs relative p-1.5 sm:p-2 ${baseColor.split(' ').filter(c => !c.startsWith('bg-') && !c.startsWith('border-')).join(' ')}`}>
             <div className="flex items-center justify-between gap-1">
               <span className="font-bold truncate">{event.courseCode}</span>
               {isCollision && <AlertTriangle className="h-3 w-3 text-destructive shrink-0" />}
