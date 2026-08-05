@@ -98,17 +98,22 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
                 const baseColor = stringToColorClass(event.courseCode);
                 const hasCollision = isCollision(event);
                 return (
-                  <div key={event.id} className={`flex flex-col p-3 rounded-md border shadow-sm ${hasCollision ? 'border-destructive ring-1 ring-destructive' : ''} ${baseColor}`}>
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="font-bold text-sm">{event.courseCode}</span>
-                      <span className="text-xs font-semibold bg-background/50 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/20">
-                        {formatTime(event.startTime)} - {formatTime(event.endTime)}
-                      </span>
-                    </div>
-                    <span className="text-xs opacity-90 mb-2 line-clamp-1">{event.courseName}</span>
-                    <div className="flex items-center justify-between text-[11px] mt-auto pt-2 border-t border-border/30 opacity-90">
-                      <span className="capitalize font-semibold">{event.type}</span>
-                      <span className="font-semibold">{event.room}</span>
+                  <div key={event.id} className={`relative flex flex-col rounded-md border shadow-sm overflow-hidden bg-background ${hasCollision ? 'border-destructive ring-1 ring-destructive' : 'border-primary/15'}`}>
+                    {/* Tint overlay */}
+                    <div className={`absolute inset-0 pointer-events-none ${baseColor.split(' ').filter(c => c.startsWith('bg-')).join(' ')}`} />
+                    
+                    <div className={`flex flex-col p-3 relative ${baseColor.split(' ').filter(c => !c.startsWith('bg-') && !c.startsWith('border-')).join(' ')}`}>
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="font-bold text-sm">{event.courseCode}</span>
+                        <span className="text-xs font-semibold bg-background/50 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/20">
+                          {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                        </span>
+                      </div>
+                      <span className="text-xs opacity-90 mb-2 line-clamp-1">{event.courseName}</span>
+                      <div className="flex items-center justify-between text-[11px] mt-auto pt-2 border-t border-border/30 opacity-90">
+                        <span className="capitalize font-semibold">{event.type}</span>
+                        <span className="font-semibold">{event.room}</span>
+                      </div>
                     </div>
                   </div>
                 );
