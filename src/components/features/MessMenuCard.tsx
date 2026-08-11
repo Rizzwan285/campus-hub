@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
-import { UtensilsCrossed, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { UtensilsCrossed, ChevronLeft, ChevronRight, Clock, CalendarDays } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import {
-  kedaramMessMenu, commonItems,
+  week1and3Menu, week2and4Menu, commonItems,
   nilaMessMenu, nilaCommonItems,
   weekdayTimings, weekendTimings,
   type WeekMenu,
 } from '@/data/messData';
+import { getWeekCycle } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 
 interface MessMenuCardProps {
@@ -21,7 +22,6 @@ type Campus = 'kedaram' | 'nila';
 interface CampusConfig {
   label: string;
   subtitle: string;
-  menu: WeekMenu;
   commonItems: Record<string, string>;
 }
 
@@ -29,7 +29,6 @@ const CAMPUS_CONFIG: Record<Campus, CampusConfig> = {
   kedaram: {
     label: 'Kedaram',
     subtitle: 'Ideal Catering',
-    menu: kedaramMessMenu,
     commonItems: {
       Breakfast: commonItems.breakfast,
       Lunch: commonItems.lunch,
@@ -40,7 +39,6 @@ const CAMPUS_CONFIG: Record<Campus, CampusConfig> = {
   nila: {
     label: 'Nila',
     subtitle: 'Manu Catering',
-    menu: nilaMessMenu,
     commonItems: {
       Breakfast: nilaCommonItems.breakfast,
       Lunch: nilaCommonItems.lunch,
@@ -118,8 +116,24 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
   // Initialize with profile's mess if available, otherwise 'kedaram'
   const initialCampus = profile?.mess ? (profile.mess.toLowerCase() as Campus) : 'kedaram';
   const [campus, setCampus] = useState<Campus>(initialCampus);
+  
+  const autoWeekCycle = useMemo(() => getWeekCycle(date), [date]);
+  const [weekCycle, setWeekCycle] = useState<'week13' | 'week24'>(autoWeekCycle);
+
+  useEffect(() => {
+    setWeekCycle(autoWeekCycle);
+  }, [autoWeekCycle]);
+
   const config = CAMPUS_CONFIG[campus];
-  const dayMenu = config.menu[dayName];
+
+  const selectedMenu: WeekMenu = useMemo(() => {
+    if (campus === 'kedaram') {
+      return weekCycle === 'week13' ? week1and3Menu : week2and4Menu;
+    }
+    return nilaMessMenu;
+  }, [campus, weekCycle]);
+
+  const dayMenu = selectedMenu[dayName];
 
   const autoMealIndex = useMemo(() => getCurrentMealIndex(date), [date]);
   const [activeMealIndex, setActiveMealIndex] = useState(autoMealIndex);
@@ -159,7 +173,7 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
       </div>
 
       {/* Campus Toggle */}
-      <div className="flex rounded-lg bg-muted/50 p-1 mb-5">
+      <div className="flex rounded-lg bg-muted/50 p-1 mb-3">
         {(Object.keys(CAMPUS_CONFIG) as Campus[]).map((key) => (
           <button
             key={key}
@@ -174,6 +188,38 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
           </button>
         ))}
       </div>
+
+      {/* Week Cycle Switcher for Kedaram Mess */}
+      {campus === 'kedaram' && (
+        <div className="flex items-center justify-between gap-1.5 p-1 bg-muted/30 border border-border/40 rounded-lg mb-5 text-xs">
+          <div className="flex items-center gap-1 pl-2 text-muted-foreground font-medium text-[11px] sm:text-xs">
+            <CalendarDays className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+            <span className="hidden sm:inline">Week:</span>
+          </div>
+          <div className="flex flex-1 sm:flex-initial gap-1">
+            <button
+              onClick={() => setWeekCycle('week13')}
+              className={`flex-1 sm:flex-initial text-[11px] sm:text-xs font-medium py-1 px-2.5 rounded-md transition-all duration-200 ${
+                weekCycle === 'week13'
+                  ? 'bg-primary/15 text-primary border border-primary/30 font-semibold shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Odd (1st & 3rd) {autoWeekCycle === 'week13' && <span className="opacity-75 text-[10px] ml-0.5">• Today</span>}
+            </button>
+            <button
+              onClick={() => setWeekCycle('week24')}
+              className={`flex-1 sm:flex-initial text-[11px] sm:text-xs font-medium py-1 px-2.5 rounded-md transition-all duration-200 ${
+                weekCycle === 'week24'
+                  ? 'bg-primary/15 text-primary border border-primary/30 font-semibold shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Even (2nd & 4th) {autoWeekCycle === 'week24' && <span className="opacity-75 text-[10px] ml-0.5">• Today</span>}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Meal Navigation */}
       <div className="flex items-center justify-between gap-2 mb-5">
