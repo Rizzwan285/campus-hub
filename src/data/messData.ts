@@ -21,54 +21,99 @@ export const commonItems = {
   dinner: "Appalam, Mixed Salad, Pickle (Mango, Chilli, Mix), White Rice, Kerala Rice"
 };
 
-// Kedaram Mess Menu (Same for all weeks)
-export const kedaramMessMenu: WeekMenu = {
+// Kedaram Mess Menu — Odd Weeks (1st & 3rd Week)
+export const week1and3Menu: WeekMenu = {
   Monday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Idli", "Vada", "Chutney", "Sambhar", "Boiled Egg/Banana"] }],
-    Lunch: [{ meal: "Lunch", items: ["Chawali Masala", "Aloo Palak Dry", "Dal Palak", "Kollu Rasam", "Kokam Juice"] }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Snack Gourd Dry Veg", "Mix Dal", "Andhra Rasam", "Ice Cream"], veg: "Paneer Butter Masala", nonVeg: "Egg Masala" }]
+    Breakfast: [{ meal: "Breakfast", items: ["Idli", "Wada", "Sambhar", "Chatni", "Boiled Egg/Banana", "Boiled Peanut", "Cornflakes"] }],
+    Lunch: [{ meal: "Lunch", items: ["Padwal Chana Dry", "Aloo Tomato Raswala", "Jeera Rice", "Dal Makhani", "Sambhar", "Rasam", "Fresh Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Cabbage Thoran", "Gobi Mutter Masala", "Steam Rice", "Dal Methi", "Rasam", "Seviya Kheer"] }]
   },
   Tuesday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Pav Bhaji", "Appam", "Veg Stew", "Boiled Egg/Banana"] }],
-    Lunch: [{ meal: "Lunch", items: ["Green Peas Masala", "Aloo Bhindi Dry", "Dal Tadka", "Sambhar", "Watermelon Juice"] }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Veg Tawa", "Black Chana Masala", "Moong Dal Tadka", "Rasam Kokam", "Pineapple Sheera"] }]
+    Breakfast: [{ meal: "Breakfast", items: ["Poori Bhaji/Puttu", "Kadala Curry", "Boiled Egg/Watermelon", "Sprouted Moong", "Bournvita"] }],
+    Lunch: [{ meal: "Lunch", items: ["Mix Veg Dry", "Dahi Kadhi Pakoda", "Sambhar", "Flavoured Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Paneer Mutter Masala", "Tomato Rice", "Dal Pancharatna", "Rasam", "Ice Cream"] }]
   },
   Wednesday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Upma", "Poha", "Chutney"], nonVeg: "Omelette", veg: "Mix Fruits" }],
-    Lunch: [{ meal: "Lunch", items: ["Rajma Masala", "Mix Veg Dry", "Dal Kolhapuri", "Jal Jeera", "Puri", "Sambhar"] }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Ghee Rice", "Dry Veg", "Dal Tomato", "Gulab Jamun", "Rasam", "Palak Paratha"], veg: "Paneer Butter Masala", nonVeg: "Chicken Masala" }]
+    Breakfast: [{ meal: "Breakfast", items: ["Podi Dosa", "Chatni", "Sambhar", "Boiled Egg/Banana", "Boiled Chana", "Oats"] }],
+    Lunch: [{ meal: "Lunch", items: ["Aloo Bhindi Dry", "Rajma Masala", "Tadka Rice", "Dal Kolhapuri", "Sambhar", "Rasam", "Fresh Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Dudhi Chana Dry", "Steam Rice", "Dal Methi", "Rasam", "Gulab Jamun"], veg: "Paneer Kadai", nonVeg: "Chicken Kadai" }]
   },
   Thursday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Podi Dosa", "Red Chutney", "Sambhar"], nonVeg: "Omelette", veg: "Kerala Banana" }],
-    Lunch: [{ meal: "Lunch", items: ["Palak Khichdi", "Kadhi Pakoda", "Mix Veg Dry", "Sambhar", "Pineapple Juice"] }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Chole Masala", "Cabbage Poriyal", "Andhra Rasam", "Dal Palak", "Vermicelli Kheer"] }]
+    Breakfast: [{ meal: "Breakfast", items: ["Poha & Upma", "Chatni", "Mix Sprouts", "Cornflakes"], veg: "Cut Fruits", nonVeg: "Omelette" }],
+    Lunch: [{ meal: "Lunch", items: ["Aloo Jeera Dry", "Chole Masala", "Poori", "Dal Tadka", "Moru Curry", "Flavoured Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Tendli Chana (Kovakka) Dry", "Corn Capsicum/Mushroom Masala", "Steam Rice", "Dal Palak", "Rasam", "Pineapple Sheera"] }]
   },
   Friday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Puri", "Aloo Tomato Sabji", "Idiyappam", "Kadala Curry", "Boiled Egg/Cut Fruits"] }],
-    Lunch: [{ meal: "Lunch", items: ["Carrot Beans Dry", "Paneer Kadhai", "Dal Fry", "Kokam Rasam", "Juice"] }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Mix Whole Pulses", "Dal", "Coconut Burfi", "Sambhar", "Chapati"], veg: "Paneer Do Pyaza", nonVeg: "Chicken Curry" }]
+    Breakfast: [{ meal: "Breakfast", items: ["Pav Bhaji", "Vellappam with Veg Stew", "Boiled Egg/Banana", "Sprouts", "Bournvita"] }],
+    Lunch: [{ meal: "Lunch", items: ["Carrot Aloo Beans Dry", "Sprouted Mix Curry", "Steam Rice", "Dal Fry", "Methi Paratha", "Sambhar", "Fresh Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Cabbage Poriyal", "Ghee Rice", "Mix Dal", "Burfi/Laddu"], veg: "Paneer Kolhapuri", nonVeg: "Chicken Kolhapuri" }]
   },
   Saturday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Aloo Paratha", "Curd", "Poha", "Chutney", "Pickle", "Tomato Sauce"], nonVeg: "Omelette", veg: "Cut Fruits" }],
-    Lunch: [{ meal: "Lunch", items: ["Jeera Rice", "Baingan Masala", "Tawa Veg", "Sambhar", "Lime Juice", "Mix Dal"] }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Veg Fried Rice", "Veg Noodles/Veg Manchurian", "Soya Bean Masala", "Chana Dal", "Rasam", "Moong Dal Payasam"] }]
+    Breakfast: [{ meal: "Breakfast", items: ["Aloo Paratha/Seviya Upma", "Curd/Green Chatni", "Boiled Egg/Banana", "Oats", "Sprouts"] }],
+    Lunch: [{ meal: "Lunch", items: ["Chana Masala", "Veg Pulao", "Veg Raita", "Tadka Rice", "Dal Fry", "Buttermilk", "Yellow Dal Tadka", "Rasam", "Flavoured Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Aloo Capsicum Dry", "Soyabean Mutter Masala", "Tadka Rice", "Yellow Dal Tadka", "Sambhar", "Payasam"] }]
   },
   Sunday: {
-    Breakfast: [{ meal: "Breakfast", items: ["Masala Dosa", "Coconut Chutney", "Sambhar", "Boiled Egg/Banana"] }],
-    Lunch: [{ meal: "Lunch", items: ["Veg Raita", "Dal Pappu", "Dry Veg Seasonal", "Lemon Juice", "Triangle Paratha", "Rasam"], veg: "Paneer Biryani", nonVeg: "Chicken Biryani" }],
-    Snacks: [{ meal: "Snacks", items: ["Tea", "Coffee", "Milk"] }],
-    Dinner: [{ meal: "Dinner", items: ["Matar Masala", "Aloo Capsicum", "Mix Veg Sambhar", "Dal Tadka", "Moong Dal Halwa"] }]
+    Breakfast: [{ meal: "Breakfast", items: ["Masala Dosa", "Sambhar", "Chatni", "Boiled Egg/Banana", "Cornflakes", "Sprouts"] }],
+    Lunch: [{ meal: "Lunch", items: ["Raita", "Beetroot Dry", "Dal Tadka", "Lime Juice"], veg: "Veg / Paneer Biryani", nonVeg: "Chicken Biryani" }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Raw Banana Dry", "Aloo Mutter Gravy", "Steam Rice", "Dal Fry", "Triangle Paratha", "Sambhar", "Fruit Custard"] }]
   }
 };
 
-export const week1and3Menu: WeekMenu = kedaramMessMenu;
-export const week2and4Menu: WeekMenu = kedaramMessMenu;
+// Kedaram Mess Menu — Even Weeks (2nd & 4th Week)
+export const week2and4Menu: WeekMenu = {
+  Monday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Idli", "Wada", "Sambhar", "Chatni", "Dahi", "Boiled Egg/Banana", "Boiled Black Chana", "Cornflakes"] }],
+    Lunch: [{ meal: "Lunch", items: ["Whole Pulses Dry", "Dahi Bhindi Masala", "Dal Pappu", "Chana Dal Masala", "Sambhar", "Fresh Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Cabbage Mutter Dry", "Veg Kofta Curry", "Chana Dal Masala", "Rasam", "Seviya Kheer"] }]
+  },
+  Tuesday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Poori Bhaji/Nool Puttu", "Kadala Curry", "Boiled Egg/Watermelon", "Sprouted Moong", "Bournvita"] }],
+    Lunch: [{ meal: "Lunch", items: ["Veg Kolhapuri", "Tomato Rice", "Raita", "Dal Tadka", "Sambhar", "Flavoured Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Aloo Green Chawli Dry", "Mutter Paneer", "Rice", "Dal Fry", "Rasam", "Ice Cream"] }]
+  },
+  Wednesday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Set Dosa", "Red Chatni", "Sambhar", "Boiled Egg/Banana", "Sprouts", "Oats"] }],
+    Lunch: [{ meal: "Lunch", items: ["Mix Veg Dry", "Methi Malai Mutter", "Triangle Paratha", "Steam Rice", "Green Peas Pulao", "Dal", "Sambhar", "Rasam", "Jaljeera"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Beetroot Poriyal", "Gulab Jamun"], veg: "Paneer Kolhapuri", nonVeg: "Chicken Kolhapuri" }]
+  },
+  Thursday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Poha & Upma", "Chatni", "Sprouts", "Cornflakes"], veg: "Corn Capsicum / Mushroom Masala / Cut Fruits", nonVeg: "Egg Masala / Omelette" }],
+    Lunch: [{ meal: "Lunch", items: ["Aloo Methi / Aloo Jeera", "Chole Masala", "Poori", "Lemon Rice", "Moru Curry", "Dal", "Flavoured Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Padwal Chana Dry", "Green Peas Pulao", "Dal", "Rasam", "Pineapple Sheera"], veg: "Paneer Kolhapuri", nonVeg: "Chicken Kolhapuri" }]
+  },
+  Friday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Pav Bhaji", "Vellappam with Veg Stew", "Boiled Egg/Banana", "Boiled Black Chana", "Bournvita"] }],
+    Lunch: [{ meal: "Lunch", items: ["Veg Soya Chunk", "Rajma Masala", "Jeera Rice", "Dal Palak", "Sambhar", "Fresh Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Cabbage Poriyal", "Dal Lasooni Tadka", "Burfi/Laddu"], veg: "Paneer Tikka Masala", nonVeg: "Chicken Kebab with Curry" }]
+  },
+  Saturday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Aloo Paratha / Green Peas Upma", "Curd / Green Chatni", "Boiled Egg/Banana", "Oats", "Sprouts"] }],
+    Lunch: [{ meal: "Lunch", items: ["Mix Veg Semi Dry", "Besan Gatte Masala", "Dal Fry", "Steam Rice", "Rasam", "Flavoured Juice"] }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Veg Fried Rice", "Veg Noodles", "Veg Manchurian Gravy", "Aloo Capsicum", "Dal Adraki", "Rasam", "Payasam"] }]
+  },
+  Sunday: {
+    Breakfast: [{ meal: "Breakfast", items: ["Masala Dosa", "Sambhar", "Chatni", "Boiled Egg/Banana", "Cornflakes", "Boiled Peanut"] }],
+    Lunch: [{ meal: "Lunch", items: ["Mandi Rice", "Beetroot Dry", "Dal Tadka", "Lime Juice"], veg: "Paneer Masala", nonVeg: "Chicken Masala" }],
+    Snacks: [{ meal: "Snacks", items: ["Tea/Coffee", "Payasam/Snacks"] }],
+    Dinner: [{ meal: "Dinner", items: ["Aloo Mutter Dry", "Brinjal Curry", "Triangle Paratha", "Sambhar", "Fruit Custard"] }]
+  }
+};
+
+export const kedaramMessMenu: WeekMenu = week1and3Menu;
 
 // Nila Campus Mess - Manu Catering Service
 export const nilaCommonItems = {
