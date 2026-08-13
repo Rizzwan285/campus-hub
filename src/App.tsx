@@ -7,6 +7,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import Food from "./pages/Food";
 import Timetable from "./pages/Timetable";
+import Campus from "./pages/Campus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/timetable" element={<Timetable />} />
             <Route path="/food" element={<Food />} />
+            <Route path="/campus" element={<Campus />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
