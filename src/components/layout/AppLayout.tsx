@@ -18,6 +18,9 @@ export function AppLayout() {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const profile = useUserStore((state) => state.profile);
+  
+  const initializeTimetable = useTimetableStore((state) => state.initializeTimetable);
+  const updatePreviewDate = useTimetableStore((state) => state.updatePreviewDate);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -28,15 +31,15 @@ export function AppLayout() {
 
   useEffect(() => {
     if (profile && profile.program && profile.branch) {
-      useTimetableStore.getState().initializeTimetable(profile.program, profile.branch);
+      initializeTimetable(profile.program, profile.branch);
     }
-  }, [profile]);
+  }, [profile, initializeTimetable]);
 
   const displayDate = selectedDate || currentTime;
 
   useEffect(() => {
-    useTimetableStore.getState().updatePreviewDate(displayDate);
-  }, [displayDate]);
+    updatePreviewDate(displayDate);
+  }, [displayDate, updatePreviewDate]);
 
   const handleRefresh = () => {
     setCurrentTime(getCurrentTimeInKolkata());
@@ -116,12 +119,16 @@ export function AppLayout() {
               }`
             }
           >
-            <div className={`p-1.5 rounded-lg mb-1 transition-colors ${isActive ? 'bg-primary/10' : 'bg-transparent'}`}>
-              <item.icon className={`h-5 w-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-            </div>
-            <span className={`text-[10px] tracking-wide transition-all ${isActive ? 'font-bold' : 'font-medium'}`}>
-              {item.label}
-            </span>
+            {({ isActive }) => (
+              <>
+                <div className={`p-1.5 rounded-lg mb-1 transition-colors ${isActive ? 'bg-primary/10' : 'bg-transparent'}`}>
+                  <item.icon className={`h-5 w-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                </div>
+                <span className={`text-[10px] tracking-wide transition-all ${isActive ? 'font-bold' : 'font-medium'}`}>
+                  {item.label}
+                </span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
