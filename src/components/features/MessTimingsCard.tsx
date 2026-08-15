@@ -9,8 +9,9 @@ interface MessTimingsCardProps {
 
 export function MessTimingsCard({ date }: MessTimingsCardProps) {
   const dayType = getDayType(date);
-  const timings = dayType === 'weekday' ? weekdayTimings : weekendTimings;
-  const scheduleType = dayType === 'weekday' ? 'Weekday' : 'Weekend/Holiday';
+  const isWeekday = dayType === 'weekday' || dayType === 'friday';
+  const timings = isWeekday ? weekdayTimings : weekendTimings;
+  const scheduleType = isWeekday ? 'Weekday' : 'Weekend/Holiday';
 
   const timingsList = [
     { meal: 'Breakfast', time: timings.breakfast },
@@ -45,7 +46,7 @@ export function MessTimingsCard({ date }: MessTimingsCardProps) {
 
       <div className="mt-4 pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground">
-          {dayType === 'weekday' 
+          {isWeekday 
             ? 'Weekday timings apply Monday-Friday (excluding holidays)'
             : 'Weekend/Holiday timings apply on Saturdays, Sundays, and Institute holidays'
           }

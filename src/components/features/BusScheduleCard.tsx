@@ -8,7 +8,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
 import { getUpcomingBuses, getNextBus, getTimeUntil } from '@/utils/dateUtils';
-import { workingDaysBus, saturdayHolidayBus, sundayBus } from '@/data/busData';
+import { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } from '@/data/busData';
 
 interface BusScheduleCardProps {
   currentTime: Date;
@@ -27,7 +27,9 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     ? sundayBus
     : dayType === 'saturday'
       ? saturdayHolidayBus
-      : workingDaysBus;
+      : dayType === 'friday'
+        ? fridayBus
+        : workingDaysBus;
 
   // For preview mode, show all buses. For current time, show only upcoming
   const upcomingNilaToSahyadri = isPreviewMode
@@ -40,7 +42,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
   const nextNilaToSahyadri = getNextBus(schedule.nilaToSahyadri, filterTime);
   const nextSahyadriToNila = getNextBus(schedule.sahyadriToNila, filterTime);
 
-  const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : 'Weekday';
+  const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : dayType === 'friday' ? 'Friday' : 'Weekday';
 
   const isMultipleBus = (time: string, direction: 'nilaToSahyadri' | 'sahyadriToNila'): boolean => {
     return schedule.multipleBusTimings?.[direction]?.includes(time) || false;
