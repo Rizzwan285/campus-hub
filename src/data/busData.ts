@@ -45,6 +45,23 @@ export const workingDaysBus: BusSchedule = {
   }
 };
 
+// Fridays
+export const fridayBus: BusSchedule = {
+  nilaToSahyadri: [...workingDaysBus.nilaToSahyadri],
+  sahyadriToNila: [...workingDaysBus.sahyadriToNila],
+  palakkadTown: [
+    { description: "Kalleppulley (7:00 AM) → Mattumantha → Koppam → Chandranagar Circle → Pudussery → Nila Gate → Sahyadri (7:50 AM)" },
+    { description: "Palakkad (8:00 AM) → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Kalmandapam → Chandranagar → Pudussery → Nila Gate → Sahyadri (8:30 AM)" },
+    { description: "Nila Gate (7:40 AM) → Palakkad (8:25 AM) → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Kalmandapam → Chandranagar → Pudussery → Nila Gate → Sahyadri (8:55 AM)" },
+    { description: "Nila Gate (7:55 AM) → Kalleppulley (8:25 AM) → Koppam → Sekharipuram → Mattumantha → Malampuzha → Nila Gate → Sahyadri (8:55 AM)" },
+    { description: "Sahyadri (5:35 PM) → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad (Weekdays: extension to Kinar Stop)" },
+    { description: "Sahyadri (5:35 PM) → Nila Manogata → Malampuzha Road → Mattumantha → Sekharipuram → Koppam → Kalleppulley (5:55 PM)" },
+    { description: "Stadium Bus Stand (9:30 PM) → Chandranagar → Pudussery → IIT Main Gate → Sahyadri" }
+  ],
+  wisePark: workingDaysBus.wisePark,
+  multipleBusTimings: workingDaysBus.multipleBusTimings
+};
+
 // Saturdays & Holidays
 export const saturdayHolidayBus: BusSchedule = {
   nilaToSahyadri: [

@@ -12,7 +12,7 @@ export function getDateInKolkata(date?: Date): Date {
   return toZonedTime(targetDate, TIMEZONE);
 }
 
-export type DayType = 'weekday' | 'saturday' | 'sunday';
+export type DayType = 'weekday' | 'friday' | 'saturday' | 'sunday';
 
 export function getDayType(date: Date): DayType {
   const dayOfWeek = date.getDay();
@@ -32,6 +32,7 @@ export function getDayType(date: Date): DayType {
   
   if (dayOfWeek === 0) return 'sunday';
   if (dayOfWeek === 6 || isHoliday) return 'saturday';
+  if (dayOfWeek === 5) return 'friday';
   return 'weekday';
 }
 
