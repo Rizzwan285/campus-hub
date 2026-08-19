@@ -11,7 +11,7 @@ This document provides a comprehensive overview of the "Campus Hub" project (rep
 - **Canteen & Important Links:** Operating hours and campus resources.
 
 ## 2. Architecture & Evolution
-The project originally started as a **Static Single Page Application (SPA)** where all data was hardcoded into TypeScript/JSON files and bundled at build time, hosted on GitHub Pages. 
+The project originally started as a **Static Single Page Application (SPA)** where all data was hardcoded into TypeScript/JSON files and bundled at build time, hosted on GitHub Pages (now retired). 
 
 It has recently undergone a **Full-Stack Migration**:
 - The data has been moved into a PostgreSQL database.
@@ -51,15 +51,32 @@ The backend runs on port 4000 locally.
 - `/api/canteen`, `/api/academic-days`, `/api/holidays`
 - `/api/timetable/branches`, `/api/timetable/metadata`, `/api/timetable/courses`, `/api/timetable/:program/:branch`, `/api/timetable/venue-overrides`
 
+### Authentication Endpoints
+- `POST /api/auth/login` — roll number, plus a password for admin accounts
+- `GET /api/auth/check/:rollNumber` — does this account need a password?
+- `GET /api/auth/me` — current profile; validates a stored session
+- `PATCH /api/auth/profile` — onboarding and later edits (including mess changes)
+- `PUT /api/auth/courses` — syncs selected courses across devices
+
 ### Protected Admin Write Endpoints (PUT / PATCH / DELETE)
-Protected by a shared secret sent via the `X-Admin-Key` header.
+Require an admin session (`Authorization: Bearer …`) or the `X-Admin-Key` header.
 - `/api/admin/mess/:messSlug/:weekCycle/:day/:meal`
 - `/api/admin/mess-timings/:dayType/:meal`
 - `/api/admin/canteen/items/:id`
 - `/api/admin/academic-days/:date`
+- `/api/admin/courses/:offeringId/schedule` — edit a course's slot
+- `/api/admin/slots/preview` — expand a slot expression before saving
+- `/api/admin/customizations`, `/api/admin/audit`, `/api/admin/cache/clear`
 
 ## 6. Current State & Next Steps
-- **Backend:** Fully built, database is migrated and seeded. It is ready to be deployed to Render (or similar hosting).
-- **Frontend:** Code is updated to fetch from the API using `VITE_API_URL`. It is still currently hosted on GitHub Pages but is functioning correctly thanks to the static data fallback.
-- **Admin UI:** The API has write endpoints, but the visual frontend forms for admins to edit the database (e.g., an Admin Dashboard) have **not** been built yet.
-- **Authentication:** OAuth for users has not been fully implemented yet; user profiles currently remain in `localStorage`.
+- **Backend:** Fully built; database migrated and seeded. Deploys to Render (root directory `server`).
+- **Frontend:** Fetches from the API via `VITE_API_URL`, with the bundled `src/data` as a fallback whenever the API is unreachable. **Hosted on Vercel** — GitHub Pages has been retired (`gh-pages` removed, `public/404.html` deleted, base path set to `/`).
+- **Admin UI:** Built, at `/admin`. Tabs for course slots (with a live preview of the resulting classes), mess menu, mess timings, a list of current overrides, and an audit log. Changes go live immediately — no redeploy.
+- **Authentication:** Implemented. Students sign in with their **roll number only, no password**; the developer account (`142301026`) requires one. Sessions are stateless HMAC tokens with a sliding 30-day expiry. Profiles and course selections now sync server-side rather than living only in `localStorage`.
+- **Seeding:** `npm run seed` refreshes content from `src/data` **without discarding admin edits** (each row records whether its value came from the files or an admin). `npm run seed:reset` is the explicit escape hatch.
+
+### Known open items
+- Google OAuth (restricted to `iitpkd.ac.in`) would remove the "anyone who knows a roll number can sign in as you" trade-off.
+- Bus timings have no admin editor yet.
+- 15 courses have free-text slot remarks (e.g. `alt weeks half batch`) that still need to be encoded by hand.
+- The database password and service role key were shared in plaintext during development and should be rotated.
