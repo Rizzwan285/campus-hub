@@ -44,3 +44,7 @@ venv/
 # Temp scripts
 tmp/
 .env
+
+# Docs
+DEPLOYMENT.md
+PROJECT_CONTEXT.md
