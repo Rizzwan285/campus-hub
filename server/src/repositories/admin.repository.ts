@@ -77,12 +77,17 @@ export async function replaceMeetings(
   try {
     await client.query('begin');
 
-    if (rawSlot !== null) {
-      await client.query('update course_offerings set raw_slot = $2 where id = $1', [
-        offeringId,
-        rawSlot,
-      ]);
-    }
+    // Marking the offering (not each meeting) is what a reseed checks: the
+    // schedule is replaced wholesale, so customisation is a property of the
+    // course rather than of an individual class.
+    await client.query(
+      `update course_offerings
+          set raw_slot = coalesce($2, raw_slot),
+              source = 'admin',
+              customized_at = now()
+        where id = $1`,
+      [offeringId, rawSlot],
+    );
 
     await client.query('delete from course_meetings where offering_id = $1', [offeringId]);
 
@@ -193,6 +198,53 @@ export function expandSlotExpression(
   }
 
   return { meetings, notes, unknown };
+}
+
+export interface Customization {
+  kind: string;
+  label: string;
+  customizedAt: string | null;
+}
+
+/**
+ * Rows whose current value came from the admin panel rather than src/data.
+ * `npm run seed` preserves exactly these; `npm run seed:reset` discards them.
+ */
+export async function listCustomizations(): Promise<Customization[]> {
+  const [menu, timings, canteen, days, courses] = await Promise.all([
+    query<{ label: string; customized_at: string | null }>(
+      `select messes.slug || ' · ' || m.week_cycle || ' · ' || m.day_of_week || ' · ' || m.meal as label,
+              m.customized_at
+         from mess_menu_entries m join messes on messes.id = m.mess_id
+        where m.source = 'admin'`,
+    ),
+    query<{ label: string; customized_at: string | null }>(
+      `select day_type || ' · ' || meal as label, customized_at
+         from mess_timings where source = 'admin'`,
+    ),
+    query<{ label: string; customized_at: string | null }>(
+      `select name as label, customized_at from canteen_items where source = 'admin'`,
+    ),
+    query<{ label: string; customized_at: string | null }>(
+      `select to_char(date, 'YYYY-MM-DD') || ' · ' || name as label, customized_at
+         from academic_days where source = 'admin'`,
+    ),
+    query<{ label: string; customized_at: string | null }>(
+      `select course_code || ' · ' || coalesce(raw_slot, '(no slot)') as label, customized_at
+         from course_offerings where source = 'admin'`,
+    ),
+  ]);
+
+  const group = (kind: string, rows: Array<{ label: string; customized_at: string | null }>) =>
+    rows.map((row) => ({ kind, label: row.label, customizedAt: row.customized_at }));
+
+  return [
+    ...group('Mess menu', menu),
+    ...group('Mess timing', timings),
+    ...group('Canteen item', canteen),
+    ...group('Academic day', days),
+    ...group('Course schedule', courses),
+  ];
 }
 
 export async function searchOfferings(term: string, limit = 25) {

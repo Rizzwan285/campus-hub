@@ -114,7 +114,10 @@ export async function updateMenuEntry(
     `update mess_menu_entries as m
         set items   = coalesce($5, m.items),
             veg     = case when $6::boolean then $7 else m.veg end,
-            non_veg = case when $8::boolean then $9 else m.non_veg end
+            non_veg = case when $8::boolean then $9 else m.non_veg end,
+            -- Marks the row as hand-edited so a reseed will not overwrite it.
+            source        = 'admin',
+            customized_at = now()
        from messes
       where messes.id = m.mess_id
         and messes.slug = $1
@@ -144,7 +147,8 @@ export async function updateTiming(
   timing: string,
 ): Promise<{ day_type: string; meal: string; timing: string } | null> {
   const rows = await query<{ day_type: string; meal: string; timing: string }>(
-    `update mess_timings set timing = $3
+    `update mess_timings
+        set timing = $3, source = 'admin', customized_at = now()
       where day_type = $1 and meal = $2
       returning day_type, meal, timing`,
     [dayType, meal, timing],

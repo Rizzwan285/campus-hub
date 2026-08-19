@@ -327,6 +327,18 @@ adminRouter.put('/courses/:offeringId/schedule', async (req, res, next) => {
 
 // ---------------------------------------------------------------- ops
 
+/**
+ * What currently differs from the files in src/data. These rows survive
+ * `npm run seed` and are only reverted by `npm run seed:reset`.
+ */
+adminRouter.get('/customizations', async (_req, res, next) => {
+  try {
+    res.json(await admin.listCustomizations());
+  } catch (error) {
+    next(error);
+  }
+});
+
 adminRouter.get('/audit', async (_req, res, next) => {
   try {
     res.json(await profiles.recentAudit());

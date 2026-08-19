@@ -48,9 +48,11 @@ export async function upsertAcademicDay(
   kind: 'holiday' | 'instructional',
 ): Promise<AcademicDayRow> {
   const rows = await query<AcademicDayRow>(
-    `insert into academic_days (date, name, kind)
-     values ($1, $2, $3)
-     on conflict (date) do update set name = excluded.name, kind = excluded.kind
+    `insert into academic_days (date, name, kind, source, customized_at)
+     values ($1, $2, $3, 'admin', now())
+     on conflict (date) do update
+        set name = excluded.name, kind = excluded.kind,
+            source = 'admin', customized_at = now()
      returning to_char(date, 'YYYY-MM-DD') as date, name, kind`,
     [date, name, kind],
   );
