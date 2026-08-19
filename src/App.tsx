@@ -19,7 +19,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       {/* Vite exposes the configured base path here, so the router follows
-          whatever VITE_BASE_PATH the deployment was built with. */}
+          whatever `base` vite.config.ts was built with. */}
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route element={<AppLayout />}>
