@@ -26,7 +26,10 @@ A web app for IIT Palakkad students to quickly check mess menus, bus schedules, 
 | Styling | Tailwind CSS |
 | UI Components | shadcn/ui (Radix UI) |
 | Routing | React Router v6 |
+| Data Fetching | TanStack Query |
 | Date Handling | date-fns + date-fns-tz |
+| Backend | Express 5 + TypeScript ([`server/`](server/README.md)) |
+| Database | PostgreSQL (Supabase) |
 | Deployment | GitHub Pages via gh-pages |
 
 ---
@@ -54,6 +57,22 @@ npm run dev
 
 The app will be available at `http://localhost:8080`.
 
+### Running with the backend
+
+The frontend works standalone — every card falls back to the data bundled in
+`src/data` when no API is configured. To run against the database instead:
+
+```bash
+cp .env.example .env          # set VITE_API_URL=http://localhost:4000
+cd server && npm install
+cp .env.example .env          # fill in your database credentials
+npm run migrate && npm run seed
+npm run dev                   # API on :4000
+```
+
+See [`server/README.md`](server/README.md) for the schema, the endpoint list and
+deployment notes.
+
 ---
 
 ## Available Scripts
@@ -73,17 +92,28 @@ The app will be available at `http://localhost:8080`.
 ```
 mess_bus_details/
 ├── public/              # Static assets (favicon, images, robots.txt)
+├── server/              # Express + Postgres API (see server/README.md)
+│   ├── db/migrations/   # Plain SQL migrations
+│   ├── scripts/         # migrate, seed, verify
+│   └── src/
+│       ├── repositories/# SQL per domain
+│       ├── routes/      # content (public) and admin (authenticated)
+│       └── app.ts
 ├── src/
 │   ├── components/
 │   │   ├── features/    # BusScheduleCard, MessMenuCard, MessTimingsCard
 │   │   ├── layout/      # Header, Footer
 │   │   └── ui/          # shadcn/ui components
-│   ├── data/
+│   ├── data/            # Bundled fallback data, also the seed source
 │   │   ├── busData.ts   # All bus routes and schedules
 │   │   └── messData.ts  # 4-week rotating mess menu
-│   ├── hooks/           # Custom React hooks
+│   ├── hooks/
+│   │   └── useApiData.ts# API-backed queries with static fallback
 │   ├── lib/             # Utility functions
 │   ├── pages/           # Index (dashboard), NotFound
+│   ├── services/
+│   │   ├── api.ts       # Fetch wrapper for VITE_API_URL
+│   │   └── timetableLoader.ts
 │   ├── utils/
 │   │   └── dateUtils.ts # Day-type detection, IST timezone, bus filtering
 │   ├── App.tsx
@@ -95,17 +125,33 @@ mess_bus_details/
 └── package.json
 ```
 
+### How data loads
+
+Cards read through `useApiData` / `TimetableLoader`, which try the API first and
+fall back to the data bundled in `src/data`. That keeps the app working when the
+API is asleep, unreachable, or simply not configured — so the current GitHub
+Pages deployment keeps working unchanged until you point `VITE_API_URL` at a
+deployed backend.
+
 ---
 
 ## Deployment
 
-The app is deployed to GitHub Pages. To deploy a new version:
+**[DEPLOYMENT.md](DEPLOYMENT.md)** has the full walkthrough: API on Render,
+database on Supabase, frontend on Vercel, plus the environment variables each
+one needs.
+
+The app currently deploys to GitHub Pages:
 
 ```bash
 npm run deploy
 ```
 
 This runs the production build and pushes the output to the `gh-pages` branch automatically.
+
+The base path is configurable, so the same source deploys to either host —
+GitHub Pages uses the default `/mess_bus_details/`, while Vercel sets
+`VITE_BASE_PATH=/` to serve from the domain root.
 
 ---
 

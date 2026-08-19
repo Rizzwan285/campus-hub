@@ -8,7 +8,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
 import { getUpcomingBuses, getNextBus, getTimeUntil } from '@/utils/dateUtils';
-import { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } from '@/data/busData';
+import { useBusSchedules } from '@/hooks/useApiData';
 
 interface BusScheduleCardProps {
   currentTime: Date;
@@ -16,6 +16,7 @@ interface BusScheduleCardProps {
 }
 
 export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
+  const { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } = useBusSchedules();
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
   const dayType = getDayType(displayDate);
 

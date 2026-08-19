@@ -3,6 +3,21 @@ import { holidays2025, specialDays2025 } from '@/data/busData';
 
 export const TIMEZONE = 'Asia/Kolkata';
 
+export interface AcademicDaysData {
+  holidays: Array<{ date: string; occasion: string }>;
+  specialDays: Array<{ date: string; type: string; note: string }>;
+}
+
+// getDayType must stay synchronous (it runs in render paths), so server data
+// arrives via this module-level swap — see useAcademicDaysSync().
+let activeHolidays: AcademicDaysData['holidays'] = holidays2025;
+let activeSpecialDays: AcademicDaysData['specialDays'] = specialDays2025;
+
+export function setAcademicDays(data: AcademicDaysData): void {
+  if (data.holidays?.length) activeHolidays = data.holidays;
+  if (data.specialDays) activeSpecialDays = data.specialDays;
+}
+
 export function getCurrentTimeInKolkata(): Date {
   return toZonedTime(new Date(), TIMEZONE);
 }
@@ -19,16 +34,16 @@ export function getDayType(date: Date): DayType {
   const dateStr = date.toISOString().split('T')[0];
 
   // Check if it's a special instructional day (treat as weekday)
-  const isInstructionalDay = specialDays2025.some(
+  const isInstructionalDay = activeSpecialDays.some(
     special => special.date === dateStr && special.type === 'instructional'
   );
-  
+
   if (isInstructionalDay) {
     return 'weekday';
   }
 
   // Check if it's a holiday
-  const isHoliday = holidays2025.some(holiday => holiday.date === dateStr);
+  const isHoliday = activeHolidays.some(holiday => holiday.date === dateStr);
   
   if (dayOfWeek === 0) return 'sunday';
   if (dayOfWeek === 6 || isHoliday) return 'saturday';

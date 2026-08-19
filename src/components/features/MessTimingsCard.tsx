@@ -1,13 +1,14 @@
 import { Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { weekdayTimings, weekendTimings } from '@/data/messData';
 import { getDayType } from '@/utils/dateUtils';
+import { useMessData } from '@/hooks/useApiData';
 
 interface MessTimingsCardProps {
   date: Date;
 }
 
 export function MessTimingsCard({ date }: MessTimingsCardProps) {
+  const { weekdayTimings, weekendTimings } = useMessData();
   const dayType = getDayType(date);
   const isWeekday = dayType === 'weekday' || dayType === 'friday';
   const timings = isWeekday ? weekdayTimings : weekendTimings;

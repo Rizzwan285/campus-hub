@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 import { useTimetableStore } from '@/store/useTimetableStore';
+import { useAcademicDaysSync } from '@/hooks/useApiData';
 import { Onboarding } from '@/components/features/Onboarding';
 
 export interface AppContextType {
@@ -15,6 +16,9 @@ export interface AppContextType {
 }
 
 export function AppLayout() {
+  // Keeps holiday/instructional-day data fresh from the API for getDayType().
+  useAcademicDaysSync();
+
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const profile = useUserStore((state) => state.profile);

@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Coffee, ChevronLeft, ChevronRight, Clock, IndianRupee } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { canteenSections } from '@/data/canteenData';
+import { type CanteenSection } from '@/data/canteenData';
+import { useCanteenSections } from '@/hooks/useApiData';
 
 interface CanteenMenuCardProps {
   date: Date;
@@ -11,7 +12,7 @@ interface CanteenMenuCardProps {
  * Returns the index of the canteen section that best matches the current time.
  * Priority: currently-active section with narrowest window → next upcoming → last section.
  */
-function getCurrentSectionIndex(date: Date): number {
+function getCurrentSectionIndex(date: Date, canteenSections: CanteenSection[]): number {
   const hour = date.getHours();
 
   // Find sections that are currently active
@@ -42,14 +43,18 @@ function getCurrentSectionIndex(date: Date): number {
 }
 
 export function CanteenMenuCard({ date }: CanteenMenuCardProps) {
-  const autoIndex = useMemo(() => getCurrentSectionIndex(date), [date]);
+  const canteenSections = useCanteenSections();
+  const autoIndex = useMemo(
+    () => getCurrentSectionIndex(date, canteenSections),
+    [date, canteenSections],
+  );
   const [activeIndex, setActiveIndex] = useState(autoIndex);
 
   useEffect(() => {
     setActiveIndex(autoIndex);
   }, [autoIndex]);
 
-  const section = canteenSections[activeIndex];
+  const section = canteenSections[Math.min(activeIndex, canteenSections.length - 1)];
 
   const handlePrev = () => {
     setActiveIndex((prev) => (prev - 1 + canteenSections.length) % canteenSections.length);
