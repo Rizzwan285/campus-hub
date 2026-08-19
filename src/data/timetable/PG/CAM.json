@@ -37,19 +37,6 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "14:00",
-        "endTime": "15:15",
-        "room": "A01-001",
-        "instructors": [
-          "Deepak Rajendraprasad (deepak@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Friday",
         "startTime": "15:30",
         "endTime": "16:45",
@@ -149,32 +136,6 @@
         "recurrence": {
           "type": "weekly"
         }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "12:05",
-        "endTime": "12:55",
-        "room": "A01-109 + A01-001",
-        "instructors": [
-          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "12:05",
-        "endTime": "12:55",
-        "room": "A01-109 + A01-001",
-        "instructors": [
-          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
       }
     ]
   },
@@ -252,19 +213,6 @@
         "recurrence": {
           "type": "weekly"
         }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "A01-002",
-        "instructors": [
-          "Albert Sunny (albert@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
       }
     ]
   },
@@ -306,35 +254,9 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "N-308",
-        "instructors": [
-          "Rohith Varma, rvarma@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "09:00",
         "endTime": "09:50",
-        "room": "N-308",
-        "instructors": [
-          "Rohith Varma, rvarma@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "08:00",
-        "endTime": "08:50",
         "room": "N-308",
         "instructors": [
           "Rohith Varma, rvarma@iitpkd.ac.in"

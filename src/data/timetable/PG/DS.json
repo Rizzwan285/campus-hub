@@ -49,19 +49,6 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-102 + A01-201",
-        "instructors": [
-          "Koninika Pal kpal@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Thursday",
         "startTime": "12:00",
         "endTime": "12:50",
@@ -379,19 +366,6 @@
         "day": "Wednesday",
         "startTime": "10:00",
         "endTime": "10:50",
-        "room": "A01-001 + A01-201",
-        "instructors": [
-          "Sahasranand K R  sahasranand@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
         "room": "A01-001 + A01-201",
         "instructors": [
           "Sahasranand K R  sahasranand@iitpkd.ac.in"

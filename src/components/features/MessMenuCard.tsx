@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { UtensilsCrossed, ChevronLeft, ChevronRight, Clock, CalendarDays } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { type MessTimings, type WeekMenu } from '@/data/messData';
@@ -113,6 +113,17 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
   // Initialize with profile's mess if available, otherwise 'kedaram'
   const initialCampus = profile?.mess ? (profile.mess.toLowerCase() as Campus) : 'kedaram';
   const [campus, setCampus] = useState<Campus>(initialCampus);
+
+  // The profile arrives asynchronously (restored session, or a mess change in
+  // settings), so follow it rather than staying on the mount-time default.
+  // Tracked separately so a manual toggle is not undone on every render.
+  const lastProfileMess = useRef(profile?.mess);
+  useEffect(() => {
+    if (profile?.mess && profile.mess !== lastProfileMess.current) {
+      lastProfileMess.current = profile.mess;
+      setCampus(profile.mess.toLowerCase() as Campus);
+    }
+  }, [profile?.mess]);
 
   const autoWeekCycle = useMemo(() => getWeekCycle(date), [date]);
   const [weekCycle, setWeekCycle] = useState<'week13' | 'week24'>(autoWeekCycle);

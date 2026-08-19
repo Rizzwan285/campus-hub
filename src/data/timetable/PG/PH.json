@@ -50,32 +50,6 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "12:05",
-        "endTime": "12:55",
-        "room": "N-301",
-        "instructors": [
-          "Uma Divakaran, uma@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "12:05",
-        "endTime": "12:55",
-        "room": "N-301",
-        "instructors": [
-          "Uma Divakaran, uma@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Friday",
         "startTime": "12:05",
         "endTime": "12:55",
@@ -214,19 +188,6 @@
         "recurrence": {
           "type": "weekly"
         }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "N-301",
-        "instructors": [
-          "Resmi P K resmipk@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
       }
     ]
   },
@@ -271,19 +232,6 @@
         "day": "Thursday",
         "startTime": "08:00",
         "endTime": "08:50",
-        "room": "N-301",
-        "instructors": [
-          "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "10:00",
-        "endTime": "10:50",
         "room": "N-301",
         "instructors": [
           "Jayakumar Balakrishnan jayakumar@iitpkd.ac.in"
@@ -363,7 +311,47 @@
     "rawAvailability": "",
     "rawSlot": "F, Q",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "09:00",
+        "endTime": "10:15",
+        "room": "N-301",
+        "instructors": [
+          "Soham Manni smanni@itpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "10:30",
+        "endTime": "11:45",
+        "room": "N-301",
+        "instructors": [
+          "Soham Manni smanni@itpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "14:50",
+        "room": "N-301",
+        "instructors": [
+          "Soham Manni smanni@itpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "PH5011",

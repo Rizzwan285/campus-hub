@@ -3,20 +3,24 @@ import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles } from 'lucide-react';
 import { useTimetableStore } from '@/store/useTimetableStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export function Onboarding() {
   const setProfile = useUserStore((state) => state.setProfile);
+  const account = useAuthStore((state) => state.account);
+  const updateAccount = useAuthStore((state) => state.updateAccount);
 
   const [formData, setFormData] = useState<Partial<UserProfile>>({
-    name: '',
-    mess: '',
-    program: '',
-    branch: '',
-    yearOfStudy: '',
-    batchNo: '',
+    name: account?.name ?? '',
+    mess: (account?.mess ?? '') as UserProfile['mess'],
+    program: (account?.program ?? '') as UserProfile['program'],
+    branch: account?.branch ?? '',
+    yearOfStudy: account?.yearOfStudy ?? '',
+    batchNo: account?.batchNo ?? '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
 
   const isFirstYearUG = formData.program === 'UG' && formData.yearOfStudy === '1';
 
@@ -46,14 +50,33 @@ export function Onboarding() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      const finalProfile = { ...formData } as UserProfile;
-      setProfile(finalProfile);
-      
-      useTimetableStore.getState().updateProfile(finalProfile.program!, finalProfile.branch!);
+    if (!validate()) return;
+
+    const finalProfile = { ...formData } as UserProfile;
+    setSaving(true);
+
+    try {
+      // Persist to the account so the profile follows the user to another
+      // device. The local store is updated either way, so a failed save still
+      // lets them use the app.
+      await updateAccount({
+        name: finalProfile.name,
+        mess: finalProfile.mess || null,
+        program: finalProfile.program || null,
+        branch: finalProfile.branch || null,
+        yearOfStudy: finalProfile.yearOfStudy || null,
+        batchNo: finalProfile.batchNo || null,
+      });
+    } catch {
+      setErrors({ submit: 'Saved on this device, but syncing failed. It will retry later.' });
+    } finally {
+      setSaving(false);
     }
+
+    setProfile(finalProfile);
+    useTimetableStore.getState().updateProfile(finalProfile.program!, finalProfile.branch!);
   };
 
   // Generate batch options B1 to B24
@@ -251,12 +274,17 @@ export function Onboarding() {
               {errors.mess && <p className="text-red-400 text-[11px] mt-1.5 font-medium">{errors.mess}</p>}
             </div>
 
+            {errors.submit && (
+              <p className="text-amber-500 text-[11px] font-medium">{errors.submit}</p>
+            )}
+
             {/* Submit Button */}
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
+              disabled={saving}
               className="w-full mt-3 h-12 rounded-xl text-sm font-semibold gap-2 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-200 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99]"
             >
-              Sign In
+              {saving ? 'Saving…' : 'Continue'}
               <ChevronRight className="w-4 h-4" />
             </Button>
           </form>
@@ -264,7 +292,7 @@ export function Onboarding() {
 
         {/* Footer Text */}
         <p className="text-center text-[11px] text-muted-foreground/50 mt-4">
-          Your data stays on your device • No account needed
+          Saved to your account • Synced across your devices
         </p>
       </div>
     </div>

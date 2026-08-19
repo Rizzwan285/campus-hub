@@ -7,7 +7,12 @@ import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { useAcademicDaysSync } from '@/hooks/useApiData';
+import { useAccountBridge } from '@/hooks/useAccountBridge';
+import { useAuthStore, isProfileComplete } from '@/store/useAuthStore';
+import { isApiConfigured } from '@/services/api';
 import { Onboarding } from '@/components/features/Onboarding';
+import { Login } from '@/components/features/Login';
+import { AccountSettings } from '@/components/features/AccountSettings';
 
 export interface AppContextType {
   currentTime: Date;
@@ -18,10 +23,23 @@ export interface AppContextType {
 export function AppLayout() {
   // Keeps holiday/instructional-day data fresh from the API for getDayType().
   useAcademicDaysSync();
+  // Mirrors the signed-in account into the profile and timetable stores.
+  useAccountBridge();
 
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const profile = useUserStore((state) => state.profile);
+
+  const token = useAuthStore((state) => state.token);
+  const account = useAuthStore((state) => state.account);
+  const isRestoring = useAuthStore((state) => state.isRestoring);
+  const restore = useAuthStore((state) => state.restore);
+
+  // Revalidate a stored session once on boot.
+  useEffect(() => {
+    void restore();
+  }, [restore]);
   
   const initializeTimetable = useTimetableStore((state) => state.initializeTimetable);
   const updatePreviewDate = useTimetableStore((state) => state.updatePreviewDate);
@@ -50,7 +68,32 @@ export function AppLayout() {
     setSelectedDate(null);
   };
 
-  if (!profile) {
+  // Accounts need the API. Without it the app still works from bundled data,
+  // so fall back to the original local-only onboarding rather than locking
+  // everyone out.
+  const accountsEnabled = isApiConfigured();
+
+  if (accountsEnabled) {
+    if (isRestoring) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="h-6 w-6 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+        </div>
+      );
+    }
+
+    if (!token) {
+      return <Login />;
+    }
+
+    if (!isProfileComplete(account)) {
+      return (
+        <div className="min-h-screen">
+          <Onboarding />
+        </div>
+      );
+    }
+  } else if (!profile) {
     return (
       <div className="min-h-screen">
         <Onboarding />
@@ -78,7 +121,8 @@ export function AppLayout() {
           onRefresh={handleRefresh}
           onDateChange={setSelectedDate}
           selectedDate={selectedDate}
-          userName={profile.name}
+          userName={account?.name ?? profile?.name ?? ''}
+          onOpenSettings={accountsEnabled ? () => setSettingsOpen(true) : undefined}
         />
         
         {/* Desktop Navigation */}
@@ -109,6 +153,10 @@ export function AppLayout() {
           <Footer />
         </div>
       </div>
+
+      {accountsEnabled && (
+        <AccountSettings open={settingsOpen} onOpenChange={setSettingsOpen} />
+      )}
 
       {/* Bottom Navigation for Mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/85 backdrop-blur-xl border-t border-border z-50 px-2 py-2 flex justify-around items-center safe-area-bottom pb-4 shadow-[0_-4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">

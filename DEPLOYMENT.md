@@ -91,7 +91,10 @@ Add these under **Environment**. Copy the values from your local
 | `SUPABASE_SERVICE_ROLE_KEY` | your rotated service role key | Server-only. Never expose to the browser. |
 | `NODE_ENV` | `production` | Hides internal error messages from API responses. |
 | `CORS_ORIGIN` | `https://rizzwan285.github.io` | Start with the current site; you'll add the Vercel URL in Part 3. |
-| `ADMIN_API_KEY` | a long random string | Guards the write endpoints. |
+| `ADMIN_API_KEY` | a long random string | Fallback for the write endpoints from scripts/curl. |
+| `SESSION_SECRET` | a long random string (32+ chars) | Signs session tokens. **Changing it signs everyone out.** |
+| `SESSION_DAYS` | `30` | How long a session survives without being used. |
+| `ADMIN_ROLL_NUMBER` | `142301026` | Roll number granted developer rights. |
 
 **Do not set `PORT`.** Render injects it, and the server already reads it.
 
@@ -143,6 +146,19 @@ npm run verify      # 1263 checks: API output vs. the bundled static data
 
 `npm run migrate` is safe to re-run; it records applied files in a
 `schema_migrations` table and skips them next time.
+
+### Step 7. Set the developer password
+
+Accounts are created on first sign-in, but the developer account needs a
+password before it can be used:
+
+```bash
+cd server
+npm run set-admin -- --password 'your-password'
+```
+
+Run it against the same database the deployment uses. The password is stored
+only as a scrypt hash. Re-run it any time to change the password.
 
 ### About the free tier
 
@@ -283,7 +299,10 @@ URL for a few weeks, since people may have bookmarked the old address.
 | `SUPABASE_SERVICE_ROLE_KEY` | no | Server-only. Bypasses row level security. |
 | `NODE_ENV` | yes | `production`. |
 | `CORS_ORIGIN` | yes | Comma-separated origins; `*` allowed as a subdomain wildcard. |
-| `ADMIN_API_KEY` | yes | Without it, admin routes return 503. |
+| `ADMIN_API_KEY` | no | Fallback admin auth for scripts. Admin UI uses the session instead. |
+| `SESSION_SECRET` | yes | 32+ chars. Rotating it invalidates every session. |
+| `SESSION_DAYS` | no | Defaults to 30. |
+| `ADMIN_ROLL_NUMBER` | no | Defaults to 142301026. |
 | `PORT` | no | **Render sets this. Don't add it.** |
 
 ### Vercel (frontend) — public values only

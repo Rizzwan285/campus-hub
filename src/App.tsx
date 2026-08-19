@@ -9,6 +9,7 @@ import Food from "./pages/Food";
 import Timetable from "./pages/Timetable";
 import Campus from "./pages/Campus";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/food" element={<Food />} />
             <Route path="/campus" element={<Campus />} />
           </Route>
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
