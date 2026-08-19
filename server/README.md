@@ -16,7 +16,27 @@ npm run dev              # http://localhost:4000
 ```
 
 `npm run verify` compares every API response against the static data in
-`src/data` and exits non-zero on any difference — run it after a reseed.
+`src/data` and exits non-zero on any difference.
+
+### Seeding and admin edits
+
+`npm run seed` refreshes content from `src/data` **without discarding anything
+edited through the admin panel**. Each editable row records whether its current
+value came from the files (`source = 'seed'`) or from an admin (`source =
+'admin'`); seeding rewrites the former and skips the latter, then reports what
+it preserved.
+
+```
+mess_menu_entries       83   (1 kept from admin edits)
+Seed complete. 6 admin-edited value(s) preserved.
+```
+
+`npm run seed:reset` discards admin edits and makes the database match the files
+exactly. That is the only thing that undoes an admin change, so run
+`npm run verify` after it rather than before.
+
+The **Edits** tab in the admin panel lists everything currently overriding the
+files, and `GET /api/admin/customizations` returns the same list.
 
 ## Environment
 

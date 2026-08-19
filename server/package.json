@@ -12,7 +12,8 @@
     "seed": "tsx scripts/seed.ts",
     "verify": "tsx scripts/verify.ts",
     "typecheck": "tsc --noEmit",
-    "set-admin": "tsx scripts/set-admin.ts"
+    "set-admin": "tsx scripts/set-admin.ts",
+    "seed:reset": "tsx scripts/seed.ts --reset"
   },
   "dependencies": {
     "tsx": "^4.20.6",

@@ -60,7 +60,9 @@ export async function updateCanteenItem(
     `update canteen_items
         set name    = coalesce($2, name),
             price   = case when $3::boolean then $4 else price end,
-            variant = case when $5::boolean then $6 else variant end
+            variant = case when $5::boolean then $6 else variant end,
+            source        = 'admin',
+            customized_at = now()
       where id = $1
       returning id, name, price, variant`,
     [

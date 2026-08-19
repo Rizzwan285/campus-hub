@@ -2,7 +2,7 @@
 
 A web app for IIT Palakkad students to quickly check mess menus, bus schedules, and campus timings — all in one place.
 
-**Live site:** [Rizzwan285.github.io/mess_bus_details](https://rizzwan285.github.io/mess_bus_details/)
+**Live site:** deployed on Vercel — see [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ---
 
@@ -12,6 +12,9 @@ A web app for IIT Palakkad students to quickly check mess menus, bus schedules, 
 - **Bus Schedule** — Weekday, Saturday/holiday, and Sunday timetables for campus, town, and Wise Park routes
 - **Mess Timings** — Separate timings for weekdays and weekends
 - **Date Preview** — Browse any date's menu and bus schedule
+- **Class Timetable** — Pick your courses; the weekly grid resolves slots, rooms and clashes
+- **Sign-in** — Roll number only, no password; profile and course picks sync across devices
+- **Developer tools** — Edit mess menus, timings and course slots live at `/admin`, no redeploy
 - **Dark Mode** — Toggle between light and dark themes
 - **Real-time Clock** — Live time display with next-bus countdown
 
@@ -30,7 +33,7 @@ A web app for IIT Palakkad students to quickly check mess menus, bus schedules, 
 | Date Handling | date-fns + date-fns-tz |
 | Backend | Express 5 + TypeScript ([`server/`](server/README.md)) |
 | Database | PostgreSQL (Supabase) |
-| Deployment | GitHub Pages via gh-pages |
+| Hosting | Vercel (frontend) · Render (API) · Supabase (Postgres) |
 
 ---
 
@@ -83,7 +86,7 @@ deployment notes.
 | `npm run build` | Build for production (outputs to `dist/`) |
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Run ESLint |
-| `npm run deploy` | Build and deploy to GitHub Pages |
+| `npm test` | Run the unit tests |
 
 ---
 
@@ -128,30 +131,19 @@ mess_bus_details/
 ### How data loads
 
 Cards read through `useApiData` / `TimetableLoader`, which try the API first and
-fall back to the data bundled in `src/data`. That keeps the app working when the
-API is asleep, unreachable, or simply not configured — so the current GitHub
-Pages deployment keeps working unchanged until you point `VITE_API_URL` at a
-deployed backend.
+fall back to the data bundled in `src/data`. That keeps the app usable while the
+API is asleep (Render's free tier idles out), unreachable, or not configured at
+all — a cold start shows correct content rather than an error, then refreshes
+once the API answers.
 
 ---
 
 ## Deployment
 
-**[DEPLOYMENT.md](DEPLOYMENT.md)** has the full walkthrough: API on Render,
-database on Supabase, frontend on Vercel, plus the environment variables each
-one needs.
+Pushing to `main` deploys the frontend automatically via Vercel. The API is a
+separate Render service, and the database is Supabase Postgres.
 
-The app currently deploys to GitHub Pages:
-
-```bash
-npm run deploy
-```
-
-This runs the production build and pushes the output to the `gh-pages` branch automatically.
-
-The base path is configurable, so the same source deploys to either host —
-GitHub Pages uses the default `/mess_bus_details/`, while Vercel sets
-`VITE_BASE_PATH=/` to serve from the domain root.
+Full walkthrough, including every environment variable: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ---
 

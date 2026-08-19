@@ -225,81 +225,168 @@ const VENUE_OVERRIDES: Array<[string, string | null, number, number, string]> = 
   ['CY1140', null, 1, 999, 'A01 Chemistry Lab'],
   ['GN1003', null, 1, 999, 'N-203/204 & Nila CS Lab'],
 ];
+interface SeedReport {
+  table: string;
+  written: number;
+  preserved: number;
+}
+
+const report: SeedReport[] = [];
+
+function note(table: string, written: number, preserved = 0) {
+  report.push({ table, written, preserved });
+}
+
+/**
+ * Upserts rows keyed by `conflict`, refreshing `update` columns.
+ *
+ * When `guarded` is set, a row already marked `source = 'admin'` keeps its
+ * current values — that is what lets a reseed refresh the baseline without
+ * discarding anything edited through the admin panel.
+ */
+async function upsert(
+  client: Client,
+  table: string,
+  columns: string[],
+  rows: unknown[][],
+  conflict: string[],
+  update: string[],
+  guarded = false,
+): Promise<number> {
+  if (rows.length === 0) return 0;
+
+  const setClause = update.map((c) => `${c} = excluded.${c}`).join(', ');
+  const guard = guarded ? ` where ${table}.source = 'seed'` : '';
+  let touched = 0;
+
+  for (let start = 0; start < rows.length; start += 300) {
+    const chunk = rows.slice(start, start + 300);
+    const params: unknown[] = [];
+    const tuples = chunk.map((row) => {
+      const placeholders = row.map((value) => {
+        params.push(value);
+        return `$${params.length}`;
+      });
+      return `(${placeholders.join(', ')})`;
+    });
+
+    const result = await client.query(
+      `insert into ${table} (${columns.join(', ')})
+       values ${tuples.join(', ')}
+       on conflict (${conflict.join(', ')}) do update set ${setClause}${guard}`,
+      params,
+    );
+    touched += result.rowCount ?? 0;
+  }
+
+  return touched;
+}
+
+async function countCustomized(client: Client, table: string): Promise<number> {
+  const { rows } = await client.query<{ n: string }>(
+    `select count(*) n from ${table} where source = 'admin'`,
+  );
+  return Number(rows[0].n);
+}
 
 async function main() {
+  const reset = process.argv.includes('--reset');
   const client = new Client({
     connectionString: config.DIRECT_URL ?? config.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
   });
 
   await client.connect();
-  console.log('Connected. Seeding...\n');
+
+  if (reset) {
+    console.log('Connected. RESET mode: discarding admin edits and reloading from src/data.\n');
+  } else {
+    console.log('Connected. Refreshing from src/data, keeping admin edits.\n');
+  }
 
   try {
     await client.query('begin');
 
-    // Content only. profiles survives; user_courses is cleared by the cascade
-    // from course_offerings, which is correct when the semester changes.
-    await client.query(`
-      truncate
-        mess_common_items, mess_menu_entries, mess_timings, messes,
-        bus_departures, bus_routes, bus_day_types,
-        canteen_items, canteen_sections,
-        academic_days,
-        course_meetings, course_offerings, venue_overrides, timetable_metadata
-      restart identity cascade
-    `);
+    if (reset) {
+      // Deletes rather than truncates: truncate restarts identity, and
+      // canteen_items / mess_menu_entries hang off those generated ids.
+      await client.query(`
+        delete from course_meetings;
+        delete from canteen_items;
+        delete from mess_menu_entries;
+        delete from mess_common_items;
+        delete from bus_departures;
+        delete from bus_routes;
+        delete from course_offerings;
+        delete from canteen_sections;
+        delete from mess_timings;
+        delete from messes;
+        delete from bus_day_types;
+        delete from academic_days;
+        delete from venue_overrides;
+        delete from timetable_metadata;
+      `);
+    }
 
     // ---- messes -------------------------------------------------------
-    const messRows = [
-      ['kedaram', 'Kedaram Mess', 'Ideal Catering', true, 0],
-      ['nila', 'Nila Mess', 'Manu Catering', false, 1],
-    ];
-    const { rows: insertedMesses } = await client.query<{ id: number; slug: string }>(
-      `insert into messes (slug, name, caterer, has_week_cycle, sort_order)
-       values ($1,$2,$3,$4,$5), ($6,$7,$8,$9,$10)
-       returning id, slug`,
-      messRows.flat(),
+    // Upserted by slug so the generated ids survive; menu entries reference them.
+    await upsert(
+      client,
+      'messes',
+      ['slug', 'name', 'caterer', 'has_week_cycle', 'sort_order'],
+      [
+        ['kedaram', 'Kedaram Mess', 'Ideal Catering', true, 0],
+        ['nila', 'Nila Mess', 'Manu Catering', false, 1],
+      ],
+      ['slug'],
+      ['name', 'caterer', 'has_week_cycle', 'sort_order'],
     );
-    const messId = Object.fromEntries(insertedMesses.map((m) => [m.slug, m.id])) as Record<
-      string,
-      number
-    >;
-    console.log(`  messes                ${insertedMesses.length}`);
+
+    const { rows: messRows } = await client.query<{ id: number; slug: string }>(
+      'select id, slug from messes',
+    );
+    const messId = Object.fromEntries(messRows.map((m) => [m.slug, m.id])) as Record<string, number>;
+    note('messes', messRows.length);
 
     const commonRows = [
       ...MEALS.map((meal) => [
-        messId.kedaram,
-        meal,
-        commonItems[meal.toLowerCase() as keyof typeof commonItems],
+        messId.kedaram, meal, commonItems[meal.toLowerCase() as keyof typeof commonItems],
       ]),
       ...MEALS.map((meal) => [
-        messId.nila,
-        meal,
-        nilaCommonItems[meal.toLowerCase() as keyof typeof nilaCommonItems],
+        messId.nila, meal, nilaCommonItems[meal.toLowerCase() as keyof typeof nilaCommonItems],
       ]),
     ];
-    await bulkInsert(client, 'mess_common_items', ['mess_id', 'meal', 'items'], commonRows);
-    console.log(`  mess_common_items     ${commonRows.length}`);
+    await upsert(client, 'mess_common_items', ['mess_id', 'meal', 'items'], commonRows,
+      ['mess_id', 'meal'], ['items']);
+    note('mess_common_items', commonRows.length);
 
+    // ---- mess menu (admin-editable) ------------------------------------
     const menuEntries = [
       ...menuRows(messId.kedaram, 'week13', week1and3Menu),
       ...menuRows(messId.kedaram, 'week24', week2and4Menu),
       ...menuRows(messId.nila, 'all', nilaMessMenu),
     ];
-    await bulkInsert(
-      client,
-      'mess_menu_entries',
+    const menuCustom = await countCustomized(client, 'mess_menu_entries');
+    const menuWritten = await upsert(
+      client, 'mess_menu_entries',
       ['mess_id', 'week_cycle', 'day_of_week', 'meal', 'items', 'veg', 'non_veg'],
       menuEntries,
+      ['mess_id', 'week_cycle', 'day_of_week', 'meal'],
+      ['items', 'veg', 'non_veg'],
+      true,
     );
-    console.log(`  mess_menu_entries     ${menuEntries.length}`);
+    note('mess_menu_entries', menuWritten, menuCustom);
 
+    // ---- mess timings (admin-editable) ---------------------------------
     const timings = [...timingRows('weekday', weekdayTimings), ...timingRows('weekend', weekendTimings)];
-    await bulkInsert(client, 'mess_timings', ['day_type', 'meal', 'timing', 'sort_order'], timings);
-    console.log(`  mess_timings          ${timings.length}`);
+    const timingCustom = await countCustomized(client, 'mess_timings');
+    const timingWritten = await upsert(
+      client, 'mess_timings', ['day_type', 'meal', 'timing', 'sort_order'], timings,
+      ['day_type', 'meal'], ['timing', 'sort_order'], true,
+    );
+    note('mess_timings', timingWritten, timingCustom);
 
-    // ---- bus ----------------------------------------------------------
+    // ---- bus (no admin editor yet: always refreshed) --------------------
     const dayTypes: Array<[string, string, number, BusSchedule]> = [
       ['weekday', 'Monday – Thursday', 0, workingDaysBus],
       ['friday', 'Friday', 1, fridayBus],
@@ -307,12 +394,9 @@ async function main() {
       ['sunday', 'Sunday', 3, sundayBus],
     ];
 
-    await bulkInsert(
-      client,
-      'bus_day_types',
-      ['slug', 'label', 'sort_order'],
+    await upsert(client, 'bus_day_types', ['slug', 'label', 'sort_order'],
       dayTypes.map(([slug, label, order]) => [slug, label, order]),
-    );
+      ['slug'], ['label', 'sort_order']);
 
     const allDepartures: unknown[][] = [];
     const allRoutes: unknown[][] = [];
@@ -322,50 +406,62 @@ async function main() {
       allRoutes.push(...routes);
     }
 
-    await bulkInsert(
-      client,
-      'bus_departures',
+    await client.query('delete from bus_departures');
+    await client.query('delete from bus_routes');
+    await bulkInsert(client, 'bus_departures',
       ['day_type', 'direction', 'depart_time', 'depart_minutes', 'sort_order', 'is_multiple_bus'],
-      allDepartures,
-    );
-    await bulkInsert(
-      client,
-      'bus_routes',
-      ['day_type', 'category', 'description', 'sort_order'],
-      allRoutes,
-    );
-    console.log(`  bus_day_types         ${dayTypes.length}`);
-    console.log(`  bus_departures        ${allDepartures.length}`);
-    console.log(`  bus_routes            ${allRoutes.length}`);
+      allDepartures);
+    await bulkInsert(client, 'bus_routes',
+      ['day_type', 'category', 'description', 'sort_order'], allRoutes);
+    note('bus_departures', allDepartures.length);
+    note('bus_routes', allRoutes.length);
 
-    // ---- canteen ------------------------------------------------------
-    let canteenItemCount = 0;
-    for (const [index, section] of canteenSections.entries()) {
-      const { rows } = await client.query<{ id: number }>(
-        `insert into canteen_sections (title, timing, start_hour, end_hour, sort_order)
-         values ($1,$2,$3,$4,$5) returning id`,
-        [section.title, section.timing, section.startHour, section.endHour, index],
+    // ---- canteen (items are admin-editable) -----------------------------
+    await upsert(client, 'canteen_sections',
+      ['title', 'timing', 'start_hour', 'end_hour', 'sort_order'],
+      canteenSections.map((s, i) => [s.title, s.timing, s.startHour, s.endHour, i]),
+      ['title'], ['timing', 'start_hour', 'end_hour', 'sort_order']);
+
+    const { rows: sectionRows } = await client.query<{ id: number; title: string }>(
+      'select id, title from canteen_sections',
+    );
+    const sectionId = Object.fromEntries(sectionRows.map((s) => [s.title, s.id]));
+
+    let itemsWritten = 0;
+    let itemsPreserved = 0;
+    const sectionsSkipped: string[] = [];
+    for (const section of canteenSections) {
+      const id = sectionId[section.title];
+      if (id === undefined) continue;
+
+      // Items have no stable natural key, so they are replaced as a set.
+      // A section containing any hand-edited price is left untouched — coarse,
+      // but it can never mismatch an edited price onto a different item.
+      const { rows: custom } = await client.query<{ n: string }>(
+        "select count(*) n from canteen_items where section_id = $1 and source = 'admin'",
+        [id],
       );
-      const sectionId = rows[0].id;
+      if (Number(custom[0].n) > 0) {
+        itemsPreserved += Number(custom[0].n);
+        sectionsSkipped.push(section.title);
+        continue;
+      }
 
-      const itemRows = section.items.map((item, itemIndex) => [
-        sectionId,
-        item.name,
-        item.price,
-        item.variant ?? null,
-        itemIndex,
-      ]);
-      canteenItemCount += await bulkInsert(
-        client,
-        'canteen_items',
-        ['section_id', 'name', 'price', 'variant', 'sort_order'],
-        itemRows,
+      await client.query('delete from canteen_items where section_id = $1', [id]);
+      itemsWritten += await bulkInsert(
+        client, 'canteen_items', ['section_id', 'name', 'price', 'variant', 'sort_order'],
+        section.items.map((item, i) => [id, item.name, item.price, item.variant ?? null, i]),
       );
     }
-    console.log(`  canteen_sections      ${canteenSections.length}`);
-    console.log(`  canteen_items         ${canteenItemCount}`);
+    note('canteen_sections', sectionRows.length);
+    note('canteen_items', itemsWritten, itemsPreserved);
+    if (sectionsSkipped.length > 0) {
+      console.log(
+        `  note: canteen sections left untouched because they contain edits: ${sectionsSkipped.join(', ')}\n`,
+      );
+    }
 
-    // ---- academic calendar --------------------------------------------
+    // ---- academic calendar (admin-editable) ------------------------------
     const timetableHolidays: Array<{ date: string; name: string }> = JSON.parse(
       fs.readFileSync(path.join(TIMETABLE_DIR, 'holidays.json'), 'utf8'),
     );
@@ -378,15 +474,22 @@ async function main() {
     }
 
     const academicDays = [...byDate.values()];
-    await bulkInsert(client, 'academic_days', ['date', 'name', 'kind'], academicDays);
-    console.log(`  academic_days         ${academicDays.length}`);
+    const dayCustom = await countCustomized(client, 'academic_days');
+    // Drops seed-owned days no longer in the files; admin-added days stay.
+    await client.query(
+      "delete from academic_days where source = 'seed' and not (date = any($1::date[]))",
+      [[...byDate.keys()]],
+    );
+    const daysWritten = await upsert(client, 'academic_days', ['date', 'name', 'kind'],
+      academicDays, ['date'], ['name', 'kind'], true);
+    note('academic_days', daysWritten, dayCustom);
 
-    // ---- timetable ----------------------------------------------------
+    // ---- timetable (schedules are admin-editable) ------------------------
     const metadata = JSON.parse(fs.readFileSync(path.join(TIMETABLE_DIR, 'metadata.json'), 'utf8'));
     const semester: string = metadata.semester ?? 'unknown';
 
     const offerings: unknown[][] = [];
-    const meetings: unknown[][] = [];
+    const meetingsByOffering = new Map<string, unknown[][]>();
 
     for (const program of ['UG', 'PG']) {
       const dir = path.join(TIMETABLE_DIR, program);
@@ -402,61 +505,62 @@ async function main() {
           const offeringId = `${program}_${branch}_${course.courseCode}`;
 
           offerings.push([
-            offeringId,
-            program,
-            branch,
-            course.courseCode,
-            course.courseName,
-            course.credits ?? null,
-            course.category ?? null,
-            course.rawSlot ?? null,
-            semester,
+            offeringId, program, branch, course.courseCode, course.courseName,
+            course.credits ?? null, course.category ?? null, course.rawSlot ?? null, semester,
           ]);
 
-          (course.meetings ?? []).forEach((meeting, index) => {
-            meetings.push([
-              offeringId,
-              meeting.type,
-              meeting.day,
-              meeting.startTime,
-              meeting.endTime,
-              meeting.room ?? null,
-              meeting.instructors ?? [],
-              meeting.recurrence?.type ?? 'weekly',
-              index,
-            ]);
-          });
+          meetingsByOffering.set(
+            offeringId,
+            (course.meetings ?? []).map((meeting, index) => [
+              offeringId, meeting.type, meeting.day, meeting.startTime, meeting.endTime,
+              meeting.room ?? null, meeting.instructors ?? [],
+              meeting.recurrence?.type ?? 'weekly', index,
+            ]),
+          );
         }
       }
     }
 
-    await bulkInsert(
-      client,
-      'course_offerings',
+    const offeringCustom = await countCustomized(client, 'course_offerings');
+    await upsert(
+      client, 'course_offerings',
       ['id', 'program', 'branch', 'course_code', 'course_name', 'credits', 'category', 'raw_slot', 'semester'],
-      offerings,
+      offerings, ['id'],
+      ['program', 'branch', 'course_code', 'course_name', 'credits', 'category', 'raw_slot', 'semester'],
+      true,
+    );
+
+    // Meetings belong to their offering as a set, so the guard is per course:
+    // a schedule edited in the admin panel is skipped entirely.
+    const { rows: customized } = await client.query<{ id: string }>(
+      "select id from course_offerings where source = 'admin'",
+    );
+    const skip = new Set(customized.map((r) => r.id));
+
+    const meetingRows: unknown[][] = [];
+    for (const [offeringId, rows] of meetingsByOffering) {
+      if (!skip.has(offeringId)) meetingRows.push(...rows);
+    }
+
+    await client.query(
+      "delete from course_meetings where offering_id in (select id from course_offerings where source = 'seed')",
     );
     await bulkInsert(
-      client,
-      'course_meetings',
+      client, 'course_meetings',
       ['offering_id', 'type', 'day', 'start_time', 'end_time', 'room', 'instructors', 'recurrence', 'sort_order'],
-      meetings,
+      meetingRows,
     );
-    console.log(`  course_offerings      ${offerings.length}`);
-    console.log(`  course_meetings       ${meetings.length}`);
+    note('course_offerings', offerings.length, offeringCustom);
+    note('course_meetings', meetingRows.length, skip.size);
 
-    await bulkInsert(
-      client,
-      'venue_overrides',
+    // ---- venue overrides & metadata (no admin editors) -------------------
+    await client.query('delete from venue_overrides');
+    await bulkInsert(client, 'venue_overrides',
       ['course_code', 'meeting_type', 'batch_min', 'batch_max', 'room'],
-      VENUE_OVERRIDES.map((row) => [...row]),
-    );
-    console.log(`  venue_overrides       ${VENUE_OVERRIDES.length}`);
+      VENUE_OVERRIDES.map((row) => [...row]));
+    note('venue_overrides', VENUE_OVERRIDES.length);
 
-    await bulkInsert(
-      client,
-      'timetable_metadata',
-      ['key', 'value'],
+    await upsert(client, 'timetable_metadata', ['key', 'value'],
       [
         ['semester', JSON.stringify(semester)],
         ['schemaVersion', JSON.stringify(metadata.schemaVersion ?? null)],
@@ -466,10 +570,25 @@ async function main() {
         // definitions server-side rather than only in the frontend bundle.
         ['slots', fs.readFileSync(path.join(TIMETABLE_DIR, 'slots.json'), 'utf8')],
       ],
-    );
+      ['key'], ['value']);
 
     await client.query('commit');
-    console.log('\nSeed complete.');
+
+    for (const row of report) {
+      const kept = row.preserved > 0 ? `   (${row.preserved} kept from admin edits)` : '';
+      console.log(`  ${row.table.padEnd(20)} ${String(row.written).padStart(5)}${kept}`);
+    }
+
+    const totalPreserved = report.reduce((sum, r) => sum + r.preserved, 0);
+    console.log();
+    if (reset) {
+      console.log('Reset complete. Everything now matches src/data.');
+    } else if (totalPreserved > 0) {
+      console.log(`Seed complete. ${totalPreserved} admin-edited value(s) preserved.`);
+      console.log('Run with --reset to discard those and match src/data exactly.');
+    } else {
+      console.log('Seed complete. No admin edits to preserve.');
+    }
   } catch (error) {
     await client.query('rollback');
     throw error;

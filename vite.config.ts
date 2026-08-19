@@ -4,9 +4,10 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // GitHub Pages serves the app from /<repo-name>/; hosts that serve from the
-  // domain root (Vercel, Netlify) set VITE_BASE_PATH=/ instead.
-  base: process.env.VITE_BASE_PATH || "/mess_bus_details/",
+  // Served from the domain root on Vercel. src/App.tsx reads this back through
+  // import.meta.env.BASE_URL, so changing it here is enough to move the app
+  // under a sub-path.
+  base: "/",
   server: {
     host: "::",
     port: 8080,

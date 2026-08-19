@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
+  FileDiff,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -330,6 +331,50 @@ function MessMenuEditor() {
   );
 }
 
+/** Shows what currently overrides src/data, and therefore survives a reseed. */
+function Customizations() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-customizations'],
+    queryFn: () => apiFetch<Array<{ kind: string; label: string; customizedAt: string | null }>>(
+      '/api/admin/customizations',
+    ),
+    staleTime: 30_000,
+  });
+
+  if (isLoading) return <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />;
+
+  if (!data?.length) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Nothing overridden — the database matches the files in <code>src/data</code>.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        {data.length} value{data.length === 1 ? '' : 's'} edited here rather than in the source
+        files. These survive <code className="px-1 rounded bg-muted text-xs">npm run seed</code>;
+        only <code className="px-1 rounded bg-muted text-xs">npm run seed:reset</code> reverts them.
+      </p>
+      <ul className="space-y-1.5 max-h-96 overflow-y-auto text-sm">
+        {data.map((row, index) => (
+          <li key={index} className="flex flex-wrap gap-x-2 border-b border-border/40 pb-1.5">
+            <span className="text-xs font-semibold text-primary w-28 shrink-0">{row.kind}</span>
+            <span className="truncate">{row.label}</span>
+            {row.customizedAt && (
+              <span className="text-xs text-muted-foreground ml-auto">
+                {new Date(row.customizedAt).toLocaleDateString('en-IN')}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function AuditTrail() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-audit'],
@@ -396,16 +441,18 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="courses">
-        <TabsList className="grid grid-cols-4 mb-5">
+        <TabsList className="grid grid-cols-5 mb-5">
           <TabsTrigger value="courses"><CalendarDays className="h-4 w-4 mr-1" />Slots</TabsTrigger>
           <TabsTrigger value="menu"><UtensilsCrossed className="h-4 w-4 mr-1" />Menu</TabsTrigger>
           <TabsTrigger value="timings"><Clock className="h-4 w-4 mr-1" />Timings</TabsTrigger>
+          <TabsTrigger value="edits"><FileDiff className="h-4 w-4 mr-1" />Edits</TabsTrigger>
           <TabsTrigger value="audit"><History className="h-4 w-4 mr-1" />Log</TabsTrigger>
         </TabsList>
 
         <TabsContent value="courses"><Card className="p-5"><CourseSlotEditor /></Card></TabsContent>
         <TabsContent value="menu"><Card className="p-5"><MessMenuEditor /></Card></TabsContent>
         <TabsContent value="timings"><Card className="p-5"><MessTimingsEditor /></Card></TabsContent>
+        <TabsContent value="edits"><Card className="p-5"><Customizations /></Card></TabsContent>
         <TabsContent value="audit"><Card className="p-5"><AuditTrail /></Card></TabsContent>
       </Tabs>
     </div>

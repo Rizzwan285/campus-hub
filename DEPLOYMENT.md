@@ -10,11 +10,10 @@ How to put the Campus Hub online: the API on **Render**, the database on
 └─────────────┘                         └──────────────┘                    └──────────────┘
 ```
 
-You were right that GitHub Pages only serves static files — it cannot run the
-API. But that does **not** force the frontend to move: a static host plus a
-separate API host is the normal split. Moving to Vercel is optional, and the
-reasons to do it are build-time environment variables, automatic deploys, and
-losing the `/mess_bus_details/` path prefix and the `404.html` redirect hack.
+GitHub Pages has been retired: it only serves static files, so it could not run
+the API, and the app now depends on one for accounts and admin edits. Vercel
+replaces it, which also gives build-time environment variables, automatic
+deploys per push, and serving from the domain root.
 
 > **Order matters.** Deploy the backend first so you have its URL, then the
 > frontend, then come back and add the frontend's URL to the backend's
@@ -90,7 +89,7 @@ Add these under **Environment**. Copy the values from your local
 | `SUPABASE_URL` | `https://lpfykagfworqjevwnjzj.supabase.co` | Reserved for server-side Supabase Auth later. |
 | `SUPABASE_SERVICE_ROLE_KEY` | your rotated service role key | Server-only. Never expose to the browser. |
 | `NODE_ENV` | `production` | Hides internal error messages from API responses. |
-| `CORS_ORIGIN` | `https://rizzwan285.github.io` | Start with the current site; you'll add the Vercel URL in Part 3. |
+| `CORS_ORIGIN` | your Vercel domain, e.g. `https://campus-hub.vercel.app` | Add `https://*.vercel.app` too if you want preview deploys to reach the API. |
 | `ADMIN_API_KEY` | a long random string | Fallback for the write endpoints from scripts/curl. |
 | `SESSION_SECRET` | a long random string (32+ chars) | Signs session tokens. **Changing it signs everyone out.** |
 | `SESSION_DAYS` | `30` | How long a session survives without being used. |
@@ -140,7 +139,7 @@ later, run from your laptop rather than on Render:
 ```bash
 cd server
 npm run migrate     # applies any new db/migrations/*.sql
-npm run seed        # reloads content from src/data (leaves profiles alone)
+npm run seed        # refreshes from src/data, keeping admin edits
 npm run verify      # 1263 checks: API output vs. the bundled static data
 ```
 
@@ -176,15 +175,15 @@ content rather than a spinner or an error. Data refreshes once the API responds.
 Two things had to change, and both are already in the repo in a way that
 **doesn't break your current GitHub Pages site**:
 
-- [`vite.config.ts`](vite.config.ts) now reads `base` from `VITE_BASE_PATH`,
-  defaulting to `/mess_bus_details/`. Vercel sets it to `/`.
+- [`vite.config.ts`](vite.config.ts) serves from the domain root (`base: "/"`).
 - [`src/App.tsx`](src/App.tsx) derives the router's `basename` from
   `import.meta.env.BASE_URL`, so it follows whatever the build used.
 - [`vercel.json`](vercel.json) rewrites all routes to `index.html`, which is
   what makes `/timetable` work on a hard refresh.
 
-Because the default is unchanged, `npm run deploy` still publishes a working
-GitHub Pages build until you decide to switch off.
+The GitHub Pages tooling is gone: no `gh-pages` dependency, no
+`predeploy`/`deploy` scripts, and `public/404.html` (the SPA redirect hack Pages
+needed) has been deleted.
 
 ### Step 2. Import the project
 
@@ -203,7 +202,6 @@ Add these in **Settings → Environment Variables**, for all environments
 | Variable | Value | Why |
 |---|---|---|
 | `VITE_API_URL` | `https://campus-hub-api.onrender.com` | Your Render URL. **No trailing slash.** |
-| `VITE_BASE_PATH` | `/` | Serve from the domain root instead of `/mess_bus_details/`. |
 | `VITE_SUPABASE_URL` | `https://lpfykagfworqjevwnjzj.supabase.co` | Only needed once you add Supabase Auth. |
 | `VITE_SUPABASE_ANON_KEY` | your anon key | Same — safe to expose, it's the public key. |
 
@@ -257,33 +255,25 @@ Once you're happy, remove the GitHub Pages origin from the list.
 
 ---
 
-# Part 4 — Retire GitHub Pages
+# Part 4 — Retiring GitHub Pages
 
-Only after Vercel is confirmed working.
+The repository side is already done: `gh-pages` uninstalled, the
+`predeploy`/`deploy` scripts removed, `public/404.html` deleted, and the base
+path set to `/`.
 
-1. Remove the deploy tooling:
+Two steps remain that can only be done on GitHub:
 
-   ```bash
-   npm uninstall gh-pages
-   ```
-
-   Then delete the `predeploy` and `deploy` scripts from `package.json`.
-
-2. Delete the old branch and turn the feature off:
+1. Delete the old branch:
 
    ```bash
    git push origin --delete gh-pages
    ```
 
-   GitHub → **Settings → Pages** → set Source to **None**.
+2. GitHub → **Settings → Pages** → set Source to **None**.
 
-3. `public/404.html` is only used by GitHub Pages. It's harmless on Vercel
-   (`vercel.json` handles routing), so you can leave it or delete it.
-
-4. Update the live-site link at the top of [`README.md`](README.md).
-
-Consider leaving a small `index.html` on `gh-pages` that redirects to the Vercel
-URL for a few weeks, since people may have bookmarked the old address.
+The old URL (`rizzwan285.github.io/mess_bus_details`) will then 404. If people
+have bookmarked it, push a single `index.html` to a fresh `gh-pages` branch that
+redirects to the Vercel domain, and leave it up for a few weeks.
 
 ---
 
@@ -310,7 +300,6 @@ URL for a few weeks, since people may have bookmarked the old address.
 | Variable | Required | Notes |
 |---|---|---|
 | `VITE_API_URL` | yes | No trailing slash. Omit it and the app runs entirely on bundled data. |
-| `VITE_BASE_PATH` | yes | `/` for Vercel. |
 | `VITE_SUPABASE_URL` | no | Needed only for Supabase Auth. |
 | `VITE_SUPABASE_ANON_KEY` | no | Public by design. |
 
@@ -332,8 +321,8 @@ back to bundled data, which is why the page still looks right.
 The SPA rewrite isn't applied. Confirm `vercel.json` is committed at the repo
 root.
 
-**Assets 404 with a doubled path like `/mess_bus_details/assets/...` on Vercel**
-`VITE_BASE_PATH` isn't set to `/`, or you set it and didn't redeploy.
+**Assets 404 with a doubled path like `/mess_bus_details/assets/...`**
+A stale build. `vite.config.ts` sets `base: "/"`; redeploy.
 
 **Frontend shows stale data**
 Responses are cached for 5 minutes by TanStack Query, and `VITE_*` values are
@@ -365,6 +354,9 @@ Changes appear within 5 minutes (the query cache window), or immediately on
 refresh. The full endpoint list is in [`server/README.md`](server/README.md).
 
 Note that `src/data/*.ts` still exists as the offline fallback. It is not
-updated by admin edits, so it slowly goes stale — that's fine for a fallback,
-but re-running `npm run seed` would overwrite database edits with the file
-contents. Only seed when intentionally resetting to the files.
+updated by admin edits, so it slowly goes stale — that's fine for a fallback.
+
+`npm run seed` is safe to re-run: it refreshes content from those files while
+keeping anything you changed in the admin panel, and prints what it preserved.
+Only `npm run seed:reset` discards admin edits. The admin panel's **Edits** tab
+shows exactly which values currently override the files.
