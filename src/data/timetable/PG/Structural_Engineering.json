@@ -168,7 +168,47 @@
     "rawAvailability": "",
     "rawSlot": "E,PA5",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "A01-018",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Friday",
+        "startTime": "08:00",
+        "endTime": "08:50",
+        "room": "A01-018",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lab",
+        "day": "Friday",
+        "startTime": "14:00",
+        "endTime": "16:45",
+        "room": "A01-018",
+        "instructors": [
+          "anil@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "CE5624",

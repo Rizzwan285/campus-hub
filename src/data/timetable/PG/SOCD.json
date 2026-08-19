@@ -224,32 +224,6 @@
         "recurrence": {
           "type": "weekly"
         }
-      },
-      {
-        "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "12:05",
-        "endTime": "12:55",
-        "room": "A01-109 + A01-001",
-        "instructors": [
-          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "12:05",
-        "endTime": "12:55",
-        "room": "A01-109 + A01-001",
-        "instructors": [
-          "Vivek Chaturvedi (vivek@iitpkd.ac.in)"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
       }
     ]
   },
@@ -277,17 +251,6 @@
       {
         "type": "lecture",
         "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
         "startTime": "12:00",
         "endTime": "12:50",
         "room": "",

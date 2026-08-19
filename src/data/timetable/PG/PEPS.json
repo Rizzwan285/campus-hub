@@ -162,17 +162,6 @@
     "meetings": [
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "12:00",
-        "endTime": "12:50",
-        "room": "A01-119",
-        "instructors": [],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Thursday",
         "startTime": "12:00",
         "endTime": "12:50",

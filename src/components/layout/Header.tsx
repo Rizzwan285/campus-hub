@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, ChevronRight, RotateCcw, LogOut, Stars } from 'lucide-react';
+import { Moon, Sun, ChevronRight, RotateCcw, LogOut, Stars, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatTime, formatDate, getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { addDays } from 'date-fns';
@@ -10,9 +10,11 @@ interface HeaderProps {
   onDateChange: (date: Date | null) => void;
   selectedDate: Date | null;
   userName?: string;
+  /** Present once accounts are enabled; opens the profile sheet. */
+  onOpenSettings?: () => void;
 }
 
-export function Header({ onRefresh, onDateChange, selectedDate, userName }: HeaderProps) {
+export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpenSettings }: HeaderProps) {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   const [isDark, setIsDark] = useState(false);
   const logout = useUserStore((state) => state.logout);
@@ -107,16 +109,28 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName }: Head
             <ChevronRight className="h-3.5 w-3.5 ml-1" />
           </Button>
 
-          {userName && (
+          {onOpenSettings ? (
             <Button
               variant="outline"
               size="icon"
-              onClick={handleLogout}
-              className="rounded-xl h-9 w-9 border-border/60 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
-              title="Logout"
+              onClick={onOpenSettings}
+              className="rounded-xl h-9 w-9 border-border/60 hover:bg-muted"
+              title="Account & settings"
             >
-              <LogOut className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
             </Button>
+          ) : (
+            userName && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleLogout}
+                className="rounded-xl h-9 w-9 border-border/60 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            )
           )}
         </div>
       </div>

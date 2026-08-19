@@ -455,19 +455,6 @@
         "recurrence": {
           "type": "weekly"
         }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "15:30",
-        "endTime": "16:45",
-        "room": "A01-118",
-        "instructors": [
-          "krishna.s@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
       }
     ]
   },
@@ -995,19 +982,6 @@
         "day": "Friday",
         "startTime": "08:00",
         "endTime": "08:50",
-        "room": "A01-007",
-        "instructors": [
-          "santhakumar@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "14:00",
-        "endTime": "15:15",
         "room": "A01-007",
         "instructors": [
           "santhakumar@iitpkd.ac.in"

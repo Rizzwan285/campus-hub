@@ -37,35 +37,9 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "N-308",
-        "instructors": [
-          "Rohith Varma, rvarma@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "09:00",
         "endTime": "09:50",
-        "room": "N-308",
-        "instructors": [
-          "Rohith Varma, rvarma@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "08:00",
-        "endTime": "08:50",
         "room": "N-308",
         "instructors": [
           "Rohith Varma, rvarma@iitpkd.ac.in"
@@ -114,35 +88,9 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "N-308",
-        "instructors": [
-          "Dr. Jaikrishnan Janardhanan, jaikrishnan@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "11:00",
         "endTime": "11:50",
-        "room": "N-308",
-        "instructors": [
-          "Dr. Jaikrishnan Janardhanan, jaikrishnan@iitpkd.ac.in"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
         "room": "N-308",
         "instructors": [
           "Dr. Jaikrishnan Janardhanan, jaikrishnan@iitpkd.ac.in"
@@ -540,7 +488,47 @@
     "rawAvailability": "",
     "rawSlot": "L, E (Wednesday)",
     "eligibility": {},
-    "meetings": []
+    "meetings": [
+      {
+        "type": "lecture",
+        "day": "Tuesday",
+        "startTime": "15:30",
+        "endTime": "16:45",
+        "room": "TBD",
+        "instructors": [
+          "Dr. Subhankar Dey, subhankardey@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Thursday",
+        "startTime": "14:00",
+        "endTime": "15:15",
+        "room": "TBD",
+        "instructors": [
+          "Dr. Subhankar Dey, subhankardey@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      },
+      {
+        "type": "lecture",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "10:50",
+        "room": "TBD",
+        "instructors": [
+          "Dr. Subhankar Dey, subhankardey@iitpkd.ac.in"
+        ],
+        "recurrence": {
+          "type": "weekly"
+        }
+      }
+    ]
   },
   {
     "id": "MA5621",

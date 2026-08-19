@@ -11,6 +11,12 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CORS_ORIGIN: z.string().default('http://localhost:8080'),
   ADMIN_API_KEY: z.string().optional(),
+  // Signs session tokens. Changing it signs everyone out.
+  SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 characters'),
+  // How long a session survives without use.
+  SESSION_DAYS: z.coerce.number().int().positive().default(30),
+  /** Roll number that owns the developer account. */
+  ADMIN_ROLL_NUMBER: z.string().default('142301026'),
 });
 
 const parsed = schema.safeParse(process.env);

@@ -462,6 +462,9 @@ async function main() {
         ['schemaVersion', JSON.stringify(metadata.schemaVersion ?? null)],
         ['generatedAt', JSON.stringify(metadata.generatedAt ?? null)],
         ['sourceWorkbooks', JSON.stringify(metadata.sourceWorkbooks ?? [])],
+        // The admin UI expands slot codes into meetings, so it needs the
+        // definitions server-side rather than only in the frontend bundle.
+        ['slots', fs.readFileSync(path.join(TIMETABLE_DIR, 'slots.json'), 'utf8')],
       ],
     );
 

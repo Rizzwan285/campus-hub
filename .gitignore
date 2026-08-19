@@ -30,6 +30,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# Python bytecode
+__pycache__/
+*.pyc
+
 # Raw source data (mess menu, timetable xlsx, etc.)
 raw_data/
 venv/

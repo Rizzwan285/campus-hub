@@ -1417,19 +1417,6 @@
       },
       {
         "type": "lecture",
-        "day": "Friday",
-        "startTime": "15:30",
-        "endTime": "16:45",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Manoj and Dr. Jayakumar"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "14:00",
         "endTime": "14:50",
@@ -1481,19 +1468,6 @@
       },
       {
         "type": "lecture",
-        "day": "Wednesday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Supratik"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Friday",
         "startTime": "11:00",
         "endTime": "11:50",
@@ -1507,35 +1481,9 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Supratik"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "11:00",
         "endTime": "11:50",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Supratik"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Friday",
-        "startTime": "09:00",
-        "endTime": "09:50",
         "room": "N-305",
         "instructors": [
           "Dr. Supratik"
@@ -1571,19 +1519,6 @@
       },
       {
         "type": "lecture",
-        "day": "Tuesday",
-        "startTime": "08:00",
-        "endTime": "08:50",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Sujatha"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Friday",
         "startTime": "10:00",
         "endTime": "10:50",
@@ -1597,35 +1532,9 @@
       },
       {
         "type": "lecture",
-        "day": "Monday",
-        "startTime": "11:00",
-        "endTime": "11:50",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Sujatha"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
         "day": "Wednesday",
         "startTime": "09:00",
         "endTime": "09:50",
-        "room": "N-305",
-        "instructors": [
-          "Dr. Sujatha"
-        ],
-        "recurrence": {
-          "type": "weekly"
-        }
-      },
-      {
-        "type": "lecture",
-        "day": "Thursday",
-        "startTime": "08:00",
-        "endTime": "08:50",
         "room": "N-305",
         "instructors": [
           "Dr. Sujatha"
