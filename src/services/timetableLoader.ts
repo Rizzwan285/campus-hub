@@ -1,4 +1,5 @@
 import { CourseOffering, Holiday } from '../engine/types';
+import { fetchJson, isApiConfigured } from './api';
 
 export class TimetableLoader {
   private static courseCache: Map<string, Promise<CourseOffering[]>> = new Map();
@@ -7,7 +8,7 @@ export class TimetableLoader {
 
   /**
    * Loads branch-specific timetable data asynchronously.
-   * Leverages Vite's dynamic import pattern.
+   * Tries the API first (fresh data), then the bundled JSON (offline/static).
    * Caches the promise to prevent multiple network requests.
    */
   static async loadBranchData(program: string, branch: string): Promise<CourseOffering[]> {
@@ -18,6 +19,15 @@ export class TimetableLoader {
     }
 
     const loadPromise = (async () => {
+      if (isApiConfigured()) {
+        try {
+          const courses = await fetchJson<CourseOffering[]>(`/api/timetable/${program}/${branch}`);
+          if (courses.length > 0) return courses;
+        } catch {
+          // fall through to the bundled JSON
+        }
+      }
+
       try {
         const module = await import(`../data/timetable/${program}/${branch}.json`);
         return module.default as CourseOffering[];
@@ -50,6 +60,14 @@ export class TimetableLoader {
     }
 
     const loadPromise = (async () => {
+      if (isApiConfigured()) {
+        try {
+          return await fetchJson<Holiday[]>('/api/holidays');
+        } catch {
+          // fall through to the bundled JSON
+        }
+      }
+
       try {
         const module = await import('../data/timetable/holidays.json');
         return module.default as Holiday[];
@@ -73,8 +91,17 @@ export class TimetableLoader {
     }
 
     const loadPromise = (async () => {
+      if (isApiConfigured()) {
+        try {
+          const courses = await fetchJson<CourseOffering[]>('/api/timetable/courses');
+          if (courses.length > 0) return courses;
+        } catch {
+          // fall through to the bundled JSON
+        }
+      }
+
       const modules = import.meta.glob('../data/timetable/*/*.json');
-      
+
       const fetchPromises = Object.entries(modules)
         .filter(([path]) => !path.includes('slots.json') && !path.includes('holidays.json'))
         .map(([path, importFn]) => 

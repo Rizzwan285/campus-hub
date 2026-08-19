@@ -1,14 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { UtensilsCrossed, ChevronLeft, ChevronRight, Clock, CalendarDays } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import {
-  week1and3Menu, week2and4Menu, commonItems,
-  nilaMessMenu, nilaCommonItems,
-  weekdayTimings, weekendTimings,
-  type WeekMenu,
-} from '@/data/messData';
+import { type MessTimings, type WeekMenu } from '@/data/messData';
 import { getWeekCycle } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
+import { useMessData } from '@/hooks/useApiData';
 
 interface MessMenuCardProps {
   date: Date;
@@ -24,29 +20,6 @@ interface CampusConfig {
   subtitle: string;
   commonItems: Record<string, string>;
 }
-
-const CAMPUS_CONFIG: Record<Campus, CampusConfig> = {
-  kedaram: {
-    label: 'Kedaram',
-    subtitle: 'Ideal Catering',
-    commonItems: {
-      Breakfast: commonItems.breakfast,
-      Lunch: commonItems.lunch,
-      Snacks: commonItems.snacks,
-      Dinner: commonItems.dinner,
-    },
-  },
-  nila: {
-    label: 'Nila',
-    subtitle: 'Manu Catering',
-    commonItems: {
-      Breakfast: nilaCommonItems.breakfast,
-      Lunch: nilaCommonItems.lunch,
-      Snacks: nilaCommonItems.snacks,
-      Dinner: nilaCommonItems.dinner,
-    },
-  },
-};
 
 /**
  * Parse a time string like "7:15am", "12pm", "9:30am" into { hours, minutes } in 24h format.
@@ -70,11 +43,7 @@ function parseTimePart(timeStr: string): { hours: number; minutes: number } {
 /**
  * Returns the index of the meal that is currently being served or is next up.
  */
-function getCurrentMealIndex(date: Date): number {
-  const day = date.getDay();
-  const isWeekend = day === 0 || day === 6;
-  const timings = isWeekend ? weekendTimings : weekdayTimings;
-
+function getCurrentMealIndex(date: Date, timings: MessTimings): number {
   const nowMinutes = date.getHours() * 60 + date.getMinutes();
 
   const mealKeys: (keyof typeof timings)[] = ['breakfast', 'lunch', 'snacks', 'dinner'];
@@ -112,11 +81,39 @@ function getCurrentMealIndex(date: Date): number {
 export function MessMenuCard({ date }: MessMenuCardProps) {
   const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
   const profile = useUserStore((state) => state.profile);
+  const {
+    week1and3Menu, week2and4Menu, commonItems,
+    nilaMessMenu, nilaCommonItems,
+    weekdayTimings, weekendTimings,
+  } = useMessData();
+
+  const CAMPUS_CONFIG: Record<Campus, CampusConfig> = useMemo(() => ({
+    kedaram: {
+      label: 'Kedaram',
+      subtitle: 'Ideal Catering',
+      commonItems: {
+        Breakfast: commonItems.breakfast,
+        Lunch: commonItems.lunch,
+        Snacks: commonItems.snacks,
+        Dinner: commonItems.dinner,
+      },
+    },
+    nila: {
+      label: 'Nila',
+      subtitle: 'Manu Catering',
+      commonItems: {
+        Breakfast: nilaCommonItems.breakfast,
+        Lunch: nilaCommonItems.lunch,
+        Snacks: nilaCommonItems.snacks,
+        Dinner: nilaCommonItems.dinner,
+      },
+    },
+  }), [commonItems, nilaCommonItems]);
 
   // Initialize with profile's mess if available, otherwise 'kedaram'
   const initialCampus = profile?.mess ? (profile.mess.toLowerCase() as Campus) : 'kedaram';
   const [campus, setCampus] = useState<Campus>(initialCampus);
-  
+
   const autoWeekCycle = useMemo(() => getWeekCycle(date), [date]);
   const [weekCycle, setWeekCycle] = useState<'week13' | 'week24'>(autoWeekCycle);
 
@@ -131,11 +128,15 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
       return weekCycle === 'week13' ? week1and3Menu : week2and4Menu;
     }
     return nilaMessMenu;
-  }, [campus, weekCycle]);
+  }, [campus, weekCycle, week1and3Menu, week2and4Menu, nilaMessMenu]);
 
   const dayMenu = selectedMenu[dayName];
 
-  const autoMealIndex = useMemo(() => getCurrentMealIndex(date), [date]);
+  const autoMealIndex = useMemo(() => {
+    const day = date.getDay();
+    const isWeekend = day === 0 || day === 6;
+    return getCurrentMealIndex(date, isWeekend ? weekendTimings : weekdayTimings);
+  }, [date, weekdayTimings, weekendTimings]);
   const [activeMealIndex, setActiveMealIndex] = useState(autoMealIndex);
 
   useEffect(() => {
