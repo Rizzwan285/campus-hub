@@ -14,6 +14,11 @@ export interface MessPayload {
   name: string;
   caterer: string | null;
   hasWeekCycle: boolean;
+  /**
+   * Flips the odd/even cycle the client derives from its anchor date, for when
+   * the mess restarts its own count out of step with that anchor.
+   */
+  weekCycleFlipped: boolean;
   commonItems: Record<string, string>;
   menus: Record<string, WeekMenu>;
 }
@@ -29,6 +34,7 @@ interface MessRow {
   name: string;
   caterer: string | null;
   has_week_cycle: boolean;
+  week_cycle_flipped: boolean;
 }
 
 interface MenuRow {
@@ -47,7 +53,8 @@ interface MenuRow {
  */
 export async function getMessData(): Promise<MessResponse> {
   const [messRows, commonRows, menuRows, timingRows] = await Promise.all([
-    query<MessRow>('select id, slug, name, caterer, has_week_cycle from messes order by sort_order'),
+    query<MessRow>(`select id, slug, name, caterer, has_week_cycle, week_cycle_flipped
+       from messes order by sort_order`),
     query<{ mess_id: number; meal: string; items: string }>(
       'select mess_id, meal, items from mess_common_items',
     ),
@@ -69,6 +76,7 @@ export async function getMessData(): Promise<MessResponse> {
       name: row.name,
       caterer: row.caterer,
       hasWeekCycle: row.has_week_cycle,
+      weekCycleFlipped: row.week_cycle_flipped,
       commonItems: {},
       menus: {},
     };
@@ -152,6 +160,21 @@ export async function updateTiming(
       where day_type = $1 and meal = $2
       returning day_type, meal, timing`,
     [dayType, meal, timing],
+  );
+
+  return rows[0] ?? null;
+}
+
+export async function setWeekCycleFlip(
+  messSlug: string,
+  flipped: boolean,
+): Promise<{ slug: string; week_cycle_flipped: boolean } | null> {
+  const rows = await query<{ slug: string; week_cycle_flipped: boolean }>(
+    `update messes
+        set week_cycle_flipped = $2
+      where slug = $1 and has_week_cycle
+      returning slug, week_cycle_flipped`,
+    [messSlug, flipped],
   );
 
   return rows[0] ?? null;

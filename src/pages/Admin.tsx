@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff,
+  FileDiff, Repeat,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuthStore } from '@/store/useAuthStore';
 import { apiFetch, ApiError } from '@/services/api';
+import { useMessData } from '@/hooks/useApiData';
+import { getWeekCycle } from '@/utils/dateUtils';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
@@ -268,6 +270,75 @@ function MessTimingsEditor() {
   );
 }
 
+const CYCLE_LABEL = { week13: 'Odd (1st & 3rd)', week24: 'Even (2nd & 4th)' } as const;
+
+/**
+ * Realigns the odd/even rotation.
+ *
+ * The app derives the current cycle from a fixed anchor date, which never
+ * drifts but also cannot tell when the mess restarts its own count after a
+ * break. When the served food stops matching the cycle shown, flipping this
+ * corrects it for every user at once — no redeploy, no anchor edit.
+ */
+function WeekCycleAlignment() {
+  const queryClient = useQueryClient();
+  const { weekCycleFlipped } = useMessData();
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  const showing = getWeekCycle(new Date(), weekCycleFlipped);
+  const other = showing === 'week13' ? 'week24' : 'week13';
+
+  const flip = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      await apiFetch('/api/admin/mess/kedaram/week-cycle', {
+        method: 'PUT',
+        body: { flipped: !weekCycleFlipped },
+      });
+      setMessage({ kind: 'ok', text: `This week now reads as ${CYCLE_LABEL[other]} for everyone.` });
+      void queryClient.invalidateQueries({ queryKey: ['mess'] });
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Switch failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold flex items-center gap-2">
+          <Repeat className="h-4 w-4 text-primary" /> Week cycle alignment
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Kedaram only. Applies to the cycle picked automatically as &ldquo;today&rdquo; &mdash; students can
+          still browse either week by hand.
+        </p>
+      </div>
+
+      <div className="rounded-xl border border-border bg-muted/30 px-3.5 py-3 text-sm">
+        This week is being served as{' '}
+        <span className="font-semibold text-foreground">{CYCLE_LABEL[showing]}</span>
+        {weekCycleFlipped && (
+          <span className="text-muted-foreground"> &middot; switched from the calendar default</span>
+        )}
+      </div>
+
+      <Feedback message={message} />
+      <Button onClick={flip} disabled={busy} variant="outline" className="rounded-xl">
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Repeat className="h-4 w-4" />}
+        Switch this week to {CYCLE_LABEL[other]}
+      </Button>
+      <p className="text-[11px] text-muted-foreground">
+        Compare against what the mess actually served today before switching &mdash; this moves the
+        rotation for every user.
+      </p>
+    </div>
+  );
+}
+
 function MessMenuEditor() {
   const queryClient = useQueryClient();
   const [mess, setMess] = useState('kedaram');
@@ -450,7 +521,10 @@ export default function Admin() {
         </TabsList>
 
         <TabsContent value="courses"><Card className="p-5"><CourseSlotEditor /></Card></TabsContent>
-        <TabsContent value="menu"><Card className="p-5"><MessMenuEditor /></Card></TabsContent>
+        <TabsContent value="menu" className="space-y-4">
+          <Card className="p-5"><WeekCycleAlignment /></Card>
+          <Card className="p-5"><MessMenuEditor /></Card>
+        </TabsContent>
         <TabsContent value="timings"><Card className="p-5"><MessTimingsEditor /></Card></TabsContent>
         <TabsContent value="edits"><Card className="p-5"><Customizations /></Card></TabsContent>
         <TabsContent value="audit"><Card className="p-5"><AuditTrail /></Card></TabsContent>
