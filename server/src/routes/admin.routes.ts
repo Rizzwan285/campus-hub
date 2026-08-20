@@ -109,6 +109,40 @@ adminRouter.put('/mess-timings/:dayType/:meal', async (req, res, next) => {
   }
 });
 
+// --------------------------------------------------- mess week cycle
+
+/**
+ * Realigns the odd/even rotation. The client derives the current cycle from a
+ * fixed anchor date; when the mess resumes its count out of step with that
+ * anchor, every reader sees the wrong week's menu. This flips the derivation
+ * for one mess so the fix is a toggle rather than a redeploy.
+ */
+adminRouter.put('/mess/:slug/week-cycle', async (req, res, next) => {
+  try {
+    const params = z.object({ slug: z.string().min(1).max(40) }).safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: z.prettifyError(params.error) });
+      return;
+    }
+    const body = z.object({ flipped: z.boolean() }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const updated = await mess.setWeekCycleFlip(params.data.slug, body.data.flipped);
+    if (!updated) {
+      res.status(404).json({ error: 'No such mess, or it does not run a week cycle.' });
+      return;
+    }
+
+    await audit(req, 'mess.weekCycle.flip', params.data.slug, null, updated, '/api/mess');
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // ---------------------------------------------------------------- canteen
 
 adminRouter.patch('/canteen/items/:id', async (req, res, next) => {

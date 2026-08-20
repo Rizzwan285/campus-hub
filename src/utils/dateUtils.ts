@@ -51,14 +51,23 @@ export function getDayType(date: Date): DayType {
   return 'weekday';
 }
 
-export function getWeekCycle(date: Date): 'week13' | 'week24' {
+/**
+ * Which half of the mess's two-week rotation `date` falls in.
+ *
+ * The alternation is anchored to a fixed semester start, so it never drifts on
+ * its own — but it also cannot tell when the mess restarts its own count after
+ * a break. `flipped` (an admin toggle, stored per mess) inverts the result to
+ * realign the two without moving the anchor.
+ */
+export function getWeekCycle(date: Date, flipped = false): 'week13' | 'week24' {
   // Calculate week number from start of semester (July 30, 2025)
   const semesterStart = new Date('2025-07-30');
   const diffTime = Math.abs(date.getTime() - semesterStart.getTime());
   const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
 
   // Week 1 & 3 for even diffWeeks, Week 2 & 4 for odd diffWeeks
-  return diffWeeks % 2 === 0 ? 'week13' : 'week24';
+  const isOdd = diffWeeks % 2 === 0;
+  return isOdd !== flipped ? 'week13' : 'week24';
 }
 
 export function parseTime(timeStr: string, referenceDate: Date): Date {

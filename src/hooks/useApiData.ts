@@ -44,6 +44,8 @@ interface ApiMessResponse {
       name: string;
       caterer: string | null;
       hasWeekCycle: boolean;
+      /** Inverts the client's derived odd/even cycle; set from the admin panel. */
+      weekCycleFlipped?: boolean;
       /** Keyed by capitalized meal: Breakfast, Lunch, Snacks, Dinner. */
       commonItems: Record<string, string>;
       /** Keyed by week cycle: week13 / week24 / all. */
@@ -62,6 +64,8 @@ export interface MessData {
   nilaCommonItems: typeof staticNilaCommonItems;
   weekdayTimings: MessTimings;
   weekendTimings: MessTimings;
+  /** Inverts the odd/even cycle derived from the calendar. Kedaram only. */
+  weekCycleFlipped: boolean;
 }
 
 const STATIC_MESS_DATA: MessData = {
@@ -72,6 +76,7 @@ const STATIC_MESS_DATA: MessData = {
   nilaCommonItems: staticNilaCommonItems,
   weekdayTimings: staticWeekdayTimings,
   weekendTimings: staticWeekendTimings,
+  weekCycleFlipped: false,
 };
 
 function toLowercaseMeals(source: Record<string, string> | undefined) {
@@ -110,6 +115,7 @@ function toMessData(api: ApiMessResponse): MessData {
       (toLowercaseMeals(nila?.commonItems) as typeof staticNilaCommonItems) ?? staticNilaCommonItems,
     weekdayTimings: toMessTimings(api.timings?.weekday) ?? staticWeekdayTimings,
     weekendTimings: toMessTimings(api.timings?.weekend) ?? staticWeekendTimings,
+    weekCycleFlipped: kedaram?.weekCycleFlipped ?? false,
   };
 }
 

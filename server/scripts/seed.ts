@@ -330,6 +330,8 @@ async function main() {
 
     // ---- messes -------------------------------------------------------
     // Upserted by slug so the generated ids survive; menu entries reference them.
+    // week_cycle_flipped is deliberately absent from the update list: it is set
+    // from the admin panel and must survive a reseed.
     await upsert(
       client,
       'messes',

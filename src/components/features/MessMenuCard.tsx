@@ -84,7 +84,7 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
   const {
     week1and3Menu, week2and4Menu, commonItems,
     nilaMessMenu, nilaCommonItems,
-    weekdayTimings, weekendTimings,
+    weekdayTimings, weekendTimings, weekCycleFlipped,
   } = useMessData();
 
   const CAMPUS_CONFIG: Record<Campus, CampusConfig> = useMemo(() => ({
@@ -125,7 +125,10 @@ export function MessMenuCard({ date }: MessMenuCardProps) {
     }
   }, [profile?.mess]);
 
-  const autoWeekCycle = useMemo(() => getWeekCycle(date), [date]);
+  const autoWeekCycle = useMemo(
+    () => getWeekCycle(date, weekCycleFlipped),
+    [date, weekCycleFlipped],
+  );
   const [weekCycle, setWeekCycle] = useState<'week13' | 'week24'>(autoWeekCycle);
 
   useEffect(() => {
