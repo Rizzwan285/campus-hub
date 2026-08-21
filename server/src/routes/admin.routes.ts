@@ -209,6 +209,55 @@ adminRouter.put('/bus/:dayType/:direction', async (req, res, next) => {
   }
 });
 
+const ROUTE_CATEGORIES = ['palakkad_town', 'wise_park'] as const;
+
+const routeBody = z.object({
+  routes: z.array(z.string().trim().min(1).max(600)).max(30),
+});
+
+/**
+ * Replaces one category of one day type's named routes (Palakkad Town or
+ * Wise Park).
+ *
+ * Sent as a whole list for the same reason as departures: the card numbers
+ * routes by position, so editing one in isolation would renumber the others.
+ */
+adminRouter.put('/bus/:dayType/routes/:category', async (req, res, next) => {
+  try {
+    const params = z
+      .object({
+        dayType: z.string().min(1).max(40),
+        category: z.enum(ROUTE_CATEGORIES),
+      })
+      .safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: z.prettifyError(params.error) });
+      return;
+    }
+    const body = routeBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const { dayType, category } = params.data;
+    const dayTypes = await bus.listDayTypes();
+    if (!dayTypes.some((entry) => entry.slug === dayType)) {
+      res.status(404).json({
+        error: `Unknown day type. Expected one of: ${dayTypes.map((e) => e.slug).join(', ')}.`,
+      });
+      return;
+    }
+
+    const routes = await bus.replaceRoutes(dayType, category, body.data.routes);
+
+    await audit(req, 'bus.routes.update', `${dayType}/${category}`, null, { routes }, '/api/bus');
+    res.json({ dayType, category, routes });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // ---------------------------------------------------------------- canteen
 
 adminRouter.patch('/canteen/items/:id', async (req, res, next) => {

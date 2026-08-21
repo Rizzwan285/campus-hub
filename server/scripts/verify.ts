@@ -78,11 +78,18 @@ function checkBus(label: string, actual: BusSchedule, expected: BusSchedule) {
 
   // Duplicate display times collapse to one entry on the way out, so compare sets.
   const expectedMultiple = expected.multipleBusTimings ?? { nilaToSahyadri: [], sahyadriToNila: [] };
+  const expectedPositions = expected.multipleBusPositions ?? { nilaToSahyadri: [], sahyadriToNila: [] };
   for (const direction of ['nilaToSahyadri', 'sahyadriToNila'] as const) {
     check(
       `${label} multipleBusTimings.${direction}`,
       [...new Set(actual?.multipleBusTimings?.[direction] ?? [])].sort(),
       [...new Set(expectedMultiple[direction] ?? [])].sort(),
+    );
+    // Positions are what the card actually badges, so they must match exactly.
+    check(
+      `${label} multipleBusPositions.${direction}`,
+      actual?.multipleBusPositions?.[direction] ?? [],
+      expectedPositions[direction] ?? [],
     );
   }
 }

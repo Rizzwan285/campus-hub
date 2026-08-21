@@ -126,16 +126,31 @@ function busRows(dayType: string, schedule: BusSchedule) {
   const routes: unknown[][] = [];
 
   const directions = [
-    ['nila_to_sahyadri', schedule.nilaToSahyadri, schedule.multipleBusTimings?.nilaToSahyadri],
-    ['sahyadri_to_nila', schedule.sahyadriToNila, schedule.multipleBusTimings?.sahyadriToNila],
+    [
+      'nila_to_sahyadri',
+      schedule.nilaToSahyadri,
+      schedule.multipleBusTimings?.nilaToSahyadri,
+      schedule.multipleBusPositions?.nilaToSahyadri,
+    ],
+    [
+      'sahyadri_to_nila',
+      schedule.sahyadriToNila,
+      schedule.multipleBusTimings?.sahyadriToNila,
+      schedule.multipleBusPositions?.sahyadriToNila,
+    ],
   ] as const;
 
-  for (const [direction, times, multiple] of directions) {
+  for (const [direction, times, multiple, positions] of directions) {
     const minutes = resolveDepartMinutes(times);
+    // Prefer positions. Matching by string flags every occurrence of a time,
+    // and a weekday has two 8:30s of which only the morning one is doubled —
+    // that is how the evening bus ended up marked in the first place.
+    const markedPositions = positions ? new Set<number>(positions) : null;
     const multipleSet = new Set(multiple ?? []);
 
     times.forEach((time, index) => {
-      departures.push([dayType, direction, time, minutes[index], index, multipleSet.has(time)]);
+      const isMultiple = markedPositions ? markedPositions.has(index) : multipleSet.has(time);
+      departures.push([dayType, direction, time, minutes[index], index, isMultiple]);
     });
   }
 
@@ -381,19 +396,35 @@ async function main() {
           select distinct day_type, direction from bus_departures where source = 'admin'
         )`,
     );
-    await client.query('delete from bus_routes');
+    // Routes are edited a category at a time, so they get the same treatment.
+    const { rows: editedRouteGroups } = await client.query<{ day_type: string; category: string }>(
+      `select distinct day_type, category from bus_routes where source = 'admin'`,
+    );
+    const preservedRouteGroups = new Set(
+      editedRouteGroups.map((g) => `${g.day_type}|${g.category}`),
+    );
+
+    await client.query(
+      `delete from bus_routes
+        where (day_type, category) not in (
+          select distinct day_type, category from bus_routes where source = 'admin'
+        )`,
+    );
 
     const freshDepartures = allDepartures.filter(
       (row) => !preservedGroups.has(`${row[0]}|${row[1]}`),
+    );
+    const freshRoutes = allRoutes.filter(
+      (row) => !preservedRouteGroups.has(`${row[0]}|${row[1]}`),
     );
 
     await bulkInsert(client, 'bus_departures',
       ['day_type', 'direction', 'depart_time', 'depart_minutes', 'sort_order', 'is_multiple_bus'],
       freshDepartures);
     await bulkInsert(client, 'bus_routes',
-      ['day_type', 'category', 'description', 'sort_order'], allRoutes);
+      ['day_type', 'category', 'description', 'sort_order'], freshRoutes);
     note('bus_departures', freshDepartures.length, allDepartures.length - freshDepartures.length);
-    note('bus_routes', allRoutes.length);
+    note('bus_routes', freshRoutes.length, allRoutes.length - freshRoutes.length);
 
     // ---- canteen (items are admin-editable) -----------------------------
     await upsert(client, 'canteen_sections',
