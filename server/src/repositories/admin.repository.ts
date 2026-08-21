@@ -211,7 +211,7 @@ export interface Customization {
  * `npm run seed` preserves exactly these; `npm run seed:reset` discards them.
  */
 export async function listCustomizations(): Promise<Customization[]> {
-  const [menu, timings, canteen, days, courses] = await Promise.all([
+  const [menu, timings, canteen, days, courses, busTimes, busRoutes] = await Promise.all([
     query<{ label: string; customized_at: string | null }>(
       `select messes.slug || ' · ' || m.week_cycle || ' · ' || m.day_of_week || ' · ' || m.meal as label,
               m.customized_at
@@ -233,6 +233,20 @@ export async function listCustomizations(): Promise<Customization[]> {
       `select course_code || ' · ' || coalesce(raw_slot, '(no slot)') as label, customized_at
          from course_offerings where source = 'admin'`,
     ),
+    // Departures and routes are edited a whole group at a time, so they are
+    // reported per group rather than per row — one line per edited list.
+    query<{ label: string; customized_at: string | null }>(
+      `select day_type || ' · ' || direction || ' · ' || count(*) || ' departures' as label,
+              max(customized_at) as customized_at
+         from bus_departures where source = 'admin'
+        group by day_type, direction`,
+    ),
+    query<{ label: string; customized_at: string | null }>(
+      `select day_type || ' · ' || category || ' · ' || count(*) || ' routes' as label,
+              max(customized_at) as customized_at
+         from bus_routes where source = 'admin'
+        group by day_type, category`,
+    ),
   ]);
 
   const group = (kind: string, rows: Array<{ label: string; customized_at: string | null }>) =>
@@ -244,6 +258,8 @@ export async function listCustomizations(): Promise<Customization[]> {
     ...group('Canteen item', canteen),
     ...group('Academic day', days),
     ...group('Course schedule', courses),
+    ...group('Bus departures', busTimes),
+    ...group('Bus routes', busRoutes),
   ];
 }
 

@@ -1,23 +1,80 @@
-# Periodically checks the Render health endpoint so the free-tier API does not
-# idle out. Render spins a free service down after ~15 minutes without traffic,
-# and the next visitor then waits 30-60s for a cold start.
+# Keeps the Render free-tier API warm. Render spins a free service down after
+# ~15 minutes without traffic, and the next visitor then waits 30-60s for a
+# cold start.
+#
+# Why this loops instead of just using a */5 cron: GitHub throttles
+# high-frequency scheduled events hard and silently drops most of them. A plain
+# `*/5` schedule on this repo actually fired at 24-65 minute intervals, which
+# is well past Render's 15-minute idle timeout — so the service was cold for
+# most of the day regardless of what the cron said.
+#
+# Instead each run pings on its own timer for ~2 hours, which covers the gap
+# even if the scheduler stalls badly. GitHub-hosted runners are free and
+# unmetered for public repositories, which this repo is.
 name: API health check
 
 on:
   schedule:
-    # Every 5 minutes — the shortest interval GitHub Actions accepts.
-    - cron: "*/5 * * * *"
+    # Re-arms the loop. The exact cadence barely matters — whenever GitHub gets
+    # around to it, the new run takes over from the old one.
+    - cron: "*/10 * * * *"
   workflow_dispatch:
+
+# Exactly one pinger alive at a time: a new run replaces the running one rather
+# than queueing behind it, which would build an unbounded backlog.
+concurrency:
+  group: api-health-check
+  cancel-in-progress: true
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    # Slightly over the loop's own budget, so the loop decides when to stop.
+    timeout-minutes: 125
     steps:
       # The API host is public (the frontend bundle embeds it), so it is a
-      # plain value here rather than a secret. --fail makes curl exit non-zero
-      # on any 4xx/5xx, which fails the job.
-      - name: Ping /api/health
+      # plain value here rather than a secret.
+      - name: Ping /api/health on a 5-minute timer
+        env:
+          HEALTH_URL: https://campus-hub-api-nyw9.onrender.com/api/health
+          INTERVAL_SECONDS: 300
+          TOTAL_PINGS: 24
         run: |
-          curl --fail --silent --show-error \
-               --max-time 90 \
-               https://campus-hub-api-nyw9.onrender.com/api/health
+          set -uo pipefail
+          ok=0
+          fail=0
+
+          for i in $(seq 1 "$TOTAL_PINGS"); do
+            # --max-time 90 tolerates a cold start, which can take ~60s.
+            if code=$(curl --silent --show-error --location \
+                           --max-time 90 \
+                           --output /dev/null \
+                           --write-out '%{http_code}' \
+                           "$HEALTH_URL"); then
+              if [ "$code" = "200" ]; then
+                ok=$((ok + 1))
+                echo "[$i/$TOTAL_PINGS] $(date -u +%H:%M:%SZ) ok ($code)"
+              else
+                fail=$((fail + 1))
+                echo "[$i/$TOTAL_PINGS] $(date -u +%H:%M:%SZ) unexpected status $code"
+              fi
+            else
+              fail=$((fail + 1))
+              echo "[$i/$TOTAL_PINGS] $(date -u +%H:%M:%SZ) request failed"
+            fi
+
+            # No trailing sleep: the run should end on a ping, not on a wait.
+            if [ "$i" -lt "$TOTAL_PINGS" ]; then
+              sleep "$INTERVAL_SECONDS"
+            fi
+          done
+
+          echo "---"
+          echo "$ok ok, $fail failed"
+
+          # A single blip is normal on a free dyno and should not turn the run
+          # red. Only a total outage is worth reporting.
+          if [ "$ok" -eq 0 ]; then
+            echo "::error::every ping failed - the API looks down"
+            exit 1
+          fi

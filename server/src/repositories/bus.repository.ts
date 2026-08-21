@@ -10,9 +10,18 @@ export interface BusSchedule {
   sahyadriToNila: string[];
   palakkadTown: BusRoute[];
   wisePark: BusRoute[];
+  /**
+   * Ambiguous legacy view: a display time appears once even when only one of
+   * its two daily occurrences is doubled. Kept for older clients.
+   */
   multipleBusTimings: {
     nilaToSahyadri: string[];
     sahyadriToNila: string[];
+  };
+  /** Indices into each direction's list — unambiguous, preferred by the card. */
+  multipleBusPositions: {
+    nilaToSahyadri: number[];
+    sahyadriToNila: number[];
   };
 }
 
@@ -40,6 +49,7 @@ function emptySchedule(): BusSchedule {
     palakkadTown: [],
     wisePark: [],
     multipleBusTimings: { nilaToSahyadri: [], sahyadriToNila: [] },
+    multipleBusPositions: { nilaToSahyadri: [], sahyadriToNila: [] },
   };
 }
 
@@ -79,11 +89,15 @@ export async function getBusSchedules(): Promise<Record<string, BusSchedule>> {
     if (!schedule) continue;
 
     const key = DIRECTION_KEY[row.direction];
-    schedule[key].push(row.depart_time);
-    // The same display time can appear morning and evening; the client
-    // matches by string, so list it once.
-    if (row.is_multiple_bus && !schedule.multipleBusTimings[key].includes(row.depart_time)) {
-      schedule.multipleBusTimings[key].push(row.depart_time);
+    // Rows arrive in sort_order, so the push index is the departure's position.
+    const position = schedule[key].push(row.depart_time) - 1;
+    if (row.is_multiple_bus) {
+      schedule.multipleBusPositions[key].push(position);
+      // The same display time can appear morning and evening; the legacy
+      // string view can only list it once.
+      if (!schedule.multipleBusTimings[key].includes(row.depart_time)) {
+        schedule.multipleBusTimings[key].push(row.depart_time);
+      }
     }
   }
 
@@ -183,4 +197,56 @@ export async function replaceDepartures(
   }
 
   return times;
+}
+
+export type BusRouteCategory = keyof typeof CATEGORY_KEY;
+
+export function isRouteCategory(value: string): value is BusRouteCategory {
+  return value in CATEGORY_KEY;
+}
+
+/**
+ * Replaces every route in one (day_type, category), in list order.
+ *
+ * Rewritten wholesale for the same reason as departures: the card numbers the
+ * routes by their position, so "route 5" is defined by where it sits in the
+ * list. Patching one row would silently renumber the rest.
+ *
+ * Rows are marked `source = 'admin'`, which makes `npm run seed` leave this
+ * category alone on its next run.
+ */
+export async function replaceRoutes(
+  dayType: string,
+  category: BusRouteCategory,
+  descriptions: string[],
+): Promise<string[]> {
+  const cleaned = descriptions.map((text) => text.trim()).filter(Boolean);
+
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+
+    await client.query('delete from bus_routes where day_type = $1 and category = $2', [
+      dayType,
+      category,
+    ]);
+
+    for (const [index, description] of cleaned.entries()) {
+      await client.query(
+        `insert into bus_routes
+           (day_type, category, description, sort_order, source, customized_at)
+         values ($1,$2,$3,$4,'admin',now())`,
+        [dayType, category, description, index],
+      );
+    }
+
+    await client.query('commit');
+  } catch (error) {
+    await client.query('rollback');
+    throw error;
+  } finally {
+    client.release();
+  }
+
+  return cleaned;
 }

@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { getDayType } from '@/utils/dateUtils';
 import { getUpcomingBuses, getNextBus, getTimeUntil } from '@/utils/dateUtils';
 import { useBusSchedules } from '@/hooks/useApiData';
+import { busEffectiveFrom } from '@/data/busData';
 
 interface BusScheduleCardProps {
   currentTime: Date;
@@ -45,11 +46,32 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
   const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : dayType === 'friday' ? 'Friday' : 'Weekday';
 
-  const isMultipleBus = (time: string, direction: 'nilaToSahyadri' | 'sahyadriToNila'): boolean => {
+  // Route 8 runs every day, so Sunday is no longer routeless — ask the data.
+  const hasSpecialRoutes =
+    (schedule.palakkadTown?.length ?? 0) > 0 || (schedule.wisePark?.length ?? 0) > 0;
+
+  /**
+   * Whether the bus at `index` of the *full* day's list is a doubled one.
+   *
+   * Positional, because a display time is ambiguous: "8:30" appears twice in a
+   * weekday and only the morning one is doubled, so matching by string badged
+   * the 8:30 PM bus too. Falls back to the string list when the API predates
+   * `multipleBusPositions`.
+   */
+  const isMultipleBus = (
+    time: string,
+    index: number,
+    direction: 'nilaToSahyadri' | 'sahyadriToNila',
+  ): boolean => {
+    const positions = schedule.multipleBusPositions?.[direction];
+    if (positions) return positions.includes(index);
     return schedule.multipleBusTimings?.[direction]?.includes(time) || false;
   };
 
   const BusTimesList = ({ times, nextBus, direction }: { times: string[]; nextBus: string | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
+    // `times` is the tail of the day still to come, so its first entry sits
+    // this far into the full list. getUpcomingBuses only ever drops a prefix.
+    const offset = schedule[direction].length - times.length;
     // Determine if we're in afternoon context for the next bus
     const isAfternoonContext = currentTime.getHours() >= 12;
 
@@ -66,7 +88,15 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Next Bus</p>
-                    <p className="text-2xl font-bold text-primary">{nextBus}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-2xl font-bold text-primary">{nextBus}</p>
+                      {/* The hero hid this, so a doubled next bus looked ordinary. */}
+                      {isMultipleBus(nextBus, offset, direction) && (
+                        <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+                          x2
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
@@ -85,20 +115,23 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
             )}
 
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
-              {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => (
+              {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => {
+                const fullIndex = offset + idx + (!isPreviewMode && nextBus ? 1 : 0);
+                return (
                 <div
                   key={idx}
                   className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
                 >
                   <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
                   <p className="text-sm font-medium">{time}</p>
-                  {isMultipleBus(time, direction) && (
+                  {isMultipleBus(time, fullIndex, direction) && (
                     <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
                       x2
                     </Badge>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
@@ -170,7 +203,9 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </div>
         <div>
           <h2 className="text-xl font-semibold">Bus Schedule</h2>
-          <p className="text-sm text-muted-foreground">{scheduleLabel} timings</p>
+          <p className="text-sm text-muted-foreground">
+            {scheduleLabel} timings · from {busEffectiveFrom}
+          </p>
         </div>
       </div>
 
@@ -189,12 +224,12 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </TabsContent>
       </Tabs>
 
-      {dayType === 'sunday' ? (
+      {!hasSpecialRoutes ? (
         <div className="mt-6 p-4 rounded-lg bg-muted text-center border-2 border-dashed">
-          <p className="text-muted-foreground font-medium">No Palakkad Town or Wise Park bus services available on Sundays.</p>
+          <p className="text-muted-foreground font-medium">No Palakkad Town or Wise Park bus services on this day.</p>
         </div>
       ) : (
-        (schedule.palakkadTown || schedule.wisePark) && (
+        (
           <Collapsible open={showExtraRoutes} onOpenChange={setShowExtraRoutes} className="mt-6">
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full flex justify-between items-center p-4 h-auto border-2 border-dashed border-muted hover:border-primary/50 hover:bg-muted/50 hover:text-foreground text-foreground transition-all">
@@ -203,7 +238,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-4 space-y-6 animate-in slide-in-from-top-2">
-              {schedule.palakkadTown && (
+              {(schedule.palakkadTown?.length ?? 0) > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
@@ -236,7 +271,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                   </Accordion>
                 </div>
               )}
-              {schedule.wisePark && (
+              {(schedule.wisePark?.length ?? 0) > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff, Repeat, Bus,
+  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -489,7 +489,10 @@ const BUS_DIRECTIONS = [
 interface ApiBusSchedule {
   nilaToSahyadri: string[];
   sahyadriToNila: string[];
+  palakkadTown: Array<{ description: string }>;
+  wisePark: Array<{ description: string }>;
   multipleBusTimings: { nilaToSahyadri: string[]; sahyadriToNila: string[] };
+  multipleBusPositions?: { nilaToSahyadri: number[]; sahyadriToNila: number[] };
 }
 
 const DEPART_TIME = /^\d{1,2}:\d{2}$/;
@@ -525,13 +528,18 @@ function BusScheduleEditor() {
   const scheduleKey = BUS_DIRECTIONS.find((d) => d.value === direction)!.key;
   const schedule = data?.[dayType];
 
-  // The API lists a multi-bus time once even when it appears twice in a day, so
-  // a `*` marks every occurrence of that string — the same match the cards use.
+  // Marked by position, not by string. A day contains two 8:30s and only one of
+  // them may be doubled; matching by string would show `*` on both and then
+  // save that back, quietly doubling the evening bus too.
+  const markedPositions = new Set(schedule?.multipleBusPositions?.[scheduleKey] ?? []);
   const serverText = schedule
     ? schedule[scheduleKey]
-        .map((time) =>
-          schedule.multipleBusTimings[scheduleKey].includes(time) ? `${time} *` : time,
-        )
+        .map((time, index) => {
+          const marked = schedule.multipleBusPositions
+            ? markedPositions.has(index)
+            : schedule.multipleBusTimings[scheduleKey].includes(time);
+          return marked ? `${time} *` : time;
+        })
         .join('\n')
     : '';
 
@@ -633,6 +641,421 @@ function BusScheduleEditor() {
   );
 }
 
+const BUS_ROUTE_CATEGORIES = [
+  { value: 'palakkad_town', label: 'Palakkad Town', key: 'palakkadTown' },
+  { value: 'wise_park', label: 'Wise Park Junction', key: 'wisePark' },
+] as const;
+
+/**
+ * Named-route editor (Palakkad Town, Wise Park).
+ *
+ * A whole category is edited as one ordered list for the same reason the
+ * departures are: the card numbers routes by position, so inserting one
+ * renumbers every route after it.
+ */
+function BusRouteEditor() {
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-bus'],
+    queryFn: () => apiFetch<Record<string, ApiBusSchedule>>('/api/bus'),
+    staleTime: 30_000,
+  });
+
+  const [dayType, setDayType] = useState('weekday');
+  const [category, setCategory] = useState<(typeof BUS_ROUTE_CATEGORIES)[number]['value']>(
+    'palakkad_town',
+  );
+  const [draft, setDraft] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  const dayTypes = data ? Object.keys(data) : [];
+  const categoryKey = BUS_ROUTE_CATEGORIES.find((c) => c.value === category)!.key;
+  const schedule = data?.[dayType];
+
+  // One route per line; blank lines are dropped on save.
+  const serverText = schedule
+    ? (schedule[categoryKey] ?? []).map((route) => route.description).join('\n')
+    : '';
+
+  const value = draft ?? serverText;
+  const routes = value.split('\n').map((line) => line.trim()).filter(Boolean);
+
+  const select = (next: () => void) => {
+    setDraft(null);
+    setMessage(null);
+    next();
+  };
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      await apiFetch(`/api/admin/bus/${dayType}/routes/${category}`, {
+        method: 'PUT',
+        body: { routes },
+      });
+      setMessage({ kind: 'ok', text: `${routes.length} route${routes.length === 1 ? '' : 's'} saved.` });
+      setDraft(null);
+      await queryClient.invalidateQueries({ queryKey: ['admin-bus'] });
+      void queryClient.invalidateQueries({ queryKey: ['bus'] });
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Save failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const field = 'w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-sm';
+
+  if (isLoading) return <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />;
+  if (!data) return <p className="text-sm text-muted-foreground">Bus routes unavailable.</p>;
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold flex items-center gap-2">
+          <Route className="h-4 w-4 text-primary" /> Special routes
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          The town and Wise Park services listed under &ldquo;Special Routes&rdquo; on the bus card.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <select
+          value={dayType}
+          onChange={(e) => select(() => setDayType(e.target.value))}
+          className={field}
+        >
+          {dayTypes.map((slug) => (
+            <option key={slug} value={slug}>{BUS_DAY_LABELS[slug] ?? slug}</option>
+          ))}
+        </select>
+        <select
+          value={category}
+          onChange={(e) => select(() => setCategory(e.target.value as typeof category))}
+          className={field}
+        >
+          {BUS_ROUTE_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <textarea
+        value={value}
+        onChange={(e) => setDraft(e.target.value)}
+        rows={10}
+        spellCheck={false}
+        placeholder="Sahyadri (5:35 PM) → Nila Gate → Pudussery → Palakkad"
+        className={`${field} leading-relaxed`}
+      />
+
+      <p className="text-xs text-muted-foreground">
+        One route per line, in departure order. Separate stops with{' '}
+        <code className="px-1 rounded bg-muted">→</code> — the card draws a timeline from them and
+        badges anything shaped like a time. Put conditions in brackets at the end, e.g.{' '}
+        <code className="px-1 rounded bg-muted">(Fri &amp; Sat only)</code>.
+      </p>
+
+      <Feedback message={message} />
+
+      <div className="flex items-center gap-3">
+        <Button onClick={save} disabled={busy || draft === null} className="rounded-xl">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Save {routes.length} route{routes.length === 1 ? '' : 's'}
+        </Button>
+        {draft !== null && (
+          <Button variant="ghost" onClick={() => setDraft(null)} className="rounded-xl">
+            Discard changes
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface AcademicDaysResponse {
+  holidays: Array<{ date: string; occasion: string }>;
+  specialDays: Array<{ date: string; type: string; note: string }>;
+}
+
+/**
+ * Holiday and instructional-day editor.
+ *
+ * These drive getDayType(), so a holiday added here immediately switches the
+ * bus card and mess timings to their weekend schedule for everyone.
+ */
+function AcademicDaysEditor() {
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-academic-days'],
+    queryFn: () => apiFetch<AcademicDaysResponse>('/api/academic-days'),
+    staleTime: 30_000,
+  });
+
+  const [date, setDate] = useState('');
+  const [name, setName] = useState('');
+  const [kind, setKind] = useState<'holiday' | 'instructional'>('holiday');
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['admin-academic-days'] });
+    // getDayType() is fed by this list, so every card can change.
+    void queryClient.invalidateQueries({ queryKey: ['academic-days'] });
+  };
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      await apiFetch(`/api/admin/academic-days/${date}`, {
+        method: 'PUT',
+        body: { name: name.trim(), kind },
+      });
+      setMessage({ kind: 'ok', text: `${date} saved as ${kind}.` });
+      setName('');
+      await refresh();
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Save failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const remove = async (target: string) => {
+    setBusy(true);
+    try {
+      await apiFetch(`/api/admin/academic-days/${target}`, { method: 'DELETE' });
+      setMessage({ kind: 'ok', text: `${target} removed.` });
+      await refresh();
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Delete failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const field = 'w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-sm';
+
+  const entries = [
+    ...(data?.holidays ?? []).map((h) => ({ date: h.date, name: h.occasion, kind: 'holiday' })),
+    ...(data?.specialDays ?? []).map((d) => ({ date: d.date, name: d.note, kind: 'instructional' })),
+  ].sort((a, b) => a.date.localeCompare(b.date));
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-primary" /> Holidays &amp; instructional days
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          A holiday makes that date run the Saturday/Holiday bus and mess schedule. An
+          instructional day makes a Saturday run the working-day one.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field} />
+        <select value={kind} onChange={(e) => setKind(e.target.value as typeof kind)} className={field}>
+          <option value="holiday">Holiday</option>
+          <option value="instructional">Instructional day</option>
+        </select>
+      </div>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Independence Day"
+        className={field}
+      />
+
+      <Feedback message={message} />
+      <Button onClick={save} disabled={busy || !date || !name.trim()} className="rounded-xl">
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+        Save day
+      </Button>
+
+      {isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      ) : entries.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No holidays recorded.</p>
+      ) : (
+        <ul className="space-y-1.5 max-h-72 overflow-y-auto text-sm pt-2">
+          {entries.map((entry) => (
+            <li key={`${entry.kind}-${entry.date}`} className="flex items-center gap-2 border-b border-border/40 pb-1.5">
+              <span className="font-mono text-xs text-muted-foreground w-24 shrink-0">{entry.date}</span>
+              <span className="truncate">{entry.name}</span>
+              {entry.kind === 'instructional' && (
+                <span className="text-[10px] uppercase tracking-wide text-primary shrink-0">class day</span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={busy}
+                onClick={() => remove(entry.date)}
+                className="ml-auto h-7 px-2 text-muted-foreground hover:text-red-500 shrink-0"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+interface CanteenSectionRow {
+  id: number;
+  title: string;
+  items: Array<{ id: number; name: string; price: number | null; variant?: string }>;
+}
+
+/** Canteen price list editor — one item at a time, since prices move singly. */
+function CanteenPriceEditor() {
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-canteen'],
+    queryFn: () => apiFetch<CanteenSectionRow[]>('/api/canteen'),
+    staleTime: 30_000,
+  });
+
+  const [sectionId, setSectionId] = useState<number | null>(null);
+  // Only the rows actually touched, keyed by item id.
+  const [prices, setPrices] = useState<Record<number, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  const section = data?.find((s) => s.id === sectionId) ?? data?.[0];
+
+  const save = async (itemId: number, name: string) => {
+    const raw = prices[itemId];
+    const price = raw.trim() === '' ? null : Number(raw);
+    if (price !== null && (!Number.isFinite(price) || price < 0)) {
+      setMessage({ kind: 'error', text: `"${raw}" is not a valid price.` });
+      return;
+    }
+
+    setBusy(true);
+    try {
+      await apiFetch(`/api/admin/canteen/items/${itemId}`, {
+        method: 'PATCH',
+        body: { price },
+      });
+      setMessage({ kind: 'ok', text: `${name} updated.` });
+      setPrices((current) => {
+        const next = { ...current };
+        delete next[itemId];
+        return next;
+      });
+      await queryClient.invalidateQueries({ queryKey: ['admin-canteen'] });
+      void queryClient.invalidateQueries({ queryKey: ['canteen'] });
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Save failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const field = 'w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-sm';
+
+  if (isLoading) return <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />;
+  if (!data?.length) return <p className="text-sm text-muted-foreground">Canteen price list unavailable.</p>;
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold flex items-center gap-2">
+          <IndianRupee className="h-4 w-4 text-primary" /> Canteen prices
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Leave a price empty to show the item as unpriced.
+        </p>
+      </div>
+
+      <select
+        value={section?.id ?? ''}
+        onChange={(e) => { setSectionId(Number(e.target.value)); setMessage(null); }}
+        className={field}
+      >
+        {data.map((s) => (
+          <option key={s.id} value={s.id}>{s.title} ({s.items.length})</option>
+        ))}
+      </select>
+
+      <Feedback message={message} />
+
+      <ul className="space-y-1.5 max-h-96 overflow-y-auto">
+        {(section?.items ?? []).map((item) => {
+          const edited = prices[item.id] !== undefined;
+          return (
+            <li key={item.id} className="flex items-center gap-2 border-b border-border/40 pb-1.5">
+              <span className="text-sm truncate flex-1">
+                {item.name}
+                {item.variant && <span className="text-xs text-muted-foreground"> · {item.variant}</span>}
+              </span>
+              <input
+                value={edited ? prices[item.id] : (item.price ?? '')}
+                onChange={(e) => setPrices((c) => ({ ...c, [item.id]: e.target.value }))}
+                inputMode="decimal"
+                className="w-20 px-2 py-1 rounded-lg bg-background border border-border text-sm text-right"
+              />
+              <Button
+                size="sm"
+                variant={edited ? 'default' : 'ghost'}
+                disabled={busy || !edited}
+                onClick={() => save(item.id, item.name)}
+                className="h-8 px-2 rounded-lg shrink-0"
+              >
+                <Save className="h-3.5 w-3.5" />
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/** Drops the API's response cache when an edit made elsewhere looks stuck. */
+function CacheControls() {
+  const queryClient = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  const clear = async () => {
+    setBusy(true);
+    try {
+      const result = await apiFetch<{ cleared: number }>('/api/admin/cache/clear', { method: 'POST' });
+      setMessage({ kind: 'ok', text: `Cleared ${result.cleared} cached response(s).` });
+      void queryClient.invalidateQueries();
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Clear failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold flex items-center gap-2">
+          <Trash2 className="h-4 w-4 text-primary" /> Response cache
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Saving anything here already clears the affected cache. Use this only if a change is not
+          showing up.
+        </p>
+      </div>
+      <Feedback message={message} />
+      <Button onClick={clear} disabled={busy} variant="outline" className="rounded-xl">
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+        Clear cache
+      </Button>
+    </div>
+  );
+}
+
 export default function Admin() {
   const account = useAuthStore((state) => state.account);
   const navigate = useNavigate();
@@ -671,11 +1094,13 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="courses">
-        <TabsList className="grid grid-cols-6 mb-5">
+        <TabsList className="grid grid-cols-4 h-auto mb-5">
           <TabsTrigger value="courses"><CalendarDays className="h-4 w-4 mr-1" />Slots</TabsTrigger>
           <TabsTrigger value="menu"><UtensilsCrossed className="h-4 w-4 mr-1" />Menu</TabsTrigger>
           <TabsTrigger value="timings"><Clock className="h-4 w-4 mr-1" />Timings</TabsTrigger>
           <TabsTrigger value="bus"><Bus className="h-4 w-4 mr-1" />Bus</TabsTrigger>
+          <TabsTrigger value="canteen"><IndianRupee className="h-4 w-4 mr-1" />Canteen</TabsTrigger>
+          <TabsTrigger value="calendar"><CalendarDays className="h-4 w-4 mr-1" />Days</TabsTrigger>
           <TabsTrigger value="edits"><FileDiff className="h-4 w-4 mr-1" />Edits</TabsTrigger>
           <TabsTrigger value="audit"><History className="h-4 w-4 mr-1" />Log</TabsTrigger>
         </TabsList>
@@ -686,8 +1111,16 @@ export default function Admin() {
           <Card className="p-5"><MessMenuEditor /></Card>
         </TabsContent>
         <TabsContent value="timings"><Card className="p-5"><MessTimingsEditor /></Card></TabsContent>
-        <TabsContent value="bus"><Card className="p-5"><BusScheduleEditor /></Card></TabsContent>
-        <TabsContent value="edits"><Card className="p-5"><Customizations /></Card></TabsContent>
+        <TabsContent value="bus" className="space-y-4">
+          <Card className="p-5"><BusScheduleEditor /></Card>
+          <Card className="p-5"><BusRouteEditor /></Card>
+        </TabsContent>
+        <TabsContent value="canteen"><Card className="p-5"><CanteenPriceEditor /></Card></TabsContent>
+        <TabsContent value="calendar"><Card className="p-5"><AcademicDaysEditor /></Card></TabsContent>
+        <TabsContent value="edits" className="space-y-4">
+          <Card className="p-5"><Customizations /></Card>
+          <Card className="p-5"><CacheControls /></Card>
+        </TabsContent>
         <TabsContent value="audit"><Card className="p-5"><AuditTrail /></Card></TabsContent>
       </Tabs>
     </div>
