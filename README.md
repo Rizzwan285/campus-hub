@@ -14,7 +14,7 @@ A web app for IIT Palakkad students to quickly check mess menus, bus schedules, 
 - **Date Preview** — Browse any date's menu and bus schedule
 - **Class Timetable** — Pick your courses; the weekly grid resolves slots, rooms and clashes
 - **Sign-in** — Roll number only, no password; profile and course picks sync across devices
-- **Developer tools** — Edit mess menus, timings and course slots live at `/admin`, no redeploy
+- **Developer tools** — Edit mess menus, timings, bus schedules and course slots live at `/admin`, no redeploy
 - **Dark Mode** — Toggle between light and dark themes
 - **Real-time Clock** — Live time display with next-bus countdown
 
@@ -34,6 +34,8 @@ A web app for IIT Palakkad students to quickly check mess menus, bus schedules, 
 | Backend | Express 5 + TypeScript ([`server/`](server/README.md)) |
 | Database | PostgreSQL (Supabase) |
 | Hosting | Vercel (frontend) · Render (API) · Supabase (Postgres) |
+| Local stack | Docker Compose (Postgres + API + frontend + Airflow) |
+| Data pipeline | Apache Airflow 2.9 + dbt ([`pipeline/`](pipeline/README.md)) |
 
 ---
 
@@ -78,6 +80,60 @@ deployment notes.
 
 ---
 
+## Running with Docker
+
+One command brings up Postgres, the API (migrated and seeded), the frontend and
+Airflow. Nothing else to install — no Node, no Python, no local database.
+
+```bash
+docker compose up -d --build
+
+# http://localhost:8080  app
+# http://localhost:4000  API
+# http://localhost:8081  Airflow  (admin / admin)
+# localhost:5433         Postgres (dev / dev_password)
+```
+
+Migrations and the seed run automatically in a one-shot `api-init` container
+before the API starts, so a fresh clone comes up with real data.
+
+```bash
+docker compose down       # stop, keep the database
+docker compose down -v    # stop and wipe the database
+```
+
+Live reload for both the API and the frontend:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+Run the dbt models (a profile, so it stays out of the default `up`):
+
+```bash
+docker compose --profile dbt run --rm dbt build
+```
+
+Ports 4000, 8080 and 8081 must be free; Postgres is published on **5433**
+because a local Postgres install usually already owns 5432.
+
+---
+
+## Data Pipeline
+
+`pipeline/` holds an Airflow project with three DAGs and a dbt project:
+
+| DAG | Schedule | What it does |
+|---|---|---|
+| `campus_data_quality` | 06:00 IST | Four integrity checks: empty menu cells, gaps in bus ordering, slotted courses with no meetings, duplicate roll numbers |
+| `campus_analytics_etl` | 07:00 IST | Loads a star schema into the `analytics` schema — three dimensions, three facts |
+| `menu_change_tracker` | 07:30 IST | Change data capture: diffs the live menu against the last snapshot |
+
+See **[`pipeline/README.md`](pipeline/README.md)** for the schema, how to trigger
+a DAG, and how to run the checks without Airflow.
+
+---
+
 ## Available Scripts
 
 | Command | Description |
@@ -94,8 +150,15 @@ deployment notes.
 
 ```
 mess_bus_details/
+├── docker-compose.yml   # Postgres + API + frontend + Airflow
+├── Dockerfile           # Frontend build → nginx
+├── pipeline/            # Airflow DAGs + dbt project (see pipeline/README.md)
+│   ├── dags/            # campus_data_quality, campus_analytics_etl, menu_change_tracker
+│   ├── dbt/             # staging + marts models with tests
+│   └── scripts/         # Standalone quality checks, analytics DDL
 ├── public/              # Static assets (favicon, images, robots.txt)
 ├── server/              # Express + Postgres API (see server/README.md)
+│   ├── Dockerfile       # Build from the repo root, not from server/
 │   ├── db/migrations/   # Plain SQL migrations
 │   ├── scripts/         # migrate, seed, verify
 │   └── src/
@@ -144,6 +207,8 @@ Pushing to `main` deploys the frontend automatically via Vercel. The API is a
 separate Render service, and the database is Supabase Postgres.
 
 Full walkthrough, including every environment variable: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+System diagram and the reasoning behind each boundary: **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 ---
 

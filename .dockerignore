@@ -1,0 +1,26 @@
+# Anchored with ** so it also covers server/node_modules.
+**/node_modules/
+dist/
+dist-ssr/
+.git/
+.github/
+
+# Secrets never enter an image layer.
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+raw_data/
+venv/
+__pycache__/
+*.pyc
+puppeteer-debug/
+.memories/
+.claude/
+*.log
+.vercel
+Dockerfile*
+docker-compose*.yml

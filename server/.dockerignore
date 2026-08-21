@@ -1,0 +1,9 @@
+# Only applies if you build with `server/` as the context. The compose build
+# uses the repo root (see the header of server/Dockerfile), where the root
+# .dockerignore applies instead.
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log

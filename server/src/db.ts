@@ -1,5 +1,6 @@
 import { Pool, types } from 'pg';
 import { config } from './config';
+import { sslConfig } from './ssl';
 
 // numeric and int8 come back as strings by default to protect large values;
 // nothing in this schema (prices, serial ids) can exceed the safe range.
@@ -8,8 +9,7 @@ types.setTypeParser(types.builtins.INT8, (value) => parseInt(value, 10));
 
 export const pool = new Pool({
   connectionString: config.DATABASE_URL,
-  // Supabase terminates TLS with its own CA chain at the pooler.
-  ssl: { rejectUnauthorized: false },
+  ssl: sslConfig(config.DATABASE_URL),
   max: 10,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 10_000,

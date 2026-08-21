@@ -1,0 +1,27 @@
+name: campus_hub
+version: "1.0.0"
+config-version: 2
+
+profile: campus_hub
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  campus_hub:
+    staging:
+      # Views: cheap to rebuild, always current with the operational tables.
+      +materialized: view
+      +schema: staging
+    marts:
+      # Tables: read repeatedly by dashboards, so pay the cost once.
+      +materialized: table
+      +schema: marts
+
+seeds:
+  campus_hub:
+    +schema: seeds

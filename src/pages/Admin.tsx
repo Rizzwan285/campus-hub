@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff, Repeat,
+  FileDiff, Repeat, Bus,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -474,6 +474,165 @@ function AuditTrail() {
   );
 }
 
+const BUS_DAY_LABELS: Record<string, string> = {
+  weekday: 'Monday – Thursday',
+  friday: 'Friday',
+  saturday_holiday: 'Saturday & Holidays',
+  sunday: 'Sunday',
+};
+
+const BUS_DIRECTIONS = [
+  { value: 'nila_to_sahyadri', label: 'Nila → Sahyadri', key: 'nilaToSahyadri' },
+  { value: 'sahyadri_to_nila', label: 'Sahyadri → Nila', key: 'sahyadriToNila' },
+] as const;
+
+interface ApiBusSchedule {
+  nilaToSahyadri: string[];
+  sahyadriToNila: string[];
+  multipleBusTimings: { nilaToSahyadri: string[]; sahyadriToNila: string[] };
+}
+
+const DEPART_TIME = /^\d{1,2}:\d{2}$/;
+
+/**
+ * Bus schedule editor.
+ *
+ * One direction of one day type is edited as a single ordered list, because
+ * AM/PM is inferred from a departure's position — inserting a time changes what
+ * every time after it means, so there is no safe way to patch a single row.
+ * A trailing `*` marks the slots where two buses run.
+ */
+function BusScheduleEditor() {
+  const queryClient = useQueryClient();
+  // A key of its own: useBusData caches ['bus'] after merging in the static
+  // fallback, and the editor needs the API's answer unmixed.
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-bus'],
+    queryFn: () => apiFetch<Record<string, ApiBusSchedule>>('/api/bus'),
+    staleTime: 30_000,
+  });
+
+  const [dayType, setDayType] = useState('weekday');
+  const [direction, setDirection] = useState<(typeof BUS_DIRECTIONS)[number]['value']>(
+    'nila_to_sahyadri',
+  );
+  // null means "showing what the server has"; typing takes over from there.
+  const [draft, setDraft] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  const dayTypes = data ? Object.keys(data) : [];
+  const scheduleKey = BUS_DIRECTIONS.find((d) => d.value === direction)!.key;
+  const schedule = data?.[dayType];
+
+  // The API lists a multi-bus time once even when it appears twice in a day, so
+  // a `*` marks every occurrence of that string — the same match the cards use.
+  const serverText = schedule
+    ? schedule[scheduleKey]
+        .map((time) =>
+          schedule.multipleBusTimings[scheduleKey].includes(time) ? `${time} *` : time,
+        )
+        .join('\n')
+    : '';
+
+  const value = draft ?? serverText;
+  const lines = value.split('\n').map((line) => line.trim()).filter(Boolean);
+  const departures = lines.map((line) => ({
+    time: line.replace(/\*$/, '').trim(),
+    isMultipleBus: line.endsWith('*'),
+  }));
+  const invalid = departures.find((entry) => !DEPART_TIME.test(entry.time));
+
+  const select = (next: () => void) => {
+    setDraft(null);
+    setMessage(null);
+    next();
+  };
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      await apiFetch(`/api/admin/bus/${dayType}/${direction}`, {
+        method: 'PUT',
+        body: { departures },
+      });
+      setMessage({ kind: 'ok', text: `${departures.length} departures saved.` });
+      setDraft(null);
+      await queryClient.invalidateQueries({ queryKey: ['admin-bus'] });
+      void queryClient.invalidateQueries({ queryKey: ['bus'] });
+    } catch (error) {
+      setMessage({ kind: 'error', text: error instanceof ApiError ? error.message : 'Save failed.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const field = 'w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-sm';
+
+  if (isLoading) return <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />;
+  if (!data) return <p className="text-sm text-muted-foreground">Bus schedule unavailable.</p>;
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <select
+          value={dayType}
+          onChange={(e) => select(() => setDayType(e.target.value))}
+          className={field}
+        >
+          {dayTypes.map((slug) => (
+            <option key={slug} value={slug}>{BUS_DAY_LABELS[slug] ?? slug}</option>
+          ))}
+        </select>
+        <select
+          value={direction}
+          onChange={(e) => select(() => setDirection(e.target.value as typeof direction))}
+          className={field}
+        >
+          {BUS_DIRECTIONS.map((d) => (
+            <option key={d.value} value={d.value}>{d.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <textarea
+        value={value}
+        onChange={(e) => setDraft(e.target.value)}
+        rows={14}
+        spellCheck={false}
+        className={`${field} font-mono leading-relaxed`}
+      />
+
+      <p className="text-xs text-muted-foreground">
+        One departure per line, in the order buses actually run — morning first.
+        No am/pm: it is worked out from position. Add <code>*</code> after a time
+        when two buses leave together.
+      </p>
+
+      <Feedback message={message} />
+      {invalid && (
+        <Feedback message={{ kind: 'error', text: `"${invalid.time}" is not a H:MM time.` }} />
+      )}
+
+      <div className="flex items-center gap-3">
+        <Button
+          onClick={save}
+          disabled={busy || !departures.length || Boolean(invalid) || draft === null}
+          className="rounded-xl"
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Save {departures.length} departures
+        </Button>
+        {draft !== null && (
+          <Button variant="ghost" onClick={() => setDraft(null)} className="rounded-xl">
+            Discard changes
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Admin() {
   const account = useAuthStore((state) => state.account);
   const navigate = useNavigate();
@@ -512,10 +671,11 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="courses">
-        <TabsList className="grid grid-cols-5 mb-5">
+        <TabsList className="grid grid-cols-6 mb-5">
           <TabsTrigger value="courses"><CalendarDays className="h-4 w-4 mr-1" />Slots</TabsTrigger>
           <TabsTrigger value="menu"><UtensilsCrossed className="h-4 w-4 mr-1" />Menu</TabsTrigger>
           <TabsTrigger value="timings"><Clock className="h-4 w-4 mr-1" />Timings</TabsTrigger>
+          <TabsTrigger value="bus"><Bus className="h-4 w-4 mr-1" />Bus</TabsTrigger>
           <TabsTrigger value="edits"><FileDiff className="h-4 w-4 mr-1" />Edits</TabsTrigger>
           <TabsTrigger value="audit"><History className="h-4 w-4 mr-1" />Log</TabsTrigger>
         </TabsList>
@@ -526,6 +686,7 @@ export default function Admin() {
           <Card className="p-5"><MessMenuEditor /></Card>
         </TabsContent>
         <TabsContent value="timings"><Card className="p-5"><MessTimingsEditor /></Card></TabsContent>
+        <TabsContent value="bus"><Card className="p-5"><BusScheduleEditor /></Card></TabsContent>
         <TabsContent value="edits"><Card className="p-5"><Customizations /></Card></TabsContent>
         <TabsContent value="audit"><Card className="p-5"><AuditTrail /></Card></TabsContent>
       </Tabs>

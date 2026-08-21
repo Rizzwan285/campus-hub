@@ -1,4 +1,5 @@
-import { query } from '../db';
+import { pool, query } from '../db';
+import { resolveDepartMinutes } from '../utils/busTime';
 
 export interface BusRoute {
   description: string;
@@ -19,6 +20,13 @@ const DIRECTION_KEY = {
   nila_to_sahyadri: 'nilaToSahyadri',
   sahyadri_to_nila: 'sahyadriToNila',
 } as const;
+
+export type BusDirection = keyof typeof DIRECTION_KEY;
+
+export interface DepartureInput {
+  time: string;
+  isMultipleBus?: boolean;
+}
 
 const CATEGORY_KEY = {
   palakkad_town: 'palakkadTown',
@@ -119,4 +127,60 @@ export async function getUpcomingDepartures(
     minutes: row.depart_minutes,
     isMultipleBus: row.is_multiple_bus,
   }));
+}
+
+export async function listDayTypes(): Promise<Array<{ slug: string; label: string }>> {
+  return query<{ slug: string; label: string }>(
+    'select slug, label from bus_day_types order by sort_order',
+  );
+}
+
+/**
+ * Replaces every departure for one (day_type, direction), in list order.
+ *
+ * A direction is rewritten wholesale rather than patched row by row because
+ * position is data: depart_minutes is derived by walking the list and deciding
+ * where the afternoon starts, so changing one time can change what the times
+ * after it mean. Runs in a transaction so a failure cannot leave a direction
+ * with a half-written schedule.
+ *
+ * Rows are marked `source = 'admin'`, which makes `npm run seed` leave this
+ * direction alone on its next run.
+ */
+export async function replaceDepartures(
+  dayType: string,
+  direction: BusDirection,
+  departures: DepartureInput[],
+): Promise<string[]> {
+  const times = departures.map((entry) => entry.time.trim());
+  const minutes = resolveDepartMinutes(times);
+
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+
+    await client.query('delete from bus_departures where day_type = $1 and direction = $2', [
+      dayType,
+      direction,
+    ]);
+
+    for (const [index, time] of times.entries()) {
+      await client.query(
+        `insert into bus_departures
+           (day_type, direction, depart_time, depart_minutes, sort_order,
+            is_multiple_bus, source, customized_at)
+         values ($1,$2,$3,$4,$5,$6,'admin',now())`,
+        [dayType, direction, time, minutes[index], index, departures[index].isMultipleBus ?? false],
+      );
+    }
+
+    await client.query('commit');
+  } catch (error) {
+    await client.query('rollback');
+    throw error;
+  } finally {
+    client.release();
+  }
+
+  return times;
 }

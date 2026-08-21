@@ -5,6 +5,7 @@ import { invalidate } from '../middleware/cache';
 import * as mess from '../repositories/mess.repository';
 import * as canteen from '../repositories/canteen.repository';
 import * as calendar from '../repositories/calendar.repository';
+import * as bus from '../repositories/bus.repository';
 import * as admin from '../repositories/admin.repository';
 import * as profiles from '../repositories/profile.repository';
 
@@ -138,6 +139,71 @@ adminRouter.put('/mess/:slug/week-cycle', async (req, res, next) => {
 
     await audit(req, 'mess.weekCycle.flip', params.data.slug, null, updated, '/api/mess');
     res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ---------------------------------------------------------------- bus
+
+const DIRECTIONS = ['nila_to_sahyadri', 'sahyadri_to_nila'] as const;
+
+// Times are stored exactly as displayed: one or two digits, a colon, two
+// minutes. AM/PM is deliberately absent — it is inferred from position.
+const DEPART_TIME = /^\d{1,2}:\d{2}$/;
+
+const departureBody = z.object({
+  departures: z
+    .array(
+      z.object({
+        time: z
+          .string()
+          .trim()
+          .regex(DEPART_TIME, 'Use H:MM or HH:MM, with no am/pm marker.'),
+        isMultipleBus: z.boolean().optional(),
+      }),
+    )
+    .max(60),
+});
+
+/**
+ * Replaces one direction of one day type's schedule.
+ *
+ * The whole list is sent at once rather than a single time: the client infers
+ * AM/PM from a departure's position, so the order of the list is part of its
+ * meaning and cannot be edited row by row.
+ */
+adminRouter.put('/bus/:dayType/:direction', async (req, res, next) => {
+  try {
+    const params = z
+      .object({
+        dayType: z.string().min(1).max(40),
+        direction: z.enum(DIRECTIONS),
+      })
+      .safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: z.prettifyError(params.error) });
+      return;
+    }
+    const body = departureBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const { dayType, direction } = params.data;
+    const dayTypes = await bus.listDayTypes();
+    if (!dayTypes.some((entry) => entry.slug === dayType)) {
+      res.status(404).json({
+        error: `Unknown day type. Expected one of: ${dayTypes.map((e) => e.slug).join(', ')}.`,
+      });
+      return;
+    }
+
+    const times = await bus.replaceDepartures(dayType, direction, body.data.departures);
+
+    await audit(req, 'bus.departures.update', `${dayType}/${direction}`, null, { times }, '/api/bus');
+    res.json({ dayType, direction, departures: times });
   } catch (error) {
     next(error);
   }
