@@ -11,6 +11,8 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
 import { config } from '../src/config';
+import { sslConfig } from '../src/ssl';
+import { resolveDepartMinutes } from '../src/utils/busTime';
 
 import {
   workingDaysBus,
@@ -57,49 +59,6 @@ interface RawCourse {
   category?: string;
   rawSlot?: string;
   meetings?: RawMeeting[];
-}
-
-/**
- * Resolves a display time ("7:45", "12:00") to minutes past midnight.
- *
- * Bus times carry no AM/PM marker, so the schedule is read in order and a
- * flag tracks whether we have crossed into the afternoon — the same rule
- * src/utils/dateUtils.ts uses on the client. Kept in sync deliberately: the
- * client still renders the raw strings, this only backfills a sortable value.
- */
-function resolveDepartMinutes(times: string[]): (number | null)[] {
-  let isAfternoonOrLater = false;
-  let prevHour = 0;
-
-  return times.map((raw) => {
-    const clean = raw.trim().toLowerCase();
-    const match = clean.match(/(\d+):?(\d+)?/);
-    if (!match) return null;
-
-    let hours = parseInt(match[1], 10);
-    const minutes = match[2] ? parseInt(match[2], 10) : 0;
-
-    if (clean.includes('am')) {
-      if (hours === 12) hours = 0;
-    } else if (clean.includes('pm')) {
-      if (hours !== 12) hours += 12;
-      isAfternoonOrLater = true;
-    } else if (hours >= 1 && hours <= 6) {
-      hours += 12;
-      isAfternoonOrLater = true;
-    } else if (hours >= 7 && hours <= 11) {
-      if (isAfternoonOrLater) hours += 12;
-    } else if (hours === 12) {
-      if (isAfternoonOrLater && prevHour >= 17 && minutes === 0) {
-        hours = 24; // midnight, end of the schedule
-      } else {
-        isAfternoonOrLater = true;
-      }
-    }
-
-    prevHour = hours;
-    return hours * 60 + minutes;
-  });
 }
 
 /** Inserts rows in chunks using a single multi-VALUES statement per chunk. */
@@ -291,9 +250,10 @@ async function countCustomized(client: Client, table: string): Promise<number> {
 
 async function main() {
   const reset = process.argv.includes('--reset');
+  const connectionString = config.DIRECT_URL ?? config.DATABASE_URL;
   const client = new Client({
-    connectionString: config.DIRECT_URL ?? config.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    connectionString,
+    ssl: sslConfig(connectionString),
   });
 
   await client.connect();
@@ -388,7 +348,7 @@ async function main() {
     );
     note('mess_timings', timingWritten, timingCustom);
 
-    // ---- bus (no admin editor yet: always refreshed) --------------------
+    // ---- bus (departures are admin-editable) ----------------------------
     const dayTypes: Array<[string, string, number, BusSchedule]> = [
       ['weekday', 'Monday – Thursday', 0, workingDaysBus],
       ['friday', 'Friday', 1, fridayBus],
@@ -408,14 +368,31 @@ async function main() {
       allRoutes.push(...routes);
     }
 
-    await client.query('delete from bus_departures');
+    // A direction is edited as a whole list — order carries the AM/PM meaning —
+    // so provenance is tracked per (day_type, direction) group, not per row.
+    const { rows: editedGroups } = await client.query<{ day_type: string; direction: string }>(
+      `select distinct day_type, direction from bus_departures where source = 'admin'`,
+    );
+    const preservedGroups = new Set(editedGroups.map((g) => `${g.day_type}|${g.direction}`));
+
+    await client.query(
+      `delete from bus_departures
+        where (day_type, direction) not in (
+          select distinct day_type, direction from bus_departures where source = 'admin'
+        )`,
+    );
     await client.query('delete from bus_routes');
+
+    const freshDepartures = allDepartures.filter(
+      (row) => !preservedGroups.has(`${row[0]}|${row[1]}`),
+    );
+
     await bulkInsert(client, 'bus_departures',
       ['day_type', 'direction', 'depart_time', 'depart_minutes', 'sort_order', 'is_multiple_bus'],
-      allDepartures);
+      freshDepartures);
     await bulkInsert(client, 'bus_routes',
       ['day_type', 'category', 'description', 'sort_order'], allRoutes);
-    note('bus_departures', allDepartures.length);
+    note('bus_departures', freshDepartures.length, allDepartures.length - freshDepartures.length);
     note('bus_routes', allRoutes.length);
 
     // ---- canteen (items are admin-editable) -----------------------------

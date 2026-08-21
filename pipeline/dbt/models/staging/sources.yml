@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: campus_hub
+    description: Operational tables written by the Express API.
+    schema: public
+    tables:
+      - name: messes
+      - name: mess_menu_entries
+      - name: bus_departures
+      - name: bus_day_types
+      - name: course_offerings
+      - name: course_meetings
+      - name: profiles
+      - name: user_courses
+      - name: audit_log

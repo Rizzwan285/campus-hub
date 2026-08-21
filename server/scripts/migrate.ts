@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
 import { config } from '../src/config';
+import { sslConfig } from '../src/ssl';
 
 const MIGRATIONS_DIR = path.resolve(__dirname, '../db/migrations');
 
@@ -15,7 +16,7 @@ async function main() {
   // DDL runs over the session pooler: the transaction pooler does not keep a
   // session between statements, which breaks some DDL and advisory locking.
   const connectionString = config.DIRECT_URL ?? config.DATABASE_URL;
-  const client = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
+  const client = new Client({ connectionString, ssl: sslConfig(connectionString) });
 
   await client.connect();
   console.log('Connected to database.');

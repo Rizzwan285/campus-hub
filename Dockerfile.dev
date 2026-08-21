@@ -1,0 +1,10 @@
+# Frontend dev image: Vite dev server with HMR, source bind-mounted by
+# docker-compose.dev.yml. Not for production — use Dockerfile for that.
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+EXPOSE 8080
+# vite.config.ts already binds host "::" and port 8080.
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,12 @@
+# Installed on top of the apache/airflow base image, resolved against the
+# official constraints file for that Airflow version — so nothing is pinned
+# here. Re-pinning apache-airflow itself would fight the base image.
+apache-airflow-providers-postgres
+psycopg2-binary
+pandas
+
+# Deliberately not installed:
+#   dbt-postgres      — lives in its own image (pipeline/dbt/Dockerfile); its
+#                       dependency tree conflicts with the Airflow constraints.
+#   great-expectations — the four data-quality checks are plain SQL; adding GE
+#                       pulls in a large, constraint-breaking dependency tree.

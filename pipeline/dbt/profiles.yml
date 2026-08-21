@@ -1,0 +1,17 @@
+# Every value has a docker-compose-friendly default, so `dbt build` works with
+# no environment set when run through `docker compose --profile dbt run dbt`.
+campus_hub:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'db') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER', 'dev') }}"
+      password: "{{ env_var('DBT_PASSWORD', 'dev_password') }}"
+      dbname: "{{ env_var('DBT_DBNAME', 'campus_hub') }}"
+      # Kept apart from the `analytics` schema the Airflow DAGs own, so the two
+      # modelling approaches never fight over the same table names.
+      schema: "{{ env_var('DBT_SCHEMA', 'analytics_dbt') }}"
+      threads: 4
+      sslmode: "{{ env_var('DBT_SSLMODE', 'disable') }}"

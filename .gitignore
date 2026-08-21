@@ -48,3 +48,13 @@ tmp/
 # Docs
 DEPLOYMENT.md
 PROJECT_CONTEXT.md
+
+# Docker
+docker-compose.override.yml
+
+# Pipeline build output
+pipeline/dbt/target/
+pipeline/dbt/dbt_packages/
+pipeline/dbt/logs/
+pipeline/logs/
+MANUAL_STEPS.md

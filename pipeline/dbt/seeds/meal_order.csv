@@ -1,0 +1,5 @@
+meal,meal_sort_order,served_at
+Breakfast,1,morning
+Lunch,2,midday
+Snacks,3,evening
+Dinner,4,night

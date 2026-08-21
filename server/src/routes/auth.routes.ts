@@ -9,13 +9,38 @@ export const authRouter = Router();
 const ROLL_RE = /^[A-Za-z0-9]{4,20}$/;
 
 /**
- * Failed password attempts per roll number. The admin account is the only
- * password-protected one, so this is a small map that never grows unbounded in
- * practice; entries are dropped once the window passes.
+ * Failed password attempts per roll number.
+ *
+ * Only accounts that carry a password can land here — today that is the
+ * developer account alone — so the map stays small; entries are dropped once
+ * the window passes. MAX_TRACKED is the belt-and-braces bound for the day more
+ * accounts get passwords: it caps memory no matter what arrives.
+ *
+ * This lives in process memory, so it protects one instance. Running more than
+ * one API instance needs shared state (Redis) for the limit to mean anything.
  */
 const attempts = new Map<string, { count: number; firstAt: number }>();
 const MAX_ATTEMPTS = 8;
 const WINDOW_MS = 15 * 60 * 1000;
+const MAX_TRACKED = 1000;
+
+/** Drops expired entries, then the oldest ones, until the map fits. */
+function pruneAttempts(): void {
+  const now = Date.now();
+  for (const [roll, entry] of attempts) {
+    if (now - entry.firstAt > WINDOW_MS) attempts.delete(roll);
+  }
+  if (attempts.size <= MAX_TRACKED) return;
+
+  // Map iterates in insertion order, so the front is the oldest.
+  const excess = attempts.size - MAX_TRACKED;
+  let dropped = 0;
+  for (const roll of attempts.keys()) {
+    if (dropped >= excess) break;
+    attempts.delete(roll);
+    dropped += 1;
+  }
+}
 
 function tooManyAttempts(roll: string): boolean {
   const entry = attempts.get(roll);
@@ -31,6 +56,7 @@ function tooManyAttempts(roll: string): boolean {
 function recordFailure(roll: string): void {
   const entry = attempts.get(roll);
   if (!entry || Date.now() - entry.firstAt > WINDOW_MS) {
+    if (attempts.size >= MAX_TRACKED) pruneAttempts();
     attempts.set(roll, { count: 1, firstAt: Date.now() });
   } else {
     entry.count += 1;

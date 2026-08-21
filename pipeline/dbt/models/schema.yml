@@ -1,0 +1,137 @@
+version: 2
+
+models:
+  # ---------------------------------------------------------------- staging
+
+  - name: stg_mess_menu
+    description: One row per (mess, week cycle, day, meal) menu cell.
+    columns:
+      - name: menu_entry_id
+        description: Primary key from mess_menu_entries.
+        tests: [unique, not_null]
+      - name: mess_slug
+        tests:
+          - not_null
+      - name: week_cycle
+        tests:
+          - accepted_values:
+              values: ["week13", "week24", "all"]
+      - name: meal
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["Breakfast", "Lunch", "Snacks", "Dinner"]
+      - name: day_of_week
+        tests:
+          - accepted_values:
+              values:
+                ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+      - name: source
+        tests:
+          - accepted_values:
+              values: ["seed", "admin"]
+      - name: is_empty
+        description: >
+          A cell with neither an item list nor a veg/non_veg pair. Should always
+          be false; this is the dbt twin of the DAG's menu completeness check.
+        tests:
+          - accepted_values:
+              values: [false]
+              quote: false
+
+  - name: stg_bus_departures
+    description: One row per scheduled departure, ordered by sort_order.
+    columns:
+      - name: departure_id
+        tests: [unique, not_null]
+      - name: direction
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["nila_to_sahyadri", "sahyadri_to_nila"]
+      - name: sort_order
+        tests: [not_null]
+      - name: day_type
+        tests: [not_null]
+
+  - name: stg_user_activity
+    description: One row per student profile with timetable-setup metrics.
+    columns:
+      - name: user_id
+        tests: [unique, not_null]
+      - name: roll_number
+        description: Null until a student logs in for the first time.
+        tests:
+          - unique
+      - name: role
+        tests:
+          - accepted_values:
+              values: ["student", "admin"]
+      - name: course_count
+        tests: [not_null]
+
+  # ---------------------------------------------------------------- marts
+
+  - name: dim_courses
+    description: Course dimension keyed on course_offerings.id.
+    columns:
+      - name: course_key
+        tests: [unique, not_null]
+      - name: course_code
+        description: Not unique — the same code is offered to several branches.
+        tests: [not_null]
+      - name: program
+        tests:
+          - accepted_values:
+              values: ["UG", "PG"]
+      - name: num_meetings
+        tests: [not_null]
+      - name: slot_status
+        description: >
+          scheduled — has meetings; no_slot_required — raw_slot records that the
+          course has no slot ("TBD", "N.A.", "Not required", "-");
+          unresolved — a real slot expression that produced no meetings.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["scheduled", "no_slot_required", "unresolved"]
+      - name: has_unresolved_slot
+        description: >
+          True only for the third case above. Warns rather than fails: an
+          offering the parser cannot resolve is data to fix, not a reason to
+          break the build. As of 2026-08-21 no offering is in this state — all
+          15 courses without meetings carry a non-slot status.
+        tests:
+          - accepted_values:
+              name: dim_courses_no_unresolved_slots
+              values: [false]
+              quote: false
+              config:
+                severity: warn
+
+  - name: fct_bus_utilization
+    description: Service-level metrics per day type and direction.
+    columns:
+      - name: total_departures
+        tests: [not_null]
+      - name: direction
+        tests:
+          - accepted_values:
+              values: ["nila_to_sahyadri", "sahyadri_to_nila"]
+
+  - name: fct_menu_changes
+    description: Menu edits reconstructed from the API audit trail.
+    columns:
+      - name: audit_id
+        tests: [unique, not_null]
+      - name: meal
+        tests:
+          - accepted_values:
+              values: ["Breakfast", "Lunch", "Snacks", "Dinner"]
+
+seeds:
+  - name: meal_order
+    description: Canonical meal ordering, used to sort menus for display.
+    columns:
+      - name: meal
+        tests: [unique, not_null]

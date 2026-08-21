@@ -1,0 +1,147 @@
+# Full local stack: Postgres + API + frontend + Airflow.
+#
+#   docker compose up -d --build      # everything, migrated and seeded
+#   docker compose --profile dbt run --rm dbt build   # run the dbt models
+#
+# The `version:` key is obsolete in Compose v2+ and is deliberately omitted.
+
+# The API and the one-shot migrate/seed job need identical environments.
+x-api-env: &api-env
+  DATABASE_URL: postgresql://dev:dev_password@db:5432/campus_hub?sslmode=disable
+  DIRECT_URL: postgresql://dev:dev_password@db:5432/campus_hub?sslmode=disable
+  PORT: "4000"
+  NODE_ENV: development
+  CORS_ORIGIN: "http://localhost:8080,http://localhost:3000,http://localhost:5173"
+  SESSION_SECRET: "docker-dev-secret-change-in-production-min-32-chars"
+  SESSION_DAYS: "30"
+  ADMIN_ROLL_NUMBER: "142301026"
+
+services:
+  # ── Local PostgreSQL (stands in for Supabase during development) ──
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: campus_hub
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      # 5433 on the host: a local Postgres install already owns 5432.
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d campus_hub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── One-shot: apply migrations, then seed from src/data ──
+  # Both are idempotent; the seed leaves admin-edited rows alone.
+  api-init:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *api-env
+    command:
+      - sh
+      - -c
+      - "node_modules/.bin/tsx scripts/migrate.ts && node_modules/.bin/tsx scripts/seed.ts"
+    restart: "no"
+
+  # ── Express API ──
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      api-init:
+        condition: service_completed_successfully
+    environment: *api-env
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/api/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 5
+
+  # ── React frontend (nginx) ──
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Baked into the bundle: the browser talks to the published API port.
+        VITE_API_URL: http://localhost:4000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+
+  # ── Airflow (data pipeline orchestrator) ──
+  airflow:
+    build:
+      context: ./pipeline
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://dev:dev_password@db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__FERNET_KEY: "Zp8kP2sQ7vN4xR1yT6wU9aB3cD5eF0gH2iJ4kL6mN8o="
+      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-dev-secret"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+      # Connection the DAGs use to reach the operational database.
+      AIRFLOW_CONN_CAMPUS_HUB_DB: postgresql://dev:dev_password@db:5432/campus_hub
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    ports:
+      - "8081:8080"
+    volumes:
+      # DAG and model edits land without a rebuild.
+      - ./pipeline/dags:/opt/airflow/dags
+      - ./pipeline/dbt:/opt/airflow/dbt
+      - ./pipeline/scripts:/opt/airflow/scripts
+      - airflow-logs:/opt/airflow/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
+
+  # ── dbt CLI runner (on demand, not a long-running service) ──
+  dbt:
+    profiles: ["dbt"]
+    build:
+      context: ./pipeline/dbt
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DBT_HOST: db
+      DBT_PORT: "5432"
+      DBT_USER: dev
+      DBT_PASSWORD: dev_password
+      DBT_DBNAME: campus_hub
+      DBT_SCHEMA: analytics_dbt
+    volumes:
+      - ./pipeline/dbt:/usr/app/dbt
+    working_dir: /usr/app/dbt
+    entrypoint: ["dbt"]
+    command: ["build"]
+
+volumes:
+  pgdata:
+  airflow-logs:
