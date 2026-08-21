@@ -1,0 +1,23 @@
+# Periodically checks the Render health endpoint so the free-tier API does not
+# idle out. Render spins a free service down after ~15 minutes without traffic,
+# and the next visitor then waits 30-60s for a cold start.
+name: API health check
+
+on:
+  schedule:
+    # Every 5 minutes — the shortest interval GitHub Actions accepts.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      # The API host is public (the frontend bundle embeds it), so it is a
+      # plain value here rather than a secret. --fail makes curl exit non-zero
+      # on any 4xx/5xx, which fails the job.
+      - name: Ping /api/health
+        run: |
+          curl --fail --silent --show-error \
+               --max-time 90 \
+               https://campus-hub-api-nyw9.onrender.com/api/health
