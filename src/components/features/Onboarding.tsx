@@ -9,6 +9,7 @@ export function Onboarding() {
   const setProfile = useUserStore((state) => state.setProfile);
   const account = useAuthStore((state) => state.account);
   const updateAccount = useAuthStore((state) => state.updateAccount);
+  const logout = useAuthStore((state) => state.logout);
 
   const [formData, setFormData] = useState<Partial<UserProfile>>({
     name: account?.name ?? '',
@@ -119,6 +120,22 @@ export function Onboarding() {
             <p className="text-muted-foreground mt-2 text-sm max-w-xs mx-auto leading-relaxed">
               Making campus life simpler
             </p>
+
+            {/* A mistyped roll number signs in too (accounts are created on
+                first use) and the session survives a reload, so this is the
+                only way back to the sign-in screen before onboarding is done. */}
+            {account && (
+              <p className="text-xs text-muted-foreground mt-4">
+                Signed in as <span className="font-medium text-foreground">{account.rollNumber}</span>.{' '}
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="font-medium text-primary hover:underline focus:outline-none focus-visible:underline"
+                >
+                  Not you? Use a different roll number
+                </button>
+              </p>
+            )}
           </div>
 
           {/* Form Section */}
