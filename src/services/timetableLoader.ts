@@ -122,6 +122,27 @@ export class TimetableLoader {
   }
 
   /**
+   * Fetches every course again, past this class's cache and the browser's.
+   *
+   * loadAllCourses() answers from memory for as long as the page stays open,
+   * so timings approved in the meantime, or the real ones after a cold start
+   * left bundled data on screen, never arrive on their own. Returns null when
+   * the API does not answer, leaving whatever is loaded in place.
+   */
+  static async refreshAllCourses(): Promise<CourseOffering[] | null> {
+    if (!isApiConfigured()) return null;
+
+    try {
+      const courses = await fetchJson<CourseOffering[]>('/api/timetable/courses', { fresh: true });
+      if (courses.length === 0) return null;
+      this.allCoursesCache = Promise.resolve(courses);
+      return courses;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Clears the in-memory cache
    */
   static clearCache(): void {

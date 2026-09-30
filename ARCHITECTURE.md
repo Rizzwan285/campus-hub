@@ -92,6 +92,20 @@ who had corrected it. They are told, and can re-apply theirs. Bundled fallback
 data never counts as a change, since it can predate an approval, so a Render
 cold start cannot discard anyone's corrections.
 
+The fingerprint is only as good as the official timings the page holds, and
+those go stale: they are loaded once per page load, and after a cold start they
+are the bundled ones. So the editor fetches them again each time it opens, and a
+correction saved while only fallback data is available carries no fingerprint at
+all (`UNVERIFIED_BASE`) until the real timings are next loaded. Without both, a
+correction made *after* an approval was stamped against the pre-approval timings
+and thrown away at the next reload as if the approval had come second.
+
+**The account's copy of those corrections is adopted every time the server
+sends it** — at sign-in, including signing out and back in on a page that is
+already open, and when a stored session is revalidated on boot — unless this
+device has edits the server has not confirmed or has changed them since the last
+adoption. The course selection is still adopted once per sign-in.
+
 **Analytics is a separate schema, not separate storage.** The dataset is small
 enough that a warehouse would be ceremony. `analytics` (Airflow-owned) and
 `analytics_dbt` (dbt-owned) sit beside `public` in the same database, and

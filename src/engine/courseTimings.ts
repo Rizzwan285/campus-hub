@@ -9,11 +9,21 @@ export interface CourseOverride {
   courseCode: string;
   /** The complete list of meetings, in the same shape as the official list. */
   meetings: TimetableMeeting[];
-  /** meetingsFingerprint() of the official meetings when this was saved. */
+  /** meetingsFingerprint() of the official meetings when this was saved, or UNVERIFIED_BASE. */
   baseFingerprint: string;
   /** ISO timestamp. */
   savedAt: string;
 }
+
+/**
+ * Stands in for `baseFingerprint` when a correction was saved without the
+ * official timetable in view — the API was asleep and bundled data stood in.
+ * Fingerprinting that data would retire the correction the moment the real
+ * timings arrived, wherever the two differ (every course changed since the
+ * app was built). The store swaps this for a real fingerprint as soon as it
+ * loads the official timings.
+ */
+export const UNVERIFIED_BASE = 'unverified';
 
 export type OverrideStatus =
   /** Applied: the student sees their own timings. */
@@ -92,6 +102,8 @@ export function overrideStatus(
 ): OverrideStatus {
   if (!authoritative) return 'active';
   if (sameMeetings(override.meetings, officialMeetings)) return 'redundant';
+  // Not made against any particular official version, so none can overtake it.
+  if (override.baseFingerprint === UNVERIFIED_BASE) return 'active';
   if (meetingsFingerprint(officialMeetings) !== override.baseFingerprint) return 'superseded';
   return 'active';
 }

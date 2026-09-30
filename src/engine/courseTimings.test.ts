@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  UNVERIFIED_BASE,
   diffMeetings,
   meetingProblem,
   meetingsFingerprint,
@@ -75,6 +76,15 @@ describe('overrideStatus', () => {
     const bundled = [tuesday];
     expect(overrideStatus(overrideOf(moved), bundled, false)).toBe('active');
     expect(overrideStatus(overrideOf(moved), moved, false)).toBe('active');
+  });
+
+  it('is not overtaken when it was saved without the official timings in view', () => {
+    // Saved over bundled data, which the real timings need not match.
+    const unverified = { ...overrideOf(moved), baseFingerprint: UNVERIFIED_BASE };
+    const real = [tuesday, meeting({ day: 'Wednesday', startTime: '10:00', endTime: '10:50' })];
+
+    expect(overrideStatus(unverified, real, true)).toBe('active');
+    expect(overrideStatus(unverified, moved, true)).toBe('redundant');
   });
 });
 
