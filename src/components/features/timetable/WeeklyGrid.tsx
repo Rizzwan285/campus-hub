@@ -1,22 +1,37 @@
 import { useEffect, useRef, useState } from 'react';
+import { PencilLine } from 'lucide-react';
 import { CalendarEvent, Collision } from '@/engine/types';
 import { EventCard } from './EventCard';
 
 interface WeeklyGridProps {
   events: CalendarEvent[];
   collisions?: Collision[];
+  /** Tapping a class opens it for editing. */
+  onEventClick?: (event: CalendarEvent) => void;
 }
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const START_HOUR = 8;
-const END_HOUR = 18;
-const TOTAL_HOURS = END_HOUR - START_HOUR;
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const WEEKEND = ['Saturday', 'Sunday'];
+// The published timetable fits 8:00–18:00; students' own timings can fall
+// outside it (an evening or Saturday class), and the grid widens to show them.
+const DEFAULT_START_HOUR = 8;
+const DEFAULT_END_HOUR = 18;
+
+const weekdayOf = (date: Date) => date.toLocaleDateString('en-US', { weekday: 'long' });
 
 import { stringToColorClass } from '@/utils/colorUtils';
 
-export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
+export function WeeklyGrid({ events, collisions = [], onEventClick }: WeeklyGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState(new Date());
+
+  const days = [...WEEKDAYS, ...WEEKEND.filter(day => events.some(e => weekdayOf(e.startTime) === day))];
+  const startHour = Math.min(DEFAULT_START_HOUR, ...events.map(e => e.startTime.getHours()));
+  const endHour = Math.min(24, Math.max(
+    DEFAULT_END_HOUR,
+    ...events.map(e => e.endTime.getHours() + (e.endTime.getMinutes() > 0 ? 1 : 0)),
+  ));
+  const totalHours = endHour - startHour;
 
   // Update current time every minute
   useEffect(() => {
@@ -30,8 +45,8 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
   const getPercentage = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const minutesFromStart = (hours - START_HOUR) * 60 + minutes;
-    const totalMinutes = TOTAL_HOURS * 60;
+    const minutesFromStart = (hours - startHour) * 60 + minutes;
+    const totalMinutes = totalHours * 60;
     const raw = Math.max(0, Math.min(100, (minutesFromStart / totalMinutes) * 100));
     return PADDING_PCT + (raw * (SCALE_PCT / 100));
   };
@@ -40,7 +55,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
     const startMins = start.getHours() * 60 + start.getMinutes();
     const endMins = end.getHours() * 60 + end.getMinutes();
     const durationMins = endMins - startMins;
-    const totalMinutes = TOTAL_HOURS * 60;
+    const totalMinutes = totalHours * 60;
     const raw = Math.max(0, Math.min(100, (durationMins / totalMinutes) * 100));
     return raw * (SCALE_PCT / 100);
   };
@@ -53,7 +68,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
   useEffect(() => {
     if (scrollRef.current) {
       const hours = now.getHours();
-      if (hours >= START_HOUR && hours <= END_HOUR) {
+      if (hours >= startHour && hours <= endHour) {
         const leftPercentage = getPercentage(now);
         // Scroll so the current time is roughly in the middle horizontally
         const scrollAmount = (scrollRef.current.scrollWidth * leftPercentage) / 100;
@@ -63,12 +78,12 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const hoursList = Array.from({ length: TOTAL_HOURS + 1 }, (_, i) => START_HOUR + i);
+  const hoursList = Array.from({ length: totalHours + 1 }, (_, i) => startHour + i);
 
   // Is today a weekday?
   const todayName = now.toLocaleDateString('en-US', { weekday: 'long' });
-  const isWorkingHours = now.getHours() >= START_HOUR && now.getHours() < END_HOUR;
-  const showCurrentTime = DAYS.includes(todayName) && isWorkingHours;
+  const isWorkingHours = now.getHours() >= startHour && now.getHours() < endHour;
+  const showCurrentTime = days.includes(todayName) && isWorkingHours;
   const currentTimePercentage = getPercentage(now);
 
   const formatTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -77,7 +92,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
     <>
     {/* Mobile Agenda View */}
     <div className="md:hidden flex flex-col w-full max-h-[600px] overflow-y-auto space-y-6 px-1">
-      {DAYS.map(dayName => {
+      {days.map(dayName => {
         const dayEvents = events
           .filter(e => e.startTime.toLocaleDateString('en-US', { weekday: 'long' }) === dayName)
           .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
@@ -98,13 +113,33 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
                 const baseColor = stringToColorClass(event.courseCode);
                 const hasCollision = isCollision(event);
                 return (
-                  <div key={event.id} className={`relative flex flex-col rounded-md border shadow-sm overflow-hidden bg-background ${hasCollision ? 'border-destructive ring-1 ring-destructive' : 'border-primary/15'}`}>
+                  <div
+                    key={event.id}
+                    role={onEventClick ? 'button' : undefined}
+                    tabIndex={onEventClick ? 0 : undefined}
+                    aria-label={onEventClick ? `Edit ${event.courseCode} timings` : undefined}
+                    onClick={onEventClick ? () => onEventClick(event) : undefined}
+                    onKeyDown={onEventClick ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onEventClick(event);
+                      }
+                    } : undefined}
+                    className={`relative flex flex-col rounded-md border shadow-sm overflow-hidden bg-background ${onEventClick ? 'cursor-pointer active:scale-[0.99] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-ring' : ''} ${hasCollision ? 'border-destructive ring-1 ring-destructive' : 'border-primary/15'}`}
+                  >
                     {/* Tint overlay */}
                     <div className={`absolute inset-0 pointer-events-none ${baseColor.split(' ').filter(c => c.startsWith('bg-')).join(' ')}`} />
-                    
+
                     <div className={`flex flex-col p-3 relative ${baseColor.split(' ').filter(c => !c.startsWith('bg-') && !c.startsWith('border-')).join(' ')}`}>
                       <div className="flex justify-between items-start mb-1">
-                        <span className="font-bold text-sm">{event.courseCode}</span>
+                        <span className="font-bold text-sm flex items-center gap-1.5">
+                          {event.courseCode}
+                          {event.isPersonal && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-background/60 border border-border/30 px-1.5 py-0.5 rounded">
+                              <PencilLine className="h-2.5 w-2.5" /> Your timing
+                            </span>
+                          )}
+                        </span>
                         <span className="text-xs font-semibold bg-background/50 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/20">
                           {formatTime(event.startTime)} - {formatTime(event.endTime)}
                         </span>
@@ -126,7 +161,8 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
 
     {/* Desktop Grid View */}
     <div ref={scrollRef} className="hidden md:flex w-full h-[600px] overflow-auto relative bg-background border rounded-md shadow-inner flex-col">
-      <div className="flex flex-col min-w-[1400px] w-full h-full relative">
+      {/* 140px an hour, as the fixed 8:00–18:00 grid always had. */}
+      <div className="flex flex-col w-full h-full relative" style={{ minWidth: `${Math.max(1400, totalHours * 140)}px` }}>
         
         {/* Header Row: Sticky Top */}
         <div className="flex sticky top-0 z-10 bg-muted/80 backdrop-blur-sm border-b h-10 shadow-sm shrink-0">
@@ -139,7 +175,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
               <div 
                 key={hour}
                 className="absolute h-full border-l border-border/50 flex justify-center -translate-x-1/2"
-                style={{ left: `${PADDING_PCT + (((hour - START_HOUR) / TOTAL_HOURS) * 100) * (SCALE_PCT / 100)}%` }}
+                style={{ left: `${PADDING_PCT + (((hour - startHour) / totalHours) * 100) * (SCALE_PCT / 100)}%` }}
               >
                 <span className="text-xs text-muted-foreground pt-1">{hour}:00</span>
               </div>
@@ -153,7 +189,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
             <div 
               key={hour} 
               className="absolute h-full border-l border-border/20"
-              style={{ left: `${PADDING_PCT + (((hour - START_HOUR) / TOTAL_HOURS) * 100) * (SCALE_PCT / 100)}%` }}
+              style={{ left: `${PADDING_PCT + (((hour - startHour) / totalHours) * 100) * (SCALE_PCT / 100)}%` }}
             />
           ))}
         </div>
@@ -172,7 +208,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
 
         {/* Day Rows */}
         <div className="flex-1 flex flex-col z-10">
-          {DAYS.map(dayName => {
+          {days.map(dayName => {
             const isToday = dayName === todayName;
             const dayEvents = events.filter(e => e.startTime.toLocaleDateString('en-US', { weekday: 'long' }) === dayName);
             
@@ -198,6 +234,7 @@ export function WeeklyGrid({ events, collisions = [] }: WeeklyGridProps) {
                       left={getPercentage(event.startTime)}
                       width={getDurationPercentage(event.startTime, event.endTime)}
                       isCollision={collisions.some(c => c.courseIdA === event.courseId || c.courseIdB === event.courseId)}
+                      onClick={onEventClick ? () => onEventClick(event) : undefined}
                     />
                   ))}
                 </div>

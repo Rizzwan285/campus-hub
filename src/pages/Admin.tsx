@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee,
+  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuthStore } from '@/store/useAuthStore';
 import { apiFetch, ApiError } from '@/services/api';
+import { countPendingSuggestions } from '@/services/courseChanges';
 import { useMessData } from '@/hooks/useApiData';
 import { getWeekCycle } from '@/utils/dateUtils';
+import { CourseChangeReview } from '@/components/features/CourseChangeReview';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
@@ -1056,6 +1058,21 @@ function CacheControls() {
   );
 }
 
+/** How many timing suggestions are waiting, shown on their tab. */
+function PendingBadge() {
+  const { data } = useQuery({
+    queryKey: ['admin-course-changes-count'],
+    queryFn: countPendingSuggestions,
+    staleTime: 30_000,
+  });
+  if (!data?.pending) return null;
+  return (
+    <span className="ml-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 leading-none">
+      {data.pending}
+    </span>
+  );
+}
+
 export default function Admin() {
   const account = useAuthStore((state) => state.account);
   const navigate = useNavigate();
@@ -1093,8 +1110,9 @@ export default function Admin() {
         </div>
       </div>
 
-      <Tabs defaultValue="courses">
-        <TabsList className="grid grid-cols-4 h-auto mb-5">
+      <Tabs defaultValue="requests">
+        <TabsList className="grid grid-cols-3 h-auto mb-5">
+          <TabsTrigger value="requests"><Inbox className="h-4 w-4 mr-1" />Requests<PendingBadge /></TabsTrigger>
           <TabsTrigger value="courses"><CalendarDays className="h-4 w-4 mr-1" />Slots</TabsTrigger>
           <TabsTrigger value="menu"><UtensilsCrossed className="h-4 w-4 mr-1" />Menu</TabsTrigger>
           <TabsTrigger value="timings"><Clock className="h-4 w-4 mr-1" />Timings</TabsTrigger>
@@ -1105,6 +1123,7 @@ export default function Admin() {
           <TabsTrigger value="audit"><History className="h-4 w-4 mr-1" />Log</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="requests"><Card className="p-5"><CourseChangeReview /></Card></TabsContent>
         <TabsContent value="courses"><Card className="p-5"><CourseSlotEditor /></Card></TabsContent>
         <TabsContent value="menu" className="space-y-4">
           <Card className="p-5"><WeekCycleAlignment /></Card>

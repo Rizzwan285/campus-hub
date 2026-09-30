@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { GraduationCap, BookOpen, AlertCircle, Clock, Play, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, BookOpen, AlertCircle, Clock, Play, CheckCircle2, PencilLine } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { CalendarEvent } from '@/engine/types';
@@ -183,6 +183,11 @@ export function ClassTimetableCard({ date }: ClassTimetableCardProps) {
                     <span className="inline-flex items-center text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground uppercase">
                       {event.type}
                     </span>
+                    {event.isPersonal && (
+                      <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                        <PencilLine className="h-3 w-3" /> Your timing
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

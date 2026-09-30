@@ -80,6 +80,19 @@ Write (require `X-Admin-Key`):
 | PATCH | `/api/admin/canteen/items/:id` |
 | PUT | `/api/admin/academic-days/:date` |
 | DELETE | `/api/admin/academic-days/:date` |
+| GET | `/api/admin/course-changes?status=pending\|decided` |
+| GET | `/api/admin/course-changes/count` |
+| POST | `/api/admin/course-changes/:id/approve` — optional `note`, and `meetings` to correct the suggestion first |
+| POST | `/api/admin/course-changes/:id/reject` — optional `note` |
+
+Signed-in students (session token):
+
+| Method | Path | Does |
+|---|---|---|
+| PUT | `/api/auth/course-overrides` | Syncs the student's own timings for individual courses |
+| GET | `/api/course-changes/mine` | The student's timing suggestions and their outcome |
+| POST | `/api/course-changes` | Suggests new timings for a course, for everyone taking it |
+| DELETE | `/api/course-changes/:id` | Withdraws a suggestion that is still waiting |
 
 ```bash
 curl -X PUT localhost:4000/api/admin/mess/kedaram/week13/Monday/Dinner \
@@ -106,6 +119,13 @@ curl -X PUT localhost:4000/api/admin/mess/kedaram/week13/Monday/Dinner \
 - **RLS** is enabled everywhere. Content tables allow public reads; `profiles`
   and `user_courses` have no anon policy, so the browser's anon key cannot reach
   them via PostgREST. The API connects as `postgres` and bypasses RLS.
+- **Timing changes** (migration 009). A student's own timings for a course live
+  in `user_course_overrides` and change nobody else's timetable. A suggestion in
+  `course_change_requests` changes the course for everyone only once approved,
+  and approval rewrites the meetings of *every* offering of that course code in
+  one transaction — the client merges offerings by code, so one left behind
+  could win the merge with the old timings. Approved courses are marked
+  `source = 'admin'`, so a reseed keeps them.
 
 ## Deploying to Render
 

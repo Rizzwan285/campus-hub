@@ -13,8 +13,9 @@ A web app for IIT Palakkad students to quickly check mess menus, bus schedules, 
 - **Mess Timings** — Separate timings for weekdays and weekends
 - **Date Preview** — Browse any date's menu and bus schedule
 - **Class Timetable** — Pick your courses; the weekly grid resolves slots, rooms and clashes
-- **Sign-in** — Roll number only, no password; profile and course picks sync across devices
-- **Developer tools** — Edit mess menus, timings, bus schedules and course slots live at `/admin`, no redeploy
+- **Timing corrections** — When a professor moves, adds or cancels a class, fix it in your own timetable at once, or suggest the change for everyone taking the course
+- **Sign-in** — Roll number only, no password; profile, course picks and your own timings sync across devices
+- **Developer tools** — Edit mess menus, timings, bus schedules and course slots live at `/admin`, and approve or reject students' timing suggestions, no redeploy
 - **Dark Mode** — Toggle between light and dark themes
 - **Real-time Clock** — Live time display with next-bus countdown
 

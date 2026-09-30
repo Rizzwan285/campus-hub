@@ -5,6 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserStore } from '@/store/useUserStore';
 
+// Files in public/ are served from the app's base path. Hardcoding the old
+// GitHub Pages prefix (/mess_bus_details/) broke both links once the app moved
+// to the domain root: the SPA fallback answered with index.html instead.
+const docUrl = (fileName: string) => `${import.meta.env.BASE_URL}docs/${encodeURIComponent(fileName)}`;
+
 export function ImportantLinksCard() {
   const profile = useUserStore((state) => state.profile);
   const userMess = profile?.mess?.toLowerCase() || 'kedaram';
@@ -48,7 +53,7 @@ export function ImportantLinksCard() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a 
-              href="/mess_bus_details/docs/Hostel Rules.pdf" 
+              href={docUrl('Hostel Rules.pdf')}
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 transition-colors group"
@@ -64,7 +69,7 @@ export function ImportantLinksCard() {
             </a>
 
             <a 
-              href="/mess_bus_details/docs/Gym Regulations.pdf" 
+              href={docUrl('Gym Regulations.pdf')}
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 transition-colors group"

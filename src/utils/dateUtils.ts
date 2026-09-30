@@ -70,262 +70,111 @@ export function getWeekCycle(date: Date, flipped = false): 'week13' | 'week24' {
   return isOdd !== flipped ? 'week13' : 'week24';
 }
 
-export function parseTime(timeStr: string, referenceDate: Date): Date {
-  const date = new Date(referenceDate);
-  
-  // Remove spaces and convert to lowercase
-  const cleanTime = timeStr.trim().toLowerCase();
-  
-  // Check for AM/PM
-  const isAM = cleanTime.includes('am');
-  const isPM = cleanTime.includes('pm');
-  
-  // Extract numbers
-  const timeMatch = cleanTime.match(/(\d+):?(\d+)?/);
-  if (!timeMatch) {
-    date.setHours(0, 0, 0, 0);
-    return date;
-  }
-  
-  let hours = parseInt(timeMatch[1], 10);
-  const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-  
-  // Convert to 24-hour format
-  if (isAM) {
-    // AM times
-    if (hours === 12) {
-      hours = 0; // 12 AM is midnight
-    }
-  } else if (isPM) {
-    // PM times
-    if (hours !== 12) {
-      hours += 12; // Add 12 for PM (except 12 PM which stays 12)
-    }
-  } else {
-    // No AM/PM specified - use context based on hour
-    // Buses typically run from early morning to midnight
-    // 7-11 are morning (AM)
-    // 12 is noon (PM)
-    // 1-6 are afternoon/evening (PM)
-    // 7-11 in evening context would be PM, but bus times like "8:30" morning are AM
-    
-    if (hours >= 7 && hours <= 11) {
-      // Could be morning or evening - check if it's a typical morning time
-      // Bus schedules start around 7:30-8:30 AM
-      // Evening buses are around 7:00-11:00 PM
-      // Since we have times like 8:30 appearing twice (morning and evening),
-      // we need to sort by order in array. But for parsing individual times,
-      // we'll use a heuristic: if the reference time context shows morning, use AM
-      
-      // For simplicity: 7:xx-9:xx that appear early in schedule are AM
-      // Later appearances of 8:xx-11:xx are PM
-      // Use reference date's current hour to determine context
-      const refHour = referenceDate.getHours();
-      
-      // If before noon, interpret as AM; if after, interpret as PM
-      if (refHour < 12) {
-        // Keep as-is (morning interpretation)
-      } else {
-        // Evening interpretation
-        hours += 12;
-      }
-    } else if (hours === 12) {
-      // 12:xx without AM/PM
-      if (minutes === 0) {
-        // 12:00 could be noon or midnight
-        // In bus schedules, 12:00 at end is typically midnight (next day)
-        hours = 0;
-        date.setDate(date.getDate() + 1);
-      }
-      // 12:15, 12:30 etc. are noon
-    } else if (hours >= 1 && hours <= 6) {
-      // Afternoon times (1 PM - 6 PM)
-      hours += 12;
-    }
-  }
-  
-  date.setHours(hours, minutes, 0, 0);
-  return date;
+export interface Departure {
+  /** Exactly as the schedule prints it, e.g. "12:00". */
+  time: string;
+  /** The instant that label resolves to, once position is taken into account. */
+  at: Date;
 }
 
-// Parse all bus times for a day, handling the AM/PM context properly
-export function parseBusTimesForDay(times: string[], referenceDate: Date): { time: string; parsedDate: Date }[] {
+/**
+ * Resolves a whole direction's departures to real instants.
+ *
+ * Bus times carry no am/pm, so a label alone is ambiguous — "12:00" is noon in
+ * the middle of a Sunday list and midnight at the end of a weekday one, and
+ * "8:30" occurs both morning and evening. The only thing that disambiguates
+ * them is their position in the ordered list, so the list is walked once and a
+ * flag latches when the schedule crosses into the afternoon.
+ *
+ * This is the client twin of `resolveDepartMinutes` in
+ * `server/src/utils/busTime.ts`; keep the two rules in step.
+ *
+ * Resolve once and carry the `Date` around. Re-deriving am/pm from a lone
+ * label later is what made an 11:54 am countdown to the noon bus read as
+ * twelve hours.
+ */
+export function resolveDepartures(times: string[], referenceDate: Date): Departure[] {
   const baseDate = new Date(referenceDate);
   baseDate.setHours(0, 0, 0, 0);
-  
+
+  // Whether the schedule has already crossed midday.
   let isAfternoonOrLater = false;
+  // Resolves the trailing 12:00 (midnight) apart from a midday one.
   let prevParsedHour = 0;
-  
-  return times.map(timeStr => {
+
+  return times.map((timeStr) => {
     const cleanTime = timeStr.trim().toLowerCase();
     const isAM = cleanTime.includes('am');
     const isPM = cleanTime.includes('pm');
-    
+
     const timeMatch = cleanTime.match(/(\d+):?(\d+)?/);
     if (!timeMatch) {
-      return { time: timeStr, parsedDate: baseDate };
+      return { time: timeStr, at: new Date(baseDate) };
     }
-    
+
     let hours = parseInt(timeMatch[1], 10);
     const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-    
-    const resultDate = new Date(baseDate);
-    
+    const at = new Date(baseDate);
+
     if (isAM) {
       if (hours === 12) hours = 0;
     } else if (isPM) {
       if (hours !== 12) hours += 12;
       isAfternoonOrLater = true;
-    } else {
-      // No AM/PM specified
-      if (hours >= 1 && hours <= 6) {
-        hours += 12;
+    } else if (hours >= 1 && hours <= 6) {
+      // 1–6 only ever appear in the afternoon half of a schedule.
+      hours += 12;
+      isAfternoonOrLater = true;
+    } else if (hours >= 7 && hours <= 11) {
+      // Morning until the list has been through midday, evening after.
+      if (isAfternoonOrLater) hours += 12;
+    } else if (hours === 12) {
+      // Midnight only once the evening has been and gone; otherwise midday.
+      if (isAfternoonOrLater && prevParsedHour >= 17 && minutes === 0) {
+        hours = 0;
+        at.setDate(at.getDate() + 1);
+      } else {
         isAfternoonOrLater = true;
-      } else if (hours >= 7 && hours <= 11) {
-        if (isAfternoonOrLater) {
-          hours += 12;
-        }
-      } else if (hours === 12) {
-        if (isAfternoonOrLater && prevParsedHour >= 17 && minutes === 0) {
-          // Midnight — end of schedule
-          hours = 0;
-          resultDate.setDate(resultDate.getDate() + 1);
-        } else {
-          // Noon
-          isAfternoonOrLater = true;
-        }
       }
     }
-    
-    resultDate.setHours(hours, minutes, 0, 0);
+
+    at.setHours(hours, minutes, 0, 0);
     prevParsedHour = hours;
-    return { time: timeStr, parsedDate: resultDate };
+    return { time: timeStr, at };
   });
 }
 
-// Improved function to get upcoming buses with proper AM/PM handling
+/** The departures still to come, in order, with their resolved instants. */
+export function getUpcomingDepartures(times: string[], currentTime: Date): Departure[] {
+  return resolveDepartures(times, currentTime).filter(({ at }) => at > currentTime);
+}
+
 export function getUpcomingBuses(times: string[], currentTime: Date): string[] {
-  const baseDate = new Date(currentTime);
-  baseDate.setHours(0, 0, 0, 0);
-  
-  // Track if we've seen PM-range times (indicates we're past the morning section)
-  let isAfternoonOrLater = false;
-  // Track previous parsed hour to resolve ambiguous 12:00 (noon vs midnight)
-  let prevParsedHour = 0;
-  
-  const parsedTimes = times.map(timeStr => {
-    const cleanTime = timeStr.trim().toLowerCase();
-    const isAM = cleanTime.includes('am');
-    const isPM = cleanTime.includes('pm');
-    
-    const timeMatch = cleanTime.match(/(\d+):?(\d+)?/);
-    if (!timeMatch) {
-      return { time: timeStr, parsedDate: new Date(baseDate) };
-    }
-    
-    let hours = parseInt(timeMatch[1], 10);
-    const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-    
-    const resultDate = new Date(baseDate);
-    
-    if (isAM) {
-      if (hours === 12) hours = 0;
-    } else if (isPM) {
-      if (hours !== 12) hours += 12;
-      isAfternoonOrLater = true;
-    } else {
-      // No AM/PM specified
-      if (hours >= 1 && hours <= 6) {
-        // 1-6 are afternoon/evening hours (PM)
-        hours += 12;
-        isAfternoonOrLater = true;
-      } else if (hours >= 7 && hours <= 11) {
-        // 7-11 could be AM or PM
-        // If we've already seen PM times, these are evening (PM)
-        if (isAfternoonOrLater) {
-          hours += 12;
-        }
-        // Otherwise, they're morning (AM) - keep as is
-      } else if (hours === 12) {
-        // 12:xx without AM/PM — distinguish noon from midnight.
-        // If the previous parsed time was in the morning/early-afternoon range
-        // (i.e. we haven't gone through evening yet), this is noon.
-        // If we've already seen evening PM times (prevParsedHour >= 17),
-        // then this 12:00 is midnight.
-        if (isAfternoonOrLater && prevParsedHour >= 17 && minutes === 0) {
-          // Midnight — end of schedule
-          hours = 0;
-          resultDate.setDate(resultDate.getDate() + 1);
-        } else {
-          // Noon — keep as 12
-          isAfternoonOrLater = true;
-        }
-      }
-    }
-    
-    resultDate.setHours(hours, minutes, 0, 0);
-    prevParsedHour = hours;
-    return { time: timeStr, parsedDate: resultDate };
-  });
-  
-  // Filter for times after currentTime
-  return parsedTimes
-    .filter(({ parsedDate }) => parsedDate > currentTime)
-    .map(({ time }) => time);
+  return getUpcomingDepartures(times, currentTime).map(({ time }) => time);
+}
+
+export function getNextDeparture(times: string[], currentTime: Date): Departure | null {
+  return getUpcomingDepartures(times, currentTime)[0] ?? null;
 }
 
 export function getNextBus(times: string[], currentTime: Date): string | null {
-  const upcoming = getUpcomingBuses(times, currentTime);
-  return upcoming.length > 0 ? upcoming[0] : null;
+  return getNextDeparture(times, currentTime)?.time ?? null;
 }
 
-export function getTimeUntil(timeStr: string, currentTime: Date, isAfternoonContext: boolean = false): string {
-  const baseDate = new Date(currentTime);
-  baseDate.setHours(0, 0, 0, 0);
-  
-  const cleanTime = timeStr.trim().toLowerCase();
-  const isAM = cleanTime.includes('am');
-  const isPM = cleanTime.includes('pm');
-  
-  const timeMatch = cleanTime.match(/(\d+):?(\d+)?/);
-  if (!timeMatch) return 'Unknown';
-  
-  let hours = parseInt(timeMatch[1], 10);
-  const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-  
-  const busTime = new Date(baseDate);
-  
-  if (isAM) {
-    if (hours === 12) hours = 0;
-  } else if (isPM) {
-    if (hours !== 12) hours += 12;
-  } else {
-    if (hours >= 1 && hours <= 6) {
-      hours += 12;
-    } else if (hours >= 7 && hours <= 11) {
-      if (isAfternoonContext) {
-        hours += 12;
-      }
-    } else if (hours === 12 && minutes === 0) {
-      hours = 0;
-      busTime.setDate(busTime.getDate() + 1);
-    }
-  }
-  
-  busTime.setHours(hours, minutes, 0, 0);
-  
-  const diffMs = busTime.getTime() - currentTime.getTime();
-  
+/**
+ * How long until an already-resolved departure. Takes the instant rather than
+ * the label precisely so it cannot re-guess am/pm and disagree with the list
+ * the reader is looking at.
+ */
+export function formatTimeUntil(at: Date, currentTime: Date): string {
+  const diffMs = at.getTime() - currentTime.getTime();
   if (diffMs < 0) return 'Passed';
-  
+
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);
   const remainingMins = diffMins % 60;
-  
-  if (diffHours > 0) {
-    return `${diffHours}h ${remainingMins}m`;
-  }
-  return `${diffMins}m`;
+
+  return diffHours > 0 ? `${diffHours}h ${remainingMins}m` : `${diffMins}m`;
 }
 
 export function formatTime(date: Date): string {

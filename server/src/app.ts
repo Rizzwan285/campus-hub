@@ -9,6 +9,7 @@ import { cached, cacheStats } from './middleware/cache';
 import { contentRouter } from './routes/content.routes';
 import { adminRouter } from './routes/admin.routes';
 import { authRouter } from './routes/auth.routes';
+import { courseChangesRouter } from './routes/courseChanges.routes';
 
 export function createApp() {
   const app = express();
@@ -47,9 +48,10 @@ export function createApp() {
 
   app.use('/api/auth', authRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/course-changes', courseChangesRouter);
 
   // Content is identical for every visitor, so it is cached and ETagged.
-  // Mounted last so /api/auth and /api/admin are never served from the cache.
+  // Mounted last so the per-user routes above are never served from the cache.
   app.use('/api', cached(), contentRouter);
 
   app.use((req, res) => {
