@@ -1,42 +1,73 @@
 # Keeps the Render free-tier API warm. Render spins a free service down after
-# ~15 minutes without traffic, and the next visitor then waits 30-60s for a
-# cold start.
+# 15 minutes without inbound traffic, and the next visitor then waits up to a
+# minute for a cold start.
 #
-# Why this loops instead of just using a */5 cron: GitHub throttles
-# high-frequency scheduled events hard and silently drops most of them. A plain
-# `*/5` schedule on this repo actually fired at 24-65 minute intervals, which
-# is well past Render's 15-minute idle timeout — so the service was cold for
-# most of the day regardless of what the cron said.
+# Why this loops instead of just using a */5 cron: GitHub throttles scheduled
+# events hard. A plain `*/5` schedule on this repo fired at 24-65 minute
+# intervals, and the `*/10` below fires only every 2-8 hours.
 #
-# Instead each run pings on its own timer for ~2 hours, which covers the gap
-# even if the scheduler stalls badly. GitHub-hosted runners are free and
-# unmetered for public repositories, which this repo is.
+# Why each run starts its successor: a run pings for ~2 hours, but the schedule
+# then took a median 1h40 (up to 6h24) to start the next one, which left the
+# API free to sleep about 40% of the time. A workflow_dispatch is not
+# throttled, so the hand-off is immediate and the schedule is only a safety net
+# that restarts the chain if it ever breaks.
+#
+# GitHub-hosted runners are free and unmetered for public repositories, which
+# this repo is.
 name: API health check
 
 on:
   schedule:
-    # Re-arms the loop. The exact cadence barely matters — whenever GitHub gets
-    # around to it, the new run takes over from the old one.
+    # Safety net only. Whenever GitHub gets around to it, this restarts the
+    # chain if a run ended without dispatching its successor.
     - cron: "*/10 * * * *"
   workflow_dispatch:
 
-# Exactly one pinger alive at a time: a new run replaces the running one rather
-# than queueing behind it, which would build an unbounded backlog.
+# The hand-off step needs this; nothing else is granted.
+permissions:
+  actions: write
+
+# Exactly one pinger alive at a time. A new run waits for the running one
+# rather than cancelling it: every run dispatches its successor from its own
+# last step, so cancelling would kill each run at the hand-off. GitHub keeps at
+# most one run waiting per group, so this cannot build a backlog.
 concurrency:
   group: api-health-check
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   ping:
     runs-on: ubuntu-latest
-    # Slightly over the loop's own budget, so the loop decides when to stop.
-    timeout-minutes: 125
-    steps:
+    # Above the loop's worst case (24 pings each timing out at 90s, plus the
+    # sleeps, is ~151 minutes), so the loop always ends on its own and the
+    # hand-off step still runs.
+    timeout-minutes: 160
+    env:
       # The API host is public (the frontend bundle embeds it), so it is a
       # plain value here rather than a secret.
-      - name: Ping /api/health on a 5-minute timer
+      API_URL: https://campus-hub-api-nyw9.onrender.com
+    steps:
+      # The 5-minute pings below deliberately skip the database. This single
+      # request per run (~12 a day) reports whether Postgres is reachable, and
+      # is enough database activity to stop Supabase pausing the free project
+      # during a break, when no students are around to generate any.
+      - name: Check the database once
+        run: |
+          set -uo pipefail
+          # --max-time 90 tolerates a cold start, which can take ~60s.
+          if body=$(curl --silent --show-error --location --max-time 90 \
+                         "$API_URL/api/health"); then
+            echo "$body"
+            case "$body" in
+              *'"database":true'*) ;;
+              *) echo "::warning::the API answered but reports the database as unreachable" ;;
+            esac
+          else
+            echo "::warning::/api/health did not answer"
+          fi
+
+      - name: Ping /api/ping on a 5-minute timer
         env:
-          HEALTH_URL: https://campus-hub-api-nyw9.onrender.com/api/health
           INTERVAL_SECONDS: 300
           TOTAL_PINGS: 24
         run: |
@@ -45,12 +76,11 @@ jobs:
           fail=0
 
           for i in $(seq 1 "$TOTAL_PINGS"); do
-            # --max-time 90 tolerates a cold start, which can take ~60s.
             if code=$(curl --silent --show-error --location \
                            --max-time 90 \
                            --output /dev/null \
                            --write-out '%{http_code}' \
-                           "$HEALTH_URL"); then
+                           "$API_URL/api/ping"); then
               if [ "$code" = "200" ]; then
                 ok=$((ok + 1))
                 echo "[$i/$TOTAL_PINGS] $(date -u +%H:%M:%SZ) ok ($code)"
@@ -78,3 +108,21 @@ jobs:
             echo "::error::every ping failed - the API looks down"
             exit 1
           fi
+
+      # Runs after a failed ping step too, so an outage does not also stop the
+      # pinger. Cancelling a run by hand is the way to break the chain.
+      - name: Start the next run
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in 1 2 3; do
+            if gh workflow run health-check.yml \
+                 --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            sleep 20
+          done
+
+          echo "::error::could not start the next run - the schedule will restart the chain"
+          exit 1

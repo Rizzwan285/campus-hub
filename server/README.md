@@ -57,6 +57,7 @@ Read (public):
 
 | Method | Path | Returns |
 |---|---|---|
+| GET | `/api/ping` | `{"status":"ok"}` with no database access — the keep-alive target |
 | GET | `/api/health` | Liveness plus a database ping |
 | GET | `/api/mess` | Both messes, their menus, daily extras and meal timings |
 | GET | `/api/bus` | All four day-type schedules |
@@ -137,6 +138,75 @@ start, so the app stays usable.
 
 `CORS_ORIGIN` entries accept `*` as a single-label subdomain wildcard, e.g.
 `https://*.vercel.app` to cover preview deployments.
+
+## Keeping the API warm
+
+**What sleeps.** Only this API. Render stops a free web service after 15
+minutes without inbound traffic and takes up to a minute to start it again. The
+Vercel frontend is static files on a CDN and has nothing to cold-start. Because
+sign-in and the session check on page load both need the API, a sleeping API
+makes the whole app feel slow, not just the data.
+
+**What is pinged.** `GET /api/ping`, which returns `{"status":"ok"}`. It needs
+no authentication, reads no session and never touches the database, so it
+generates no Supabase traffic. `/api/health` is a different thing: it queries
+Postgres and is what Render's own health check and the Docker health checks
+use. Do not point a 5-minute pinger at it.
+
+**How often, and from where.** Every 5 minutes, from
+[`.github/workflows/health-check.yml`](../.github/workflows/health-check.yml).
+Each run pings 24 times over about two hours and then starts the next run
+itself. The `schedule:` trigger in that file is only a safety net — GitHub fired
+a `*/10` cron every 2–8 hours on this repo, which is why the runs chain instead
+of relying on it. Once per run the workflow also calls `/api/health`, about 12
+times a day, so that a free Supabase project is not paused for inactivity
+during a break.
+
+**Recommended second pinger.** An external uptime monitor is more punctual than
+GitHub and emails you when the API is down. It is configured outside the repo:
+
+1. Create a free account at [UptimeRobot](https://uptimerobot.com) (its free
+   plan checks every 5 minutes and is for non-commercial use; cron-job.org
+   works equally well).
+2. Add a monitor: type **HTTP(s)**, URL
+   `https://campus-hub-api-nyw9.onrender.com/api/ping`, interval **5 minutes**,
+   timeout 30 seconds or more.
+3. Leave the workflow enabled. The two do not conflict, and the workflow still
+   provides the daily database check.
+
+**Plan limits.**
+
+- *Render free:* 750 instance hours per workspace per month. One service awake
+  all month uses up to 744, so this works for a single free service; a second
+  one kept awake would exhaust the allowance and Render would suspend both
+  until the next month. A paid instance never sleeps and makes all of this
+  unnecessary.
+- *Vercel Hobby:* cron jobs run at most once a day, and this project has no
+  Vercel functions for a cron to call, so Vercel Cron is not used.
+- *GitHub Actions:* free for public repositories. GitHub disables scheduled
+  workflows after 60 days without repository activity; re-enable it under
+  **Actions → API health check** if that happens.
+
+**Checking that it works.**
+
+```bash
+# The endpoint itself: 200 and {"status":"ok"}.
+curl -i https://campus-hub-api-nyw9.onrender.com/api/ping
+
+# The chain: runs should follow each other with no gap, the newest in progress.
+gh run list --workflow health-check.yml --limit 5
+
+# The real test: after hours of no use this should take well under a second,
+# and "uptime" (seconds since the API last started) should be large.
+curl -s -w '\n%{time_total}s\n' https://campus-hub-api-nyw9.onrender.com/api/health
+```
+
+A small `uptime` means the API restarted recently. That is expected after a
+deploy, since Render redeploys on every push to `main`; otherwise it means the
+API slept. Render's **Logs** print `Campus Hub API listening` on every start.
+
+To stop the pinger, disable the workflow under **Actions → API health check**
+and cancel the run in progress.
 
 Step-by-step instructions, including the Vercel migration, are in
 [../DEPLOYMENT.md](../DEPLOYMENT.md).

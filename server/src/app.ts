@@ -16,6 +16,14 @@ export function createApp() {
 
   app.disable('x-powered-by');
   app.use(helmet());
+
+  // Keep-alive target (see README, "Keeping the API warm"). Registered ahead
+  // of everything else so it answers without parsing a body, reading a session
+  // or touching the database — unlike /api/health, which queries Postgres.
+  app.get('/api/ping', (_req, res) => {
+    res.set('Cache-Control', 'no-store').json({ status: 'ok' });
+  });
+
   app.use(compression());
   app.use(express.json({ limit: '256kb' }));
 
