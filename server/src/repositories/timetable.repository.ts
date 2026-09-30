@@ -117,6 +117,12 @@ export async function getAllCourses() {
   return buildOfferings('', []);
 }
 
+/** Every offering of the given course codes, across all programs and branches. */
+export async function getOfferingsByCodes(courseCodes: string[]) {
+  if (courseCodes.length === 0) return [];
+  return buildOfferings('where course_code = any($1::text[])', [courseCodes]);
+}
+
 export async function getBranches(): Promise<Record<string, string[]>> {
   const rows = await query<{ program: string; branch: string }>(
     'select distinct program, branch from course_offerings order by program, branch',

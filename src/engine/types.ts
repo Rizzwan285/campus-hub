@@ -2,9 +2,14 @@ export interface RecurrenceRule {
   type: 'weekly' | 'biweekly_odd' | 'biweekly_even' | 'custom';
 }
 
+export type MeetingDay =
+  | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
 export interface TimetableMeeting {
   type: 'lecture' | 'lab' | 'tutorial';
-  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
+  // The published timetable only uses Monday–Friday, but professors schedule
+  // extra classes on Saturdays, and students' own timings can say so.
+  day: MeetingDay;
   startTime: string; // "HH:MM" 24h
   endTime: string;   // "HH:MM" 24h
   room: string;
@@ -19,6 +24,10 @@ export interface CourseOffering {
   credits: string;
   category: 'core' | 'elective' | 'project' | 'backlog' | 'common';
   meetings: TimetableMeeting[];
+  /** Only the API sends this, so it also marks data that came from the server. */
+  offeringId?: string;
+  /** Set by the store when the student's own timings replace the official ones. */
+  isPersonal?: boolean;
 }
 
 export interface Holiday {
@@ -36,6 +45,8 @@ export interface CalendarEvent {
   startTime: Date; // Fully resolved JS Date for the target preview week
   endTime: Date;
   room: string;
+  /** The student's own timing for the course rather than the official one. */
+  isPersonal?: boolean;
 }
 
 export interface Collision {

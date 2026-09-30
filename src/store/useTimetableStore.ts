@@ -1,13 +1,21 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TimetableLoader } from '../services/timetableLoader';
+import { isApiConfigured } from '../services/api';
 import { TimetableEngine } from '../engine/timetableEngine';
+import {
+  meetingsFingerprint,
+  overrideStatus,
+  sameMeetings,
+  type CourseOverride,
+} from '../engine/courseTimings';
 import { useUserStore } from './useUserStore';
-import { 
-  CourseOffering, 
-  Holiday, 
-  CalendarEvent, 
-  Collision 
+import {
+  CourseOffering,
+  Holiday,
+  CalendarEvent,
+  Collision,
+  TimetableMeeting
 } from '../engine/types';
 
 function getVenueForMeeting(courseCode: string, meetingType: string, batchNo: number): string | null {
@@ -41,16 +49,35 @@ function getVenueForMeeting(courseCode: string, meetingType: string, batchNo: nu
   return null;
 }
 
+/**
+ * Whether loaded courses are the live official timetable. They are, unless an
+ * API is configured but did not answer and the bundled copy stood in — only
+ * the API sends `offeringId`.
+ */
+function isAuthoritative(courses: CourseOffering[]): boolean {
+  return !isApiConfigured() || courses.some((course) => course.offeringId !== undefined);
+}
+
 interface TimetableState {
   // Config & Persistent State
   program: string | null;
   branch: string | null;
   selectedCourseIds: string[];
   previewDate: string; // ISO string to be serializable
-  
+  /** The student's own timings, keyed by course code. */
+  courseOverrides: Record<string, CourseOverride>;
+  /**
+   * Local changes to courseOverrides the account has not confirmed yet. While
+   * set, sign-in pushes these up instead of adopting the account's copy, so an
+   * edit saved during a Render cold start survives the next app open.
+   */
+  courseOverridesUnsynced: boolean;
+
   // Transient Loaded Data (Not persisted to localStorage to save space)
   loadedCourses: CourseOffering[];
   loadedHolidays: Holiday[];
+  /** False while bundled fallback data stands in for an unreachable API. */
+  coursesAuthoritative: boolean;
   
   // Resolved Output
   resolvedEvents: CalendarEvent[];
@@ -67,6 +94,16 @@ interface TimetableState {
   updateSelectedCourses: (ids: string[]) => void;
   updatePreviewDate: (date: Date) => void;
   updateProfile: (program: string, branch: string) => void;
+  /** Uses these meetings for the course in this student's timetable only. */
+  saveCourseOverride: (courseCode: string, meetings: TimetableMeeting[]) => void;
+  /** Back to the official timings for the course. */
+  removeCourseOverride: (courseCode: string) => void;
+  /** Re-applies a superseded correction on top of the new official timings. */
+  keepCourseOverride: (courseCode: string) => void;
+  /** Replaces every correction at once, e.g. with the account's on sign-in. */
+  setCourseOverrides: (overrides: CourseOverride[]) => void;
+  /** The account now holds exactly what is stored locally. */
+  markCourseOverridesSynced: () => void;
 }
 
 export const useTimetableStore = create<TimetableState>()(
@@ -74,17 +111,44 @@ export const useTimetableStore = create<TimetableState>()(
     (set, get) => {
       // Internal pure recomputation logic (avoids redundant hook dependencies)
       const _recompute = () => {
-        const { loadedCourses, loadedHolidays, selectedCourseIds, previewDate } = get();
-        
+        const {
+          loadedCourses, loadedHolidays, selectedCourseIds, previewDate,
+          courseOverrides, coursesAuthoritative,
+        } = get();
+
         if (!loadedCourses.length) return;
 
         const selectedSet = new Set(selectedCourseIds);
-        let activeCourses = loadedCourses.filter(c => selectedSet.has(c.courseCode));
+        // A student's own timings stand in for the official ones — until the
+        // official timings change underneath them (see overrideStatus).
+        const redundant: string[] = [];
+        let activeCourses = loadedCourses
+          .filter(c => selectedSet.has(c.courseCode))
+          .map(course => {
+            const override = courseOverrides[course.courseCode];
+            if (!override) return course;
+
+            const status = overrideStatus(override, course.meetings, coursesAuthoritative);
+            if (status === 'redundant') redundant.push(course.courseCode);
+            return status === 'active'
+              ? { ...course, meetings: override.meetings, isPersonal: true }
+              : course;
+          });
+
+        if (redundant.length > 0) {
+          // Usually the student's own suggestion, now approved for everyone.
+          const remaining = { ...courseOverrides };
+          redundant.forEach(code => delete remaining[code]);
+          set({ courseOverrides: remaining, courseOverridesUnsynced: true });
+        }
 
         const profile = useUserStore.getState().profile;
         if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
           const batchNo = parseInt(profile.batchNo?.replace(/[^0-9]/g, '') || '0', 10);
           if (batchNo > 0) {
+            const officialRooms = new Map(
+              loadedCourses.map(c => [c.courseCode, new Set(c.meetings.map(m => m.room))]),
+            );
             activeCourses = activeCourses.map(course => {
               const newMeetings = course.meetings
                 .filter(m => {
@@ -137,7 +201,10 @@ export const useTimetableStore = create<TimetableState>()(
                   }
 
                   const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
-                  if (customRoom) {
+                  // A room the student typed into their own timings stays as typed.
+                  const typedByStudent =
+                    course.isPersonal && !officialRooms.get(course.courseCode)?.has(m.room);
+                  if (customRoom && !typedByStudent) {
                     finalRoom = customRoom;
                   }
                   return { ...m, room: finalRoom };
@@ -172,10 +239,13 @@ export const useTimetableStore = create<TimetableState>()(
         branch: null,
         selectedCourseIds: [],
         previewDate: new Date().toISOString(),
-        
+        courseOverrides: {},
+        courseOverridesUnsynced: false,
+
         loadedCourses: [],
         loadedHolidays: [],
-        
+        coursesAuthoritative: false,
+
         resolvedEvents: [],
         collisions: [],
         holidaysEncountered: [],
@@ -256,6 +326,7 @@ export const useTimetableStore = create<TimetableState>()(
             set({
               loadedCourses: allCourses,
               loadedHolidays: holidays,
+              coursesAuthoritative: isAuthoritative(allCoursesRaw),
               selectedCourseIds: newSelectedIds,
               isLoading: false
             });
@@ -293,7 +364,65 @@ export const useTimetableStore = create<TimetableState>()(
         updateProfile: (program: string, branch: string) => {
           set({ program, branch, selectedCourseIds: [] });
           get().initializeTimetable(program, branch);
-        }
+        },
+
+        saveCourseOverride: (courseCode: string, meetings: TimetableMeeting[]) => {
+          const official = get().loadedCourses.find(c => c.courseCode === courseCode);
+          if (!official) return;
+
+          const overrides = { ...get().courseOverrides };
+          if (sameMeetings(meetings, official.meetings)) {
+            // Edited back to the official timings: nothing personal to keep.
+            delete overrides[courseCode];
+          } else {
+            overrides[courseCode] = {
+              courseCode,
+              meetings,
+              baseFingerprint: meetingsFingerprint(official.meetings),
+              savedAt: new Date().toISOString(),
+            };
+          }
+          set({ courseOverrides: overrides, courseOverridesUnsynced: true });
+          _recompute();
+        },
+
+        removeCourseOverride: (courseCode: string) => {
+          const overrides = { ...get().courseOverrides };
+          delete overrides[courseCode];
+          set({ courseOverrides: overrides, courseOverridesUnsynced: true });
+          _recompute();
+        },
+
+        keepCourseOverride: (courseCode: string) => {
+          const override = get().courseOverrides[courseCode];
+          const official = get().loadedCourses.find(c => c.courseCode === courseCode);
+          if (!override || !official) return;
+
+          // Rebased onto the current official timings, so it applies again
+          // until they next change.
+          set({
+            courseOverrides: {
+              ...get().courseOverrides,
+              [courseCode]: {
+                ...override,
+                baseFingerprint: meetingsFingerprint(official.meetings),
+                savedAt: new Date().toISOString(),
+              },
+            },
+            courseOverridesUnsynced: true,
+          });
+          _recompute();
+        },
+
+        setCourseOverrides: (overrides: CourseOverride[]) => {
+          set({
+            courseOverrides: Object.fromEntries(overrides.map(o => [o.courseCode, o])),
+            courseOverridesUnsynced: false,
+          });
+          _recompute();
+        },
+
+        markCourseOverridesSynced: () => set({ courseOverridesUnsynced: false })
       };
     },
     {
@@ -303,7 +432,9 @@ export const useTimetableStore = create<TimetableState>()(
         program: state.program,
         branch: state.branch,
         selectedCourseIds: state.selectedCourseIds,
-        previewDate: state.previewDate
+        previewDate: state.previewDate,
+        courseOverrides: state.courseOverrides,
+        courseOverridesUnsynced: state.courseOverridesUnsynced
       })
     }
   )

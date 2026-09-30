@@ -8,6 +8,8 @@ import * as calendar from '../repositories/calendar.repository';
 import * as bus from '../repositories/bus.repository';
 import * as admin from '../repositories/admin.repository';
 import * as profiles from '../repositories/profile.repository';
+import * as changes from '../repositories/courseChanges.repository';
+import { meetingListSchema } from './schemas';
 
 export const adminRouter = Router();
 
@@ -469,6 +471,120 @@ adminRouter.put('/courses/:offeringId/schedule', async (req, res, next) => {
     invalidate('/api/timetable');
 
     res.json({ offering: await admin.getOffering(offeringId), meetings: after });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ------------------------------------------------- students' timing suggestions
+
+/** GET /api/admin/course-changes?status=pending|decided */
+adminRouter.get('/course-changes', async (req, res, next) => {
+  try {
+    const scope = req.query.status === 'decided' ? 'decided' : 'pending';
+    res.json(await changes.listForReview(scope));
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.get('/course-changes/count', async (_req, res, next) => {
+  try {
+    res.json({ pending: await changes.countPending() });
+  } catch (error) {
+    next(error);
+  }
+});
+
+function requestId(raw: string): number | null {
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+const approveBody = z.object({
+  note: z.string().trim().max(500).optional(),
+  /** Corrected meetings to apply instead of the ones the student proposed. */
+  meetings: meetingListSchema.min(1, 'Keep at least one class.').optional(),
+});
+
+/**
+ * POST /api/admin/course-changes/:id/approve
+ *
+ * Rewrites the course's official timings for everyone who has it. Students'
+ * own corrections made against the old timings stop applying on their next
+ * load, so nobody is left looking at the timings this replaces.
+ */
+adminRouter.post('/course-changes/:id/approve', async (req, res, next) => {
+  try {
+    const id = requestId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'Invalid suggestion id.' });
+      return;
+    }
+    const body = approveBody.safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const decision = await changes.approveRequest(id, {
+      adminRoll: req.session?.roll ?? 'api-key',
+      note: body.data.note || null,
+      meetings: body.data.meetings,
+    });
+    if (!decision.ok) {
+      res.status(decision.status).json({ error: decision.error });
+      return;
+    }
+
+    const { request } = decision;
+    await audit(
+      req,
+      'course.change.approve',
+      `${request.courseCode} #${request.id}`,
+      request.baseMeetings,
+      { meetings: request.appliedMeetings, offerings: decision.offeringIds },
+      '/api/timetable',
+    );
+
+    res.json({ request, offeringsUpdated: decision.offeringIds.length, alsoClosed: decision.alsoClosed });
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.post('/course-changes/:id/reject', async (req, res, next) => {
+  try {
+    const id = requestId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'Invalid suggestion id.' });
+      return;
+    }
+    const body = z.object({ note: z.string().trim().max(500).optional() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const decision = await changes.rejectRequest(id, {
+      adminRoll: req.session?.roll ?? 'api-key',
+      note: body.data.note || null,
+    });
+    if (!decision.ok) {
+      res.status(decision.status).json({ error: decision.error });
+      return;
+    }
+
+    // Recorded directly rather than through audit(): nothing public changed,
+    // and audit() without a prefix would empty the whole response cache.
+    await profiles.recordAudit({
+      actorId: req.session?.sub ?? null,
+      actorRoll: req.session?.roll ?? 'api-key',
+      action: 'course.change.reject',
+      target: `${decision.request.courseCode} #${id}`,
+      after: { note: decision.request.decisionNote },
+    });
+    res.json({ request: decision.request });
   } catch (error) {
     next(error);
   }

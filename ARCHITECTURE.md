@@ -82,6 +82,16 @@ selections key on it. `offeringId` (`${program}_${branch}_${courseCode}`) is the
 unique key; changing which one the API returns as `id` would silently wipe every
 user's timetable.
 
+**A student's own timings never outvote an official change.** Students can
+correct a course's timings for themselves at once, or suggest the correction for
+everyone, which takes effect only after the developer approves it. Each personal
+correction stores a fingerprint of the official meetings it was made against;
+once those change — an approved suggestion, an admin edit — the correction stops
+applying, so an approval reaches everyone who has the course, including students
+who had corrected it. They are told, and can re-apply theirs. Bundled fallback
+data never counts as a change, since it can predate an approval, so a Render
+cold start cannot discard anyone's corrections.
+
 **Analytics is a separate schema, not separate storage.** The dataset is small
 enough that a warehouse would be ceremony. `analytics` (Airflow-owned) and
 `analytics_dbt` (dbt-owned) sit beside `public` in the same database, and

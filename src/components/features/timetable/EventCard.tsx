@@ -1,7 +1,7 @@
 import { CalendarEvent } from '@/engine/types';
 import { stringToColorClass } from '@/utils/colorUtils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Copy, AlertTriangle } from 'lucide-react';
+import { Copy, AlertTriangle, PencilLine } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EventCardProps {
@@ -9,9 +9,11 @@ interface EventCardProps {
   left: number;    // percentage
   width: number; // percentage
   isCollision?: boolean;
+  /** Opens the class for editing. */
+  onClick?: () => void;
 }
 
-export function EventCard({ event, left, width, isCollision }: EventCardProps) {
+export function EventCard({ event, left, width, isCollision, onClick }: EventCardProps) {
   const formatTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
   
   const baseColor = stringToColorClass(event.courseCode);
@@ -35,7 +37,15 @@ export function EventCard({ event, left, width, isCollision }: EventCardProps) {
             minWidth: '24px' // even shorter classes need to be clickable
           }}
           tabIndex={0}
-          aria-label={`${event.courseCode} ${event.type} from ${formatTime(event.startTime)} to ${formatTime(event.endTime)} in ${event.room}`}
+          role={onClick ? 'button' : undefined}
+          onClick={onClick}
+          onKeyDown={onClick ? (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick();
+            }
+          } : undefined}
+          aria-label={`${event.courseCode} ${event.type} from ${formatTime(event.startTime)} to ${formatTime(event.endTime)} in ${event.room}${event.isPersonal ? ', your own timing' : ''}`}
         >
           {/* Tint overlay so the card is opaque but looks colored */}
           <div className={`absolute inset-0 pointer-events-none ${baseColor.split(' ').filter(c => c.startsWith('bg-')).join(' ')}`} />
@@ -43,6 +53,7 @@ export function EventCard({ event, left, width, isCollision }: EventCardProps) {
           <div className={`flex flex-col h-full text-xs relative p-1.5 sm:p-2 ${baseColor.split(' ').filter(c => !c.startsWith('bg-') && !c.startsWith('border-')).join(' ')}`}>
             <div className="flex items-center justify-between gap-1">
               <span className="font-bold truncate">{event.courseCode}</span>
+              {event.isPersonal && <PencilLine className="h-3 w-3 shrink-0 opacity-70" aria-hidden="true" />}
               {isCollision && <AlertTriangle className="h-3 w-3 text-destructive shrink-0" />}
             </div>
             
@@ -81,6 +92,13 @@ export function EventCard({ event, left, width, isCollision }: EventCardProps) {
           <p className="text-xs font-medium">
             {formatTime(event.startTime)} - {formatTime(event.endTime)}
           </p>
+          {event.isPersonal && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <PencilLine className="h-3 w-3" />
+              Your own timing — only you see it
+            </p>
+          )}
+          {onClick && <p className="text-[11px] text-muted-foreground">Click to edit this course&rsquo;s timings</p>}
           {isCollision && (
             <p className="text-xs text-destructive font-medium mt-2 flex items-center gap-1">
               <AlertTriangle className="h-3 w-3" />

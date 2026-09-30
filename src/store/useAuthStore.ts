@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiFetch, isApiConfigured, ApiError } from '@/services/api';
+import type { CourseOverride } from '@/engine/courseTimings';
 
 export interface AccountProfile {
   id: string;
@@ -13,6 +14,8 @@ export interface AccountProfile {
   batchNo: string | null;
   role: string;
   selectedCourseIds: string[];
+  /** Absent from servers that predate personal timings. */
+  courseOverrides?: CourseOverride[];
 }
 
 interface LoginResponse {
@@ -34,6 +37,7 @@ interface AuthState {
   restore: () => Promise<void>;
   updateAccount: (patch: Partial<Omit<AccountProfile, 'id' | 'rollNumber' | 'role'>>) => Promise<void>;
   syncCourses: (offeringIds: string[]) => Promise<void>;
+  syncCourseOverrides: (overrides: CourseOverride[]) => Promise<void>;
 }
 
 /** A profile is only usable once onboarding has filled in the essentials. */
@@ -102,6 +106,17 @@ export const useAuthStore = create<AuthState>()(
         const account = get().account;
         if (account) {
           set({ account: { ...account, selectedCourseIds: data.selectedCourseIds } });
+        }
+      },
+
+      async syncCourseOverrides(overrides) {
+        const data = await apiFetch<{ courseOverrides: CourseOverride[] }>('/api/auth/course-overrides', {
+          method: 'PUT',
+          body: { overrides },
+        });
+        const account = get().account;
+        if (account) {
+          set({ account: { ...account, courseOverrides: data.courseOverrides } });
         }
       },
     }),

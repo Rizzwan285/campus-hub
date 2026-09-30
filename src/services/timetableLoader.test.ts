@@ -1,6 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TimetableLoader } from './timetableLoader';
 
+// The loader tries the API before the bundled JSON, so without this the whole
+// suite quietly tests against whatever server happens to be listening on
+// VITE_API_URL — these cases passed or failed depending on whether the local
+// stack was up. Pin it to the offline path.
+vi.mock('./api', () => ({
+  isApiConfigured: () => false,
+  fetchJson: vi.fn(() => Promise.reject(new Error('API disabled in tests'))),
+}));
+
 // Mock the dynamic imports
 vi.mock('../data/timetable/UG/CSE.json', () => ({
   default: [{ id: 'UG_CSE_CS5634', courseCode: 'CS5634' }]

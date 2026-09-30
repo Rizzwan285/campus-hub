@@ -3,8 +3,19 @@ import { z } from 'zod';
 import { issueToken, verifyPassword } from '../auth/tokens';
 import { requireSession } from '../middleware/auth';
 import * as profiles from '../repositories/profile.repository';
+import * as changes from '../repositories/courseChanges.repository';
+import { meetingListSchema } from './schemas';
 
 export const authRouter = Router();
+
+/** The account as the client sees it: profile, course picks and personal timings. */
+async function publicProfile(row: profiles.ProfileRow): Promise<profiles.PublicProfile> {
+  const [selected, overrides] = await Promise.all([
+    profiles.getSelectedCourseIds(row.id),
+    changes.getOverrides(row.id),
+  ]);
+  return profiles.toPublicProfile(row, selected, overrides);
+}
 
 const ROLL_RE = /^[A-Za-z0-9]{4,20}$/;
 
@@ -110,11 +121,10 @@ authRouter.post('/login', async (req, res, next) => {
     const { token, expiresAt } = issueToken(profile);
     await profiles.touchLastSeen(profile.id);
 
-    const selected = await profiles.getSelectedCourseIds(profile.id);
     res.json({
       token,
       expiresAt: expiresAt.toISOString(),
-      profile: profiles.toPublicProfile(profile, selected),
+      profile: await publicProfile(profile),
     });
   } catch (error) {
     next(error);
@@ -144,8 +154,7 @@ authRouter.get('/me', requireSession, async (req, res, next) => {
       return;
     }
     await profiles.touchLastSeen(profile.id);
-    const selected = await profiles.getSelectedCourseIds(profile.id);
-    res.json({ profile: profiles.toPublicProfile(profile, selected) });
+    res.json({ profile: await publicProfile(profile) });
   } catch (error) {
     next(error);
   }
@@ -175,8 +184,7 @@ authRouter.patch('/profile', requireSession, async (req, res, next) => {
       return;
     }
 
-    const selected = await profiles.getSelectedCourseIds(updated.id);
-    res.json({ profile: profiles.toPublicProfile(updated, selected) });
+    res.json({ profile: await publicProfile(updated) });
   } catch (error) {
     next(error);
   }
@@ -197,6 +205,41 @@ authRouter.put('/courses', requireSession, async (req, res, next) => {
 
     const stored = await profiles.setSelectedCourses(req.session!.sub, parsed.data.offeringIds);
     res.json({ selectedCourseIds: stored });
+  } catch (error) {
+    next(error);
+  }
+});
+
+const overridesBody = z.object({
+  overrides: z
+    .array(
+      z.object({
+        courseCode: z.string().trim().min(2).max(20),
+        // May be empty: a student can clear a course's classes for themselves.
+        meetings: meetingListSchema,
+        baseFingerprint: z.string().min(1).max(64),
+        savedAt: z.iso.datetime(),
+      }),
+    )
+    .max(40),
+});
+
+/**
+ * PUT /api/auth/course-overrides — syncs the user's own timings across devices.
+ *
+ * These change only the user's timetable. Changing a course for everyone goes
+ * through a suggestion and the developer's approval (/api/course-changes).
+ */
+authRouter.put('/course-overrides', requireSession, async (req, res, next) => {
+  try {
+    const parsed = overridesBody.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: z.prettifyError(parsed.error) });
+      return;
+    }
+
+    const stored = await changes.replaceOverrides(req.session!.sub, parsed.data.overrides);
+    res.json({ courseOverrides: stored });
   } catch (error) {
     next(error);
   }

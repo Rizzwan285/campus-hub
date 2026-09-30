@@ -1,4 +1,5 @@
 import { query } from '../db';
+import type { CourseOverride } from './courseChanges.repository';
 
 export interface ProfileRow {
   id: string;
@@ -25,6 +26,8 @@ export interface PublicProfile {
   role: string;
   /** Course ids the user has selected, so one call restores their whole state. */
   selectedCourseIds: string[];
+  /** The user's own timings for individual courses, which only they see. */
+  courseOverrides: CourseOverride[];
 }
 
 const COLUMNS = `id, roll_number, name, mess, program, branch,
@@ -67,7 +70,11 @@ export async function getSelectedCourseIds(userId: string): Promise<string[]> {
   return rows.map((row) => row.offering_id);
 }
 
-export function toPublicProfile(row: ProfileRow, selectedCourseIds: string[]): PublicProfile {
+export function toPublicProfile(
+  row: ProfileRow,
+  selectedCourseIds: string[],
+  courseOverrides: CourseOverride[],
+): PublicProfile {
   return {
     id: row.id,
     rollNumber: row.roll_number,
@@ -79,6 +86,7 @@ export function toPublicProfile(row: ProfileRow, selectedCourseIds: string[]): P
     batchNo: row.batch_no,
     role: row.role,
     selectedCourseIds,
+    courseOverrides,
   };
 }
 

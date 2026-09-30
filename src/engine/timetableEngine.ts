@@ -165,7 +165,8 @@ export const TimetableEngine = {
           type: meeting.type,
           startTime,
           endTime,
-          room: meeting.room || 'TBA'
+          room: meeting.room || 'TBA',
+          isPersonal: course.isPersonal
         });
       });
     });

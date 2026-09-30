@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
-import { getUpcomingBuses, getNextBus, getTimeUntil } from '@/utils/dateUtils';
+import { resolveDepartures, getUpcomingDepartures, formatTimeUntil, type Departure } from '@/utils/dateUtils';
 import { useBusSchedules } from '@/hooks/useApiData';
 import { busEffectiveFrom } from '@/data/busData';
 
@@ -33,16 +33,18 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         ? fridayBus
         : workingDaysBus;
 
-  // For preview mode, show all buses. For current time, show only upcoming
+  // Preview shows the whole day; otherwise only what is still to come. Either
+  // way the departures keep their resolved instants, so the countdown measures
+  // to the same moment the list is showing.
   const upcomingNilaToSahyadri = isPreviewMode
-    ? schedule.nilaToSahyadri
-    : getUpcomingBuses(schedule.nilaToSahyadri, filterTime);
+    ? resolveDepartures(schedule.nilaToSahyadri, filterTime)
+    : getUpcomingDepartures(schedule.nilaToSahyadri, filterTime);
   const upcomingSahyadriToNila = isPreviewMode
-    ? schedule.sahyadriToNila
-    : getUpcomingBuses(schedule.sahyadriToNila, filterTime);
+    ? resolveDepartures(schedule.sahyadriToNila, filterTime)
+    : getUpcomingDepartures(schedule.sahyadriToNila, filterTime);
 
-  const nextNilaToSahyadri = getNextBus(schedule.nilaToSahyadri, filterTime);
-  const nextSahyadriToNila = getNextBus(schedule.sahyadriToNila, filterTime);
+  const nextNilaToSahyadri = upcomingNilaToSahyadri[0] ?? null;
+  const nextSahyadriToNila = upcomingSahyadriToNila[0] ?? null;
 
   const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : dayType === 'friday' ? 'Friday' : 'Weekday';
 
@@ -68,12 +70,10 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     return schedule.multipleBusTimings?.[direction]?.includes(time) || false;
   };
 
-  const BusTimesList = ({ times, nextBus, direction }: { times: string[]; nextBus: string | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
+  const BusTimesList = ({ times, nextBus, direction }: { times: Departure[]; nextBus: Departure | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
     // `times` is the tail of the day still to come, so its first entry sits
-    // this far into the full list. getUpcomingBuses only ever drops a prefix.
+    // this far into the full list — only a prefix is ever dropped.
     const offset = schedule[direction].length - times.length;
-    // Determine if we're in afternoon context for the next bus
-    const isAfternoonContext = currentTime.getHours() >= 12;
 
     return (
       <div className="space-y-3">
@@ -89,9 +89,9 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Next Bus</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-2xl font-bold text-primary">{nextBus}</p>
+                      <p className="text-2xl font-bold text-primary">{nextBus.time}</p>
                       {/* The hero hid this, so a doubled next bus looked ordinary. */}
-                      {isMultipleBus(nextBus, offset, direction) && (
+                      {isMultipleBus(nextBus.time, offset, direction) && (
                         <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
                           x2
                         </Badge>
@@ -101,7 +101,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
                     <p className="text-xl font-semibold text-primary">
-                      {getTimeUntil(nextBus, currentTime, isAfternoonContext)}
+                      {formatTimeUntil(nextBus.at, currentTime)}
                     </p>
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
             )}
 
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
-              {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((time, idx) => {
+              {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((departure, idx) => {
                 const fullIndex = offset + idx + (!isPreviewMode && nextBus ? 1 : 0);
                 return (
                 <div
@@ -123,8 +123,8 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                   className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
                 >
                   <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
-                  <p className="text-sm font-medium">{time}</p>
-                  {isMultipleBus(time, fullIndex, direction) && (
+                  <p className="text-sm font-medium">{departure.time}</p>
+                  {isMultipleBus(departure.time, fullIndex, direction) && (
                     <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
                       x2
                     </Badge>
