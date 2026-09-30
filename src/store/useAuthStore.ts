@@ -30,6 +30,12 @@ interface AuthState {
   account: AccountProfile | null;
   /** True while restoring a stored session on boot. */
   isRestoring: boolean;
+  /**
+   * When the server last sent `account` itself, at sign-in or on restoring a
+   * session; 0 while it is only the copy stored in this browser. Writes that
+   * echo a field back (courses, own timings, profile) do not count.
+   */
+  accountFetchedAt: number;
 
   login: (rollNumber: string, password?: string) => Promise<AccountProfile>;
   logout: () => void;
@@ -52,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
       expiresAt: null,
       account: null,
       isRestoring: true,
+      accountFetchedAt: 0,
 
       setToken: (token) => set({ token }),
 
@@ -61,7 +68,12 @@ export const useAuthStore = create<AuthState>()(
           body: { rollNumber, password },
         });
 
-        set({ token: data.token, expiresAt: data.expiresAt, account: data.profile });
+        set({
+          token: data.token,
+          expiresAt: data.expiresAt,
+          account: data.profile,
+          accountFetchedAt: Date.now(),
+        });
         return data.profile;
       },
 
@@ -78,7 +90,7 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const data = await apiFetch<{ profile: AccountProfile }>('/api/auth/me');
-          set({ account: data.profile });
+          set({ account: data.profile, accountFetchedAt: Date.now() });
         } catch (error) {
           // Only drop the session when the server actually rejects it; a
           // network blip or a sleeping backend must not sign anyone out.

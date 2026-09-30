@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Loader2, RotateCcw, Save, Send, ShieldCheck, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { toast } from 'sonner';
@@ -13,8 +13,8 @@ import { ApiError, isApiConfigured } from '@/services/api';
 import {
   approveSuggestion, listMySuggestions, submitSuggestion, withdrawSuggestion, type CourseChangeRequest,
 } from '@/services/courseChanges';
-import { overrideStatus, sameMeetings } from '@/engine/courseTimings';
-import type { TimetableMeeting } from '@/engine/types';
+import { overrideStatus, sameMeetings, type CourseOverride } from '@/engine/courseTimings';
+import type { CourseOffering, TimetableMeeting } from '@/engine/types';
 import { MeetingRowsEditor } from './MeetingRowsEditor';
 import { MeetingDiff } from './MeetingDiff';
 import { fromRows, rowsAreValid, toRows } from './meetingRows';
@@ -30,6 +30,27 @@ const BATCH_RANGE = /\bB\d+\s*-\s*B\d+\b/i;
 
 const shortDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+// Long enough for an awake API to answer; a sleeping one takes up to a minute,
+// and the editor should not sit behind a spinner for that.
+const FRESH_TIMINGS_WAIT_MS = 3000;
+
+/** What the timetable shows for a course: the student's own timings, or the official ones. */
+function meetingsShown(
+  timetable: {
+    loadedCourses: CourseOffering[];
+    courseOverrides: Record<string, CourseOverride>;
+    coursesAuthoritative: boolean;
+  },
+  code: string | null,
+): TimetableMeeting[] {
+  const course = timetable.loadedCourses.find((c) => c.courseCode === code);
+  if (!course) return [];
+  const own = code ? timetable.courseOverrides[code] : undefined;
+  return own && overrideStatus(own, course.meetings, timetable.coursesAuthoritative) === 'active'
+    ? own.meetings
+    : course.meetings;
+}
 
 /**
  * Lets a student correct a course's timings — add a class, drop one, move one.
@@ -47,6 +68,7 @@ export function CourseTimingsEditor({ open, onOpenChange, courseCode }: CourseTi
   const saveCourseOverride = useTimetableStore((state) => state.saveCourseOverride);
   const removeCourseOverride = useTimetableStore((state) => state.removeCourseOverride);
   const keepCourseOverride = useTimetableStore((state) => state.keepCourseOverride);
+  const refreshCourses = useTimetableStore((state) => state.refreshCourses);
   const account = useAuthStore((state) => state.account);
   const profile = useUserStore((state) => state.profile);
   const queryClient = useQueryClient();
@@ -59,21 +81,43 @@ export function CourseTimingsEditor({ open, onOpenChange, courseCode }: CourseTi
     [loadedCourses, selectedCourseIds],
   );
 
-  /** What the timetable currently shows for a course: the student's own timings, or the official ones. */
-  const meetingsShownFor = (code: string | null): TimetableMeeting[] => {
-    const course = loadedCourses.find((c) => c.courseCode === code);
-    if (!course) return [];
-    const own = code ? courseOverrides[code] : undefined;
-    return own && overrideStatus(own, course.meetings, authoritative) === 'active'
-      ? own.meetings
-      : course.meetings;
-  };
+  const meetingsShownFor = (code: string | null) =>
+    meetingsShown({ loadedCourses, courseOverrides, coursesAuthoritative: authoritative }, code);
 
   const [code, setCode] = useState<string | null>(() => courseCode ?? myCourses[0]?.courseCode ?? null);
   const [rows, setRows] = useState(() => toRows(meetingsShownFor(code)));
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState<'suggest' | 'withdraw' | null>(null);
   const [error, setError] = useState('');
+  const [checking, setChecking] = useState(() => open && isApiConfigured());
+
+  // The page holds whatever official timings it loaded when it opened: an
+  // approval since then is missing from them, and after a cold start they are
+  // the bundled ones. A correction is saved against the official timings, so
+  // fetch them again first and start the editor from what is in force now.
+  useEffect(() => {
+    if (!open || !isApiConfigured()) return;
+
+    let settled = false;
+    const start = () => {
+      if (settled) return;
+      settled = true;
+      setRows(toRows(meetingsShown(useTimetableStore.getState(), code)));
+      setChecking(false);
+    };
+    const timer = setTimeout(start, FRESH_TIMINGS_WAIT_MS);
+    void refreshCourses().finally(() => {
+      clearTimeout(timer);
+      start();
+    });
+
+    return () => {
+      settled = true;
+      clearTimeout(timer);
+    };
+    // Once per opening: the parent remounts the editor each time it opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const canSuggest = isApiConfigured() && account !== null;
   const isAdmin = account?.role === 'admin';
@@ -130,6 +174,8 @@ export function CourseTimingsEditor({ open, onOpenChange, courseCode }: CourseTi
       const request = await submitSuggestion(code, edited, note);
       if (isAdmin) {
         await approveSuggestion(request.id, 'Applied directly by the developer.');
+        // They are the official timings now, here as for everyone else.
+        void refreshCourses();
         toast.success(`${code} now has these timings for everyone taking it.`);
       } else {
         toast.success('Suggestion sent. You see the new timings now; everyone else will once it is approved.');
@@ -187,6 +233,10 @@ export function CourseTimingsEditor({ open, onOpenChange, courseCode }: CourseTi
 
         {myCourses.length === 0 || !code ? (
           <p className="text-sm text-muted-foreground">Select your courses first, then edit their timings here.</p>
+        ) : checking ? (
+          <p className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Checking the latest timings…
+          </p>
         ) : (
           <div className="space-y-4">
             <select

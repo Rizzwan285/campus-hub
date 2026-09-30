@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles } from 'lucide-react';
+import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles, ArrowLeft } from 'lucide-react';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -109,6 +109,20 @@ export function Onboarding() {
           
           {/* Header Section */}
           <div className="relative px-8 pt-10 pb-6 text-center">
+            {/* A mistyped roll number signs in too (accounts are created on
+                first use) and the session survives a reload, so this is the
+                only way back to the sign-in screen before onboarding is done. */}
+            {account && (
+              <button
+                type="button"
+                onClick={logout}
+                aria-label="Back to roll number sign-in"
+                className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back
+              </button>
+            )}
+
             {/* Logo / Icon */}
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 mb-5 shadow-lg shadow-primary/10">
               <Sparkles className="w-8 h-8 text-primary" />
@@ -121,19 +135,9 @@ export function Onboarding() {
               Making campus life simpler
             </p>
 
-            {/* A mistyped roll number signs in too (accounts are created on
-                first use) and the session survives a reload, so this is the
-                only way back to the sign-in screen before onboarding is done. */}
             {account && (
               <p className="text-xs text-muted-foreground mt-4">
-                Signed in as <span className="font-medium text-foreground">{account.rollNumber}</span>.{' '}
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="font-medium text-primary hover:underline focus:outline-none focus-visible:underline"
-                >
-                  Not you? Use a different roll number
-                </button>
+                Roll number <span className="font-medium text-foreground">{account.rollNumber}</span>
               </p>
             )}
           </div>

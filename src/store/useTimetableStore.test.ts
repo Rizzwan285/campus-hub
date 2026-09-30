@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useTimetableStore } from './useTimetableStore';
 import { useUserStore } from './useUserStore';
 import { TimetableLoader } from '../services/timetableLoader';
+import { meetingsFingerprint } from '../engine/courseTimings';
 import type { CourseOffering, TimetableMeeting } from '../engine/types';
 
 // Mock the dependencies
@@ -11,6 +12,7 @@ vi.mock('../services/timetableLoader', () => ({
     loadAllCourses: vi.fn(),
     loadCommonData: vi.fn(),
     loadHolidays: vi.fn(),
+    refreshAllCourses: vi.fn(),
     clearCache: vi.fn()
   }
 }));
@@ -216,6 +218,48 @@ describe('own class timings', () => {
 
     expect(days()).toEqual([1, 5]);
     expect(useTimetableStore.getState().courseOverrides.CS101).toBeDefined();
+  });
+
+  it('keeps a correction saved over fallback data once the real timings arrive', () => {
+    // A cold start: bundled data on screen, and the real timings differ from it
+    // because a suggestion for this course was approved after the build.
+    const real = [lecture('Monday'), lecture('Thursday')];
+    useTimetableStore.setState({ coursesAuthoritative: false });
+    useTimetableStore.getState().saveCourseOverride('CS101', moved);
+    useTimetableStore.getState().markCourseOverridesSynced();
+
+    officialBecomes(real);
+
+    expect(days()).toEqual([1, 5]);
+    expect(useTimetableStore.getState().resolvedEvents.every(event => event.isPersonal)).toBe(true);
+    // Its base is now the timings it was first seen against, and the account is told.
+    expect(useTimetableStore.getState().courseOverrides.CS101.baseFingerprint).toBe(meetingsFingerprint(real));
+    expect(useTimetableStore.getState().courseOverridesUnsynced).toBe(true);
+
+    // From then on an official change overtakes it like any other correction.
+    officialBecomes([lecture('Tuesday')]);
+    expect(days()).toEqual([2]);
+  });
+
+  it('fetches the official timings again without reloading the timetable', async () => {
+    const approved = [lecture('Monday'), lecture('Thursday')];
+    (TimetableLoader.refreshAllCourses as any).mockResolvedValue([{ ...course(approved), offeringId: 'UG_CSE_CS101' }]);
+
+    expect(await useTimetableStore.getState().refreshCourses()).toBe(true);
+    expect(days()).toEqual([1, 4]);
+
+    // A correction saved now is made against the approved timings, so it holds.
+    useTimetableStore.getState().saveCourseOverride('CS101', moved);
+    expect(useTimetableStore.getState().courseOverrides.CS101.baseFingerprint).toBe(meetingsFingerprint(approved));
+  });
+
+  it('leaves the timetable alone when the API does not answer a refresh', async () => {
+    (TimetableLoader.refreshAllCourses as any).mockResolvedValue(null);
+    useTimetableStore.getState().updateSelectedCourses(['CS101']);
+
+    expect(await useTimetableStore.getState().refreshCourses()).toBe(false);
+    expect(days()).toEqual([1, 3]);
+    expect(useTimetableStore.getState().coursesAuthoritative).toBe(true);
   });
 
   it('marks local edits as unsynced until the account confirms them', () => {

@@ -4,6 +4,7 @@ import { TimetableLoader } from '../services/timetableLoader';
 import { isApiConfigured } from '../services/api';
 import { TimetableEngine } from '../engine/timetableEngine';
 import {
+  UNVERIFIED_BASE,
   meetingsFingerprint,
   overrideStatus,
   sameMeetings,
@@ -58,6 +59,41 @@ function isAuthoritative(courses: CourseOffering[]): boolean {
   return !isApiConfigured() || courses.some((course) => course.offeringId !== undefined);
 }
 
+/**
+ * One entry per course code. When the same course appears in multiple sheets,
+ * prefer the entry with actual data (real meetings, credits, etc.) and fill in
+ * gaps.
+ */
+function mergeOfferings(offerings: CourseOffering[]): CourseOffering[] {
+  const courseMap = new Map<string, CourseOffering>();
+  offerings.forEach(c => {
+    const existing = courseMap.get(c.courseCode);
+    if (!existing) {
+      courseMap.set(c.courseCode, c);
+    } else {
+      // Merge: prefer whichever has real data for each field
+      const isPlaceholder = (val: string) => !val || val.toLowerCase().includes('check') || val.toLowerCase().includes('sheet');
+      const merged = { ...existing };
+
+      if (isPlaceholder(existing.credits) && !isPlaceholder(c.credits)) merged.credits = c.credits;
+      if (isPlaceholder(existing.courseName) && !isPlaceholder(c.courseName)) merged.courseName = c.courseName;
+      if ((!existing.meetings || existing.meetings.length === 0) && c.meetings?.length > 0) merged.meetings = c.meetings;
+      if (existing.meetings?.length > 0 && c.meetings?.length > 0 && existing.meetings.length < c.meetings.length) merged.meetings = c.meetings;
+
+      courseMap.set(c.courseCode, merged);
+    }
+  });
+  return Array.from(courseMap.values());
+}
+
+/**
+ * What a correction saved now is made against. Bundled fallback data is not the
+ * official timetable, so a correction saved over it claims no base at all.
+ */
+function baseFingerprintFor(official: CourseOffering, authoritative: boolean): string {
+  return authoritative ? meetingsFingerprint(official.meetings) : UNVERIFIED_BASE;
+}
+
 interface TimetableState {
   // Config & Persistent State
   program: string | null;
@@ -91,6 +127,12 @@ interface TimetableState {
   // Actions
   initializeTimetable: (program: string, branch: string) => Promise<void>;
   reloadTimetable: () => Promise<void>;
+  /**
+   * Fetches the official timings again without blanking the timetable, and
+   * says whether the API answered. Nothing else brings them up to date while
+   * the page stays open.
+   */
+  refreshCourses: () => Promise<boolean>;
   updateSelectedCourses: (ids: string[]) => void;
   updatePreviewDate: (date: Date) => void;
   updateProfile: (program: string, branch: string) => void;
@@ -122,11 +164,19 @@ export const useTimetableStore = create<TimetableState>()(
         // A student's own timings stand in for the official ones — until the
         // official timings change underneath them (see overrideStatus).
         const redundant: string[] = [];
+        const rebased: Record<string, CourseOverride> = {};
         let activeCourses = loadedCourses
           .filter(c => selectedSet.has(c.courseCode))
           .map(course => {
-            const override = courseOverrides[course.courseCode];
+            let override = courseOverrides[course.courseCode];
             if (!override) return course;
+
+            if (coursesAuthoritative && override.baseFingerprint === UNVERIFIED_BASE) {
+              // Saved over fallback data; the official timings are in view now,
+              // so from here on a change to them overtakes it like any other.
+              override = { ...override, baseFingerprint: meetingsFingerprint(course.meetings) };
+              rebased[course.courseCode] = override;
+            }
 
             const status = overrideStatus(override, course.meetings, coursesAuthoritative);
             if (status === 'redundant') redundant.push(course.courseCode);
@@ -135,9 +185,9 @@ export const useTimetableStore = create<TimetableState>()(
               : course;
           });
 
-        if (redundant.length > 0) {
+        if (redundant.length > 0 || Object.keys(rebased).length > 0) {
+          const remaining = { ...courseOverrides, ...rebased };
           // Usually the student's own suggestion, now approved for everyone.
-          const remaining = { ...courseOverrides };
           redundant.forEach(code => delete remaining[code]);
           set({ courseOverrides: remaining, courseOverridesUnsynced: true });
         }
@@ -263,29 +313,8 @@ export const useTimetableStore = create<TimetableState>()(
               TimetableLoader.loadHolidays()
             ]);
 
-            // Deduplicate by courseCode with smart merging:
-            // When the same course appears in multiple sheets, prefer the entry
-            // with actual data (real meetings, credits, etc.) and fill in gaps.
-            const courseMap = new Map<string, typeof allCoursesRaw[0]>();
-            allCoursesRaw.forEach(c => {
-              const existing = courseMap.get(c.courseCode);
-              if (!existing) {
-                courseMap.set(c.courseCode, c);
-              } else {
-                // Merge: prefer whichever has real data for each field
-                const isPlaceholder = (val: string) => !val || val.toLowerCase().includes('check') || val.toLowerCase().includes('sheet');
-                const merged = { ...existing };
+            const allCourses = mergeOfferings(allCoursesRaw);
 
-                if (isPlaceholder(existing.credits) && !isPlaceholder(c.credits)) merged.credits = c.credits;
-                if (isPlaceholder(existing.courseName) && !isPlaceholder(c.courseName)) merged.courseName = c.courseName;
-                if ((!existing.meetings || existing.meetings.length === 0) && c.meetings?.length > 0) merged.meetings = c.meetings;
-                if (existing.meetings?.length > 0 && c.meetings?.length > 0 && existing.meetings.length < c.meetings.length) merged.meetings = c.meetings;
-
-                courseMap.set(c.courseCode, merged);
-              }
-            });
-            const allCourses = Array.from(courseMap.values());
-            
             const userState = get();
             let newSelectedIds = userState.selectedCourseIds;
             
@@ -351,6 +380,18 @@ export const useTimetableStore = create<TimetableState>()(
           await get().initializeTimetable(program, branch);
         },
 
+        refreshCourses: async () => {
+          // Nothing to bring up to date until the first load has finished.
+          if (!get().loadedCourses.length) return false;
+
+          const fresh = await TimetableLoader.refreshAllCourses();
+          if (!fresh) return false;
+
+          set({ loadedCourses: mergeOfferings(fresh), coursesAuthoritative: isAuthoritative(fresh) });
+          _recompute();
+          return true;
+        },
+
         updateSelectedCourses: (ids: string[]) => {
           set({ selectedCourseIds: ids });
           _recompute();
@@ -378,7 +419,7 @@ export const useTimetableStore = create<TimetableState>()(
             overrides[courseCode] = {
               courseCode,
               meetings,
-              baseFingerprint: meetingsFingerprint(official.meetings),
+              baseFingerprint: baseFingerprintFor(official, get().coursesAuthoritative),
               savedAt: new Date().toISOString(),
             };
           }
@@ -405,7 +446,7 @@ export const useTimetableStore = create<TimetableState>()(
               ...get().courseOverrides,
               [courseCode]: {
                 ...override,
-                baseFingerprint: meetingsFingerprint(official.meetings),
+                baseFingerprint: baseFingerprintFor(official, get().coursesAuthoritative),
                 savedAt: new Date().toISOString(),
               },
             },

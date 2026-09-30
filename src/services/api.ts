@@ -125,7 +125,12 @@ export function isApiConfigured(): boolean {
   return getApiUrl() !== undefined;
 }
 
-export async function fetchJson<T>(path: string): Promise<T> {
+/**
+ * `fresh` makes the browser revalidate instead of reusing a body it cached
+ * under the content endpoints' `max-age`; an unchanged response still costs
+ * only a 304.
+ */
+export async function fetchJson<T>(path: string, options: { fresh?: boolean } = {}): Promise<T> {
   const apiUrl = getApiUrl();
   if (!apiUrl) {
     throw new ApiUnavailableError('VITE_API_URL is not configured');
@@ -138,6 +143,7 @@ export async function fetchJson<T>(path: string): Promise<T> {
     const response = await fetch(`${apiUrl}${path}`, {
       signal: controller.signal,
       headers: { Accept: 'application/json' },
+      ...(options.fresh ? { cache: 'no-cache' as RequestCache } : {}),
     });
 
     if (!response.ok) {

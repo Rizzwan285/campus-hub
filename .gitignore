@@ -48,6 +48,7 @@ tmp/
 # Docs
 DEPLOYMENT.md
 PROJECT_CONTEXT.md
+LINKEDIN_BRIEF.md
 
 # Docker
 docker-compose.override.yml
