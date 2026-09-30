@@ -2,6 +2,7 @@ import { useOutletContext } from 'react-router-dom';
 import { MessMenuCard } from '@/components/features/MessMenuCard';
 import { ClassTimetableCard } from '@/components/features/ClassTimetableCard';
 import { BusScheduleCard } from '@/components/features/BusScheduleCard';
+import { MessTimingsCard } from '@/components/features/MessTimingsCard';
 import type { AppContextType } from '@/components/layout/AppLayout';
 
 const Index = () => {
@@ -12,6 +13,7 @@ const Index = () => {
       <ClassTimetableCard date={displayDate} />
       <MessMenuCard date={displayDate} />
       <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
+      <MessTimingsCard date={displayDate} />
     </div>
   );
 };

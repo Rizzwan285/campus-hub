@@ -24,7 +24,6 @@ import {
   sundayBus as staticSundayBus,
   type BusSchedule,
 } from '@/data/busData';
-import { canteenSections as staticCanteenSections, type CanteenSection } from '@/data/canteenData';
 import { setAcademicDays, type AcademicDaysData } from '@/utils/dateUtils';
 
 const QUERY_OPTIONS = {
@@ -167,23 +166,6 @@ export function useBusSchedules(): BusSchedules {
   });
 
   return data ?? STATIC_BUS_SCHEDULES;
-}
-
-// ---------------------------------------------------------------- canteen
-
-export function useCanteenSections(): CanteenSection[] {
-  const { data } = useQuery({
-    queryKey: ['canteen'],
-    queryFn: async () => {
-      const sections = await fetchJson<CanteenSection[]>('/api/canteen');
-      return sections.length > 0 ? sections : staticCanteenSections;
-    },
-    enabled: isApiConfigured(),
-    placeholderData: staticCanteenSections,
-    ...QUERY_OPTIONS,
-  });
-
-  return data ?? staticCanteenSections;
 }
 
 // ---------------------------------------------------------------- academic calendar

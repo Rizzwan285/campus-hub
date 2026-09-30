@@ -2,10 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import Index from "./pages/Index";
-import Food from "./pages/Food";
 import Timetable from "./pages/Timetable";
 import Campus from "./pages/Campus";
 import NotFound from "./pages/NotFound";
@@ -25,9 +24,10 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route path="/" element={<Index />} />
             <Route path="/timetable" element={<Timetable />} />
-            <Route path="/food" element={<Food />} />
             <Route path="/campus" element={<Campus />} />
           </Route>
+          {/* The Food page is gone; its mess timings moved to Home. */}
+          <Route path="/food" element={<Navigate to="/" replace />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
