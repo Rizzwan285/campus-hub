@@ -51,7 +51,7 @@ export function ImportantLinksCard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <a 
               href={docUrl('Hostel Rules.pdf')}
               target="_blank" 
@@ -61,11 +61,11 @@ export function ImportantLinksCard() {
               <div className="p-2 bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 rounded-lg group-hover:scale-110 transition-transform">
                 <FileText className="h-5 w-5" />
               </div>
-              <div className="flex-1">
-                <h4 className="font-medium text-sm">Hostel Rules</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-sm truncate">Hostel Rules</h4>
                 <p className="text-xs text-muted-foreground">PDF Document</p>
               </div>
-              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
             </a>
 
             <a 
@@ -77,11 +77,27 @@ export function ImportantLinksCard() {
               <div className="p-2 bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 rounded-lg group-hover:scale-110 transition-transform">
                 <FileText className="h-5 w-5" />
               </div>
-              <div className="flex-1">
-                <h4 className="font-medium text-sm">Gym Regulations</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-sm truncate">Gym Regulations</h4>
                 <p className="text-xs text-muted-foreground">PDF Document</p>
               </div>
-              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </a>
+
+            <a 
+              href={docUrl('Gym Timing 2026.pdf')}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 transition-colors group"
+            >
+              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-lg group-hover:scale-110 transition-transform">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-sm truncate">Gym Timings (2026)</h4>
+                <p className="text-xs text-muted-foreground">PDF Document</p>
+              </div>
+              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
             </a>
           </div>
         </div>
@@ -89,14 +105,27 @@ export function ImportantLinksCard() {
 
       {/* Gym Timings */}
       <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-primary/8 rounded-xl">
-            <Dumbbell className="h-6 w-6 text-primary" />
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/8 rounded-xl">
+              <Dumbbell className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Gym Timings</h2>
+              <p className="text-sm text-muted-foreground">Kedaram & Malhar Gyms (2026)</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold">Gym Timings</h2>
-            <p className="text-sm text-muted-foreground">Kedaram & Malhar Gyms (2026)</p>
-          </div>
+          <a
+            href={docUrl('Gym Timing 2026.pdf')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium px-3 py-1.5 rounded-lg border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors"
+          >
+            <FileText className="h-3.5 w-3.5 text-primary" />
+            <span className="hidden sm:inline">Official Circular</span>
+            <span className="sm:hidden">PDF</span>
+            <ExternalLink className="h-3 w-3" />
+          </a>
         </div>
 
         <Tabs defaultValue="kedaram" className="w-full">
@@ -106,51 +135,51 @@ export function ImportantLinksCard() {
           </TabsList>
           
           <TabsContent value="kedaram" className="space-y-3 mt-4 animate-in fade-in-50 duration-300">
-            <div className="text-sm font-medium mb-1 text-muted-foreground px-1">Applicable on all days</div>
+            <div className="text-sm font-medium mb-1 text-muted-foreground px-1">The following slots are applicable on all days.</div>
             <div className="space-y-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                  <span className="font-medium">5:30 AM - 8:00 AM</span>
+                  <span className="font-medium">5:30 am – 8:00 am</span>
                 </div>
                 <div className="text-sm text-muted-foreground sm:text-right">
-                  Institute employees, PhD, MSc & MTech
+                  Institute employees, PhD, MSc and MTech students
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                  <span className="font-medium">8:00 AM - 11:00 AM</span>
+                  <span className="font-medium">8:00 am – 11:00 am</span>
                 </div>
                 <div className="text-sm text-muted-foreground sm:text-right">
-                  <Badge variant="secondary" className="font-normal">Common (Open to all)</Badge>
+                  <Badge variant="secondary" className="font-normal">Common (open to all)</Badge>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                  <span className="font-medium">4:00 PM - 6:00 PM</span>
+                  <span className="font-medium">4:00 pm – 6:00 pm</span>
                 </div>
                 <div className="text-sm text-muted-foreground sm:text-right">
-                  BTech 2nd & 4th year
+                  BTech 2nd and 4th year students
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                  <span className="font-medium">6:00 PM - 8:00 PM</span>
+                  <span className="font-medium">6:00 pm – 8:00 pm</span>
                 </div>
                 <div className="text-sm text-muted-foreground sm:text-right leading-relaxed">
-                  BTech 1st & 3rd year, Employees, <br className="hidden sm:block" />PhD, MTech, MSc
+                  BTech 1st and 3rd year students, institute employees, PhD, MTech and MSc students
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                  <span className="font-medium">8:00 PM - 10:00 PM</span>
+                  <span className="font-medium">8:00 pm – 10:00 pm</span>
                 </div>
                 <div className="text-sm text-muted-foreground sm:text-right">
-                  <Badge variant="secondary" className="font-normal">Common (Open to all)</Badge>
+                  <Badge variant="secondary" className="font-normal">Common (open to all)</Badge>
                 </div>
               </div>
             </div>
@@ -166,16 +195,16 @@ export function ImportantLinksCard() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                    <span className="font-medium">5:30 AM - 8:00 AM</span>
+                    <span className="font-medium">5:30 am – 8:00 am</span>
                   </div>
                   <div className="text-sm text-muted-foreground sm:text-right">
-                    BTech & Aquatics Team (All days)
+                    BTech students and Aquatics Team (all days)
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-card border border-border/50 shadow-sm gap-2 hover:bg-muted/30 transition-colors">
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                    <span className="font-medium">8:00 AM - 11:00 AM</span>
+                    <span className="font-medium">8:00 am – 11:00 am</span>
                   </div>
                   <div className="text-sm text-muted-foreground sm:text-right">
                     <Badge variant="secondary" className="font-normal">Common (Students)</Badge>
@@ -195,28 +224,28 @@ export function ImportantLinksCard() {
                     <div className="p-2 bg-pink-500/10 rounded-lg"><Clock className="h-4 w-4 text-pink-600 dark:text-pink-400" /></div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-pink-900 dark:text-pink-200">4:00 PM - 6:00 PM</span>
+                        <span className="font-semibold text-pink-900 dark:text-pink-200">4:00 pm – 6:00 pm</span>
                         <Badge variant="outline" className="bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/30 text-[10px] h-5 px-1.5">All Days</Badge>
                       </div>
                       <div className="text-xs text-pink-700/80 dark:text-pink-300/80 mt-0.5">Exclusively for women</div>
                     </div>
                   </div>
                   <div className="text-sm font-medium text-pink-900 dark:text-pink-200 sm:text-right">
-                    Women Students
+                    Women students
                   </div>
                 </div>
                 
                 <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
                   <div className="flex items-center gap-2.5 mb-4 border-b border-border/50 pb-3">
                     <div className="p-1.5 bg-primary/10 rounded-md"><Clock className="h-4 w-4 text-primary" /></div>
-                    <span className="font-medium">6:00 PM - 8:00 PM <span className="text-muted-foreground font-normal">(Team Allotments)</span></span>
+                    <span className="font-medium">6:00 pm – 8:00 pm <span className="text-muted-foreground font-normal">(Team Allotments)</span></span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Monday</span><span className="font-medium text-right">Basketball Team</span></div>
-                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Tuesday</span><span className="font-medium text-right">Athletics Team</span></div>
-                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Wednesday</span><span className="font-medium text-right">Football Team</span></div>
-                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Thursday</span><span className="font-medium text-right">Cricket Team</span></div>
-                    <div className="flex justify-between items-center py-1"><span className="font-medium text-muted-foreground">Friday</span><span className="font-medium text-right">Athletics Team</span></div>
+                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Monday</span><span className="font-medium text-right">Institute Basketball Team</span></div>
+                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Tuesday</span><span className="font-medium text-right">Institute Athletics Team</span></div>
+                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Wednesday</span><span className="font-medium text-right">Institute Football Team</span></div>
+                    <div className="flex justify-between items-center py-1 border-b border-border/30 sm:border-none"><span className="font-medium text-muted-foreground">Thursday</span><span className="font-medium text-right">Institute Cricket Team</span></div>
+                    <div className="flex justify-between items-center py-1"><span className="font-medium text-muted-foreground">Friday</span><span className="font-medium text-right">Institute Athletics Team</span></div>
                   </div>
                 </div>
               </div>
