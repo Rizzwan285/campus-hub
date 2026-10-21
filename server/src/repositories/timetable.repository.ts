@@ -25,6 +25,7 @@ export interface CourseOffering {
   credits: string | null;
   category: string | null;
   rawSlot: string | null;
+  source: 'seed' | 'admin';
   meetings: TimetableMeeting[];
 }
 
@@ -37,6 +38,7 @@ interface OfferingRow {
   credits: string | null;
   category: string | null;
   raw_slot: string | null;
+  source: 'seed' | 'admin';
 }
 
 interface MeetingRow {
@@ -55,7 +57,7 @@ async function buildOfferings(
   params: unknown[],
 ): Promise<CourseOffering[]> {
   const offerings = await query<OfferingRow>(
-    `select id, program, branch, course_code, course_name, credits, category, raw_slot
+    `select id, program, branch, course_code, course_name, credits, category, raw_slot, source
        from course_offerings
       ${where}
       order by program, branch, course_code`,
@@ -105,6 +107,7 @@ async function buildOfferings(
     credits: row.credits,
     category: row.category,
     rawSlot: row.raw_slot,
+    source: row.source,
     meetings: byOffering.get(row.id) ?? [],
   }));
 }

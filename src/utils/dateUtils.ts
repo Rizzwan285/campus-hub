@@ -1,5 +1,7 @@
 import { toZonedTime } from 'date-fns-tz';
+import { calendarDateKey } from '../lib/calendarDate';
 import { holidays2025, specialDays2025 } from '@/data/busData';
+import holidays2026 from '@/data/timetable/holidays.json';
 
 export const TIMEZONE = 'Asia/Kolkata';
 
@@ -10,11 +12,11 @@ export interface AcademicDaysData {
 
 // getDayType must stay synchronous (it runs in render paths), so server data
 // arrives via this module-level swap — see useAcademicDaysSync().
-let activeHolidays: AcademicDaysData['holidays'] = holidays2025;
+let activeHolidays: AcademicDaysData['holidays'] = [...holidays2025, ...holidays2026.map(({ date, name }) => ({ date, occasion: name }))];
 let activeSpecialDays: AcademicDaysData['specialDays'] = specialDays2025;
 
 export function setAcademicDays(data: AcademicDaysData): void {
-  if (data.holidays?.length) activeHolidays = data.holidays;
+  if (data.holidays) activeHolidays = data.holidays;
   if (data.specialDays) activeSpecialDays = data.specialDays;
 }
 
@@ -31,7 +33,9 @@ export type DayType = 'weekday' | 'friday' | 'saturday' | 'sunday';
 
 export function getDayType(date: Date): DayType {
   const dayOfWeek = date.getDay();
-  const dateStr = date.toISOString().split('T')[0];
+  // Dates here represent the displayed calendar day; UTC conversion can move
+  // an IST morning onto the previous date.
+  const dateStr = calendarDateKey(date);
 
   // Check if it's a special instructional day (treat as weekday)
   const isInstructionalDay = activeSpecialDays.some(

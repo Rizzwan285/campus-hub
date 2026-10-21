@@ -1,3 +1,5 @@
+import { academicContext, firstYearBatch } from '@/lib/academicProfile';
+import { useTimetableStore } from './useTimetableStore';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiFetch, isApiConfigured, ApiError } from '@/services/api';
@@ -48,7 +50,8 @@ interface AuthState {
 
 /** A profile is only usable once onboarding has filled in the essentials. */
 export function isProfileComplete(account: AccountProfile | null): boolean {
-  return Boolean(account?.name && account.mess && account.program && account.branch);
+  return Boolean(account?.name && account.mess && account.program && account.branch && account.yearOfStudy &&
+    (account.program !== 'UG' || account.yearOfStudy !== '1' || firstYearBatch(account.batchNo)));
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -107,16 +110,22 @@ export const useAuthStore = create<AuthState>()(
           method: 'PATCH',
           body: patch,
         });
+        const previous = get().account;
+        if (previous && academicContext(previous) !== academicContext(data.profile)) {
+          useTimetableStore.getState().updateSelectedCourses(data.profile.selectedCourseIds);
+        }
         set({ account: data.profile });
       },
 
       async syncCourses(offeringIds) {
+        const previous = get().account;
+        const context = previous ? academicContext(previous) : undefined;
         const data = await apiFetch<{ selectedCourseIds: string[] }>('/api/auth/courses', {
           method: 'PUT',
-          body: { offeringIds },
+          body: { offeringIds, context },
         });
         const account = get().account;
-        if (account) {
+        if (account && account.id === previous?.id && academicContext(account) === context) {
           set({ account: { ...account, selectedCourseIds: data.selectedCourseIds } });
         }
       },

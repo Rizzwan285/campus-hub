@@ -1,3 +1,4 @@
+import { calendarDateKey } from '../lib/calendarDate';
 import { 
   CourseOffering, 
   Holiday, 
@@ -56,7 +57,7 @@ export const TimetableEngine = {
    */
   isHoliday(date: Date, holidays: Holiday[]): Holiday | null {
     // Convert target Date to YYYY-MM-DD
-    const isoDate = date.toISOString().split('T')[0];
+    const isoDate = calendarDateKey(date);
     return holidays.find(h => h.date === isoDate) || null;
   },
 

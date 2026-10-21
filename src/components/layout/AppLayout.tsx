@@ -7,6 +7,7 @@ import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { useAcademicDaysSync } from '@/hooks/useApiData';
+import { useTimetableSync } from '@/hooks/useTimetableSync';
 import { useAccountBridge } from '@/hooks/useAccountBridge';
 import { useAuthStore, isProfileComplete } from '@/store/useAuthStore';
 import { isApiConfigured } from '@/services/api';
@@ -25,6 +26,7 @@ export function AppLayout() {
   useAcademicDaysSync();
   // Mirrors the signed-in account into the profile and timetable stores.
   useAccountBridge();
+  useTimetableSync();
 
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -51,11 +53,12 @@ export function AppLayout() {
     return () => clearInterval(timer);
   }, []);
 
+  const { program, branch, yearOfStudy, batchNo } = profile ?? {};
   useEffect(() => {
-    if (profile && profile.program && profile.branch) {
-      initializeTimetable(profile.program, profile.branch);
+    if (!isRestoring && program && branch) {
+      void initializeTimetable(program, branch);
     }
-  }, [profile, initializeTimetable]);
+  }, [program, branch, yearOfStudy, batchNo, isRestoring, initializeTimetable]);
 
   const displayDate = selectedDate || currentTime;
 

@@ -13,6 +13,7 @@ vi.mock('../services/timetableLoader', () => ({
     loadCommonData: vi.fn(),
     loadHolidays: vi.fn(),
     refreshAllCourses: vi.fn(),
+    refreshHolidays: vi.fn(),
     clearCache: vi.fn()
   }
 }));
@@ -22,6 +23,7 @@ describe('useTimetableStore', () => {
     // Reset store state
     useTimetableStore.setState({
       program: null,
+      selectionContext: null,
       branch: null,
       selectedCourseIds: [],
       loadedCourses: [],
@@ -41,7 +43,7 @@ describe('useTimetableStore', () => {
   });
 
   it('should initialize timetable and recompute', async () => {
-    const mockCourse = {
+    const mockCourse: CourseOffering = {
       id: 'UG_CSE_CS101',
       courseCode: 'CS101',
       courseName: 'Intro to CS',
@@ -61,9 +63,9 @@ describe('useTimetableStore', () => {
     };
 
     // Setup mocks
-    (TimetableLoader.loadAllCourses as any).mockResolvedValue([mockCourse]);
-    (TimetableLoader.loadCommonData as any).mockResolvedValue([]);
-    (TimetableLoader.loadHolidays as any).mockResolvedValue([]);
+    vi.mocked(TimetableLoader.loadAllCourses).mockResolvedValue([mockCourse]);
+    vi.mocked(TimetableLoader.loadCommonData).mockResolvedValue([]);
+    vi.mocked(TimetableLoader.loadHolidays).mockResolvedValue([]);
 
     // We start by pre-selecting the course ID so that recompute creates events
     useTimetableStore.setState({ selectedCourseIds: ['CS101'] });
@@ -82,7 +84,7 @@ describe('useTimetableStore', () => {
     useTimetableStore.setState({
       program: 'UG',
       branch: 'CSE',
-      loadedCourses: [{ id: 'dummy' } as any] // simulate loaded
+      loadedCourses: [{ id: 'dummy', courseCode: 'DUMMY', courseName: 'Dummy', credits: '0', category: 'core', meetings: [] }] // simulate loaded
     });
 
     await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
@@ -92,7 +94,7 @@ describe('useTimetableStore', () => {
   });
 
   it('should update selected courses and trigger recompute', () => {
-    const mockCourse = {
+    const mockCourse: CourseOffering = {
       id: 'UG_CSE_CS101',
       courseCode: 'CS101',
       courseName: 'Intro to CS',
@@ -112,7 +114,7 @@ describe('useTimetableStore', () => {
     };
 
     useTimetableStore.setState({
-      loadedCourses: [mockCourse as any],
+      loadedCourses: [mockCourse],
       loadedHolidays: [],
       previewDate: '2026-02-02T00:00:00Z' // not a holiday
     });
@@ -243,7 +245,7 @@ describe('own class timings', () => {
 
   it('fetches the official timings again without reloading the timetable', async () => {
     const approved = [lecture('Monday'), lecture('Thursday')];
-    (TimetableLoader.refreshAllCourses as any).mockResolvedValue([{ ...course(approved), offeringId: 'UG_CSE_CS101' }]);
+    vi.mocked(TimetableLoader.refreshAllCourses).mockResolvedValue([{ ...course(approved), offeringId: 'UG_CSE_CS101' }]);
 
     expect(await useTimetableStore.getState().refreshCourses()).toBe(true);
     expect(days()).toEqual([1, 4]);
@@ -254,7 +256,7 @@ describe('own class timings', () => {
   });
 
   it('leaves the timetable alone when the API does not answer a refresh', async () => {
-    (TimetableLoader.refreshAllCourses as any).mockResolvedValue(null);
+    vi.mocked(TimetableLoader.refreshAllCourses).mockResolvedValue(null);
     useTimetableStore.getState().updateSelectedCourses(['CS101']);
 
     expect(await useTimetableStore.getState().refreshCourses()).toBe(false);
@@ -300,5 +302,89 @@ describe('own class timings', () => {
     // A time change that leaves the official room alone still gets the batch venue.
     useTimetableStore.getState().saveCourseOverride('PH1030', [{ ...lecture('Tuesday', batchRoom) }]);
     expect(useTimetableStore.getState().resolvedEvents[0].room).toBe('C06-105');
+  });
+});
+
+describe('year and batch transitions', () => {
+  const meeting = (room: string): TimetableMeeting => ({
+    type: 'lab', day: 'Monday', startTime: '10:00', endTime: '11:00', room,
+    instructors: [], recurrence: { type: 'weekly' },
+  });
+  const course = (courseCode: string, rooms: string[]): CourseOffering => ({
+    id: courseCode, courseCode, courseName: courseCode, credits: '3',
+    category: 'institute core', meetings: rooms.map(meeting),
+  });
+  const common = [
+    course('ID1050A', ['Nila CS-Lab (B1-B12)', 'Nila CS-Lab (B13-B24)']),
+    course('PH1130', ['Physics (B1-B12)']), course('ME1150', ['Workshop (B1-B12)']),
+    course('CY1140', ['Chemistry (B13-B24)']), course('EE1110', ['Electronics (B13-B24)']),
+  ];
+  const profile = { name: 'Test', mess: 'Nila' as const, program: 'UG' as const, branch: 'CSE', yearOfStudy: '1', batchNo: 'B1' };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useUserStore.setState({ profile });
+    useTimetableStore.setState({
+      selectionContext: null, selectedCourseIds: [], loadedCourses: [], loadedHolidays: [],
+      resolvedEvents: [], collisions: [], courseOverrides: {}, previewDate: '2026-02-02T00:00:00Z',
+    });
+    vi.mocked(TimetableLoader.loadAllCourses).mockResolvedValue(common);
+    vi.mocked(TimetableLoader.loadCommonData).mockResolvedValue(common);
+    vi.mocked(TimetableLoader.loadHolidays).mockResolvedValue([]);
+  });
+  afterEach(() => useUserStore.setState({ profile: null }));
+
+  it('loads only the selected cohort and batch sessions', async () => {
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    expect(useTimetableStore.getState().selectedCourseIds.sort()).toEqual(['ID1050A', 'ME1150', 'PH1130']);
+    expect(useTimetableStore.getState().resolvedEvents).toHaveLength(3);
+    useUserStore.setState({ profile: { ...profile, batchNo: 'B13' } });
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    expect(useTimetableStore.getState().selectedCourseIds.sort()).toEqual(['CY1140', 'EE1110', 'ID1050A']);
+    expect(useTimetableStore.getState().resolvedEvents).toHaveLength(3);
+  });
+
+  it.each(['', 'B25', '1.5'])('does not show all batches for invalid batch %s', async batchNo => {
+    useUserStore.setState({ profile: { ...profile, batchNo } });
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    expect(useTimetableStore.getState().selectedCourseIds).toEqual([]);
+    useTimetableStore.getState().updateSelectedCourses(['ID1050A']);
+    expect(useTimetableStore.getState().resolvedEvents).toEqual([]);
+  });
+
+  it('clears first-year courses on changing to fourth year and keeps them empty on reload', async () => {
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    useUserStore.setState({ profile: { ...profile, yearOfStudy: '4', batchNo: undefined } });
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    expect(useTimetableStore.getState().selectedCourseIds).toEqual([]);
+    expect(useTimetableStore.getState().resolvedEvents).toEqual([]);
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    expect(useTimetableStore.getState().selectedCourseIds).toEqual([]);
+  });
+
+  it('preserves selections when only mess or name changes', async () => {
+    useUserStore.setState({ profile: { ...profile, yearOfStudy: '4' } });
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    useTimetableStore.getState().updateSelectedCourses(['ID1050A']);
+    useUserStore.setState({ profile: { ...profile, yearOfStudy: '4', name: 'Updated', mess: 'Kedaram' } });
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    expect(useTimetableStore.getState().selectedCourseIds).toEqual(['ID1050A']);
+  });
+
+  it('keeps an approved first-year room instead of replacing it with an old venue', async () => {
+    await useTimetableStore.getState().initializeTimetable('UG', 'CSE');
+    vi.mocked(TimetableLoader.refreshAllCourses).mockResolvedValue([
+      { ...course('ID1050A', ['New Lab (B1-B12)']), offeringId: 'UG_CommonCourses_ID1050A', source: 'admin' },
+    ]);
+    vi.mocked(TimetableLoader.refreshHolidays).mockResolvedValue([]);
+    await useTimetableStore.getState().refreshCourses();
+    expect(useTimetableStore.getState().resolvedEvents[0].room).toBe('New Lab');
+  });
+
+  it('keeps an approved first-year room instead of using the legacy batch venue', () => {
+    const approved = { ...course('ID1050A', ['New Lab (B1-B12)']), source: 'admin' as const };
+    useTimetableStore.setState({ loadedCourses: [approved], loadedHolidays: [], selectedCourseIds: [] });
+    useTimetableStore.getState().updateSelectedCourses(['ID1050A']);
+    expect(useTimetableStore.getState().resolvedEvents[0].room).toBe('New Lab');
   });
 });

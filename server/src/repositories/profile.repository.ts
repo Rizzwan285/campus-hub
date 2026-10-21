@@ -1,4 +1,5 @@
-import { query } from '../db';
+import { academicContext, firstYearBatch } from '../../../src/lib/academicProfile';
+import { pool, query } from '../db';
 import type { CourseOverride } from './courseChanges.repository';
 
 export interface ProfileRow {
@@ -99,46 +100,88 @@ export interface ProfilePatch {
   batchNo?: string | null;
 }
 
-export async function updateProfile(id: string, patch: ProfilePatch): Promise<ProfileRow | null> {
-  const rows = await query<ProfileRow>(
-    `update profiles
-        set name          = coalesce($2, name),
-            mess          = case when $3::boolean then $4  else mess end,
-            program       = case when $5::boolean then $6  else program end,
-            branch        = case when $7::boolean then $8  else branch end,
-            year_of_study = case when $9::boolean then $10 else year_of_study end,
-            batch_no      = case when $11::boolean then $12 else batch_no end
-      where id = $1
-      returning ${COLUMNS}`,
-    [
-      id,
-      patch.name ?? null,
-      patch.mess !== undefined, patch.mess ?? null,
-      patch.program !== undefined, patch.program ?? null,
-      patch.branch !== undefined, patch.branch ?? null,
-      patch.yearOfStudy !== undefined, patch.yearOfStudy ?? null,
-      patch.batchNo !== undefined, patch.batchNo ?? null,
-    ],
-  );
-  return rows[0] ?? null;
+export class ProfileError extends Error {
+  constructor(message: string, readonly status = 400) { super(message); }
 }
 
-/** Replaces the user's whole selection in one transaction-free upsert pair. */
-export async function setSelectedCourses(userId: string, offeringIds: string[]): Promise<string[]> {
-  await query('delete from user_courses where user_id = $1', [userId]);
+function academicProfile(row: ProfileRow) {
+  return { program: row.program, branch: row.branch, yearOfStudy: row.year_of_study, batchNo: row.batch_no };
+}
 
-  if (offeringIds.length > 0) {
-    // Stored verbatim: these are the client's own identifiers, and a course
-    // the user picked should survive a semester reseed.
-    await query(
-      `insert into user_courses (user_id, offering_id)
-       select $1, unnest($2::text[])
-       on conflict do nothing`,
-      [userId, [...new Set(offeringIds)]],
+export async function updateProfile(id: string, patch: ProfilePatch): Promise<ProfileRow | null> {
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+    const before = (await client.query<ProfileRow>(`select ${COLUMNS} from profiles where id = $1 for update`, [id])).rows[0];
+    if (!before) { await client.query('rollback'); return null; }
+    const next = { ...academicProfile(before), ...patch };
+    if (next.program === 'UG' && next.yearOfStudy === '1') {
+      const batch = firstYearBatch(next.batchNo);
+      if (!batch) throw new ProfileError('Select a batch from B1 to B24 for first year.');
+      patch = { ...patch, batchNo: `B${batch}` };
+    } else {
+      patch = { ...patch, batchNo: null };
+    }
+    const { rows } = await client.query<ProfileRow>(
+      `update profiles
+          set name          = coalesce($2, name),
+              mess          = case when $3::boolean then $4  else mess end,
+              program       = case when $5::boolean then $6  else program end,
+              branch        = case when $7::boolean then $8  else branch end,
+              year_of_study = case when $9::boolean then $10 else year_of_study end,
+              batch_no      = case when $11::boolean then $12 else batch_no end
+        where id = $1
+        returning ${COLUMNS}`,
+      [
+        id,
+        patch.name ?? null,
+        patch.mess !== undefined, patch.mess ?? null,
+        patch.program !== undefined, patch.program ?? null,
+        patch.branch !== undefined, patch.branch ?? null,
+        patch.yearOfStudy !== undefined, patch.yearOfStudy ?? null,
+        patch.batchNo !== undefined, patch.batchNo ?? null,
+      ],
     );
+    if (academicContext(academicProfile(before)) !== academicContext(academicProfile(rows[0]))) {
+      await client.query('delete from user_courses where user_id = $1', [id]);
+    }
+    await client.query('commit');
+    return rows[0];
+  } catch (error) {
+    await client.query('rollback');
+    throw error;
+  } finally {
+    client.release();
   }
+}
 
-  return getSelectedCourseIds(userId);
+/** Serializes selections with profile changes, rejecting writes from an old year/batch. */
+export async function setSelectedCourses(userId: string, offeringIds: string[], context: string): Promise<string[]> {
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+    const profile = (await client.query<ProfileRow>(`select ${COLUMNS} from profiles where id = $1 for update`, [userId])).rows[0];
+    if (!profile) throw new ProfileError('Account not found.', 404);
+    if (context !== academicContext(academicProfile(profile))) {
+      throw new ProfileError('Your year or batch changed. Reload before selecting courses.', 409);
+    }
+    await client.query('delete from user_courses where user_id = $1', [userId]);
+    const selected = [...new Set(offeringIds)];
+    if (selected.length) {
+      await client.query(
+        `insert into user_courses (user_id, offering_id)
+         select $1, unnest($2::text[]) on conflict do nothing`,
+        [userId, selected],
+      );
+    }
+    await client.query('commit');
+    return selected;
+  } catch (error) {
+    await client.query('rollback');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function ensureAdmin(roll: string, passwordHash: string): Promise<void> {

@@ -1,3 +1,4 @@
+import { firstYearBatch } from '@/lib/academicProfile';
 import { useState } from 'react';
 import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
@@ -43,8 +44,8 @@ export function Onboarding() {
     if (!formData.branch) newErrors.branch = 'Branch is required';
     if (!formData.yearOfStudy) newErrors.yearOfStudy = 'Year of study is required';
     
-    if (isFirstYearUG && !formData.batchNo) {
-      newErrors.batchNo = 'Batch No is required for first year BTech';
+    if (isFirstYearUG && !firstYearBatch(formData.batchNo)) {
+      newErrors.batchNo = 'Select a batch from B1 to B24';
     }
 
     setErrors(newErrors);
@@ -55,7 +56,7 @@ export function Onboarding() {
     e.preventDefault();
     if (!validate()) return;
 
-    const finalProfile = { ...formData } as UserProfile;
+    const finalProfile = { ...formData, batchNo: isFirstYearUG ? `B${firstYearBatch(formData.batchNo)}` : undefined } as UserProfile;
     setSaving(true);
 
     try {
@@ -204,21 +205,15 @@ export function Onboarding() {
             {isFirstYearUG && (
               <div className="animate-in slide-in-from-top-2 fade-in duration-300">
                 <label className={labelClass}>Batch No</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="24"
+                <select
                   name="batchNo"
-                  value={formData.batchNo?.replace('B', '') || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    handleChange({
-                      target: { name: 'batchNo', value: val ? `B${val}` : '' }
-                    } as any);
-                  }}
+                  value={firstYearBatch(formData.batchNo) ? `B${firstYearBatch(formData.batchNo)}` : ''}
+                  onChange={handleChange}
                   className={inputClass('batchNo')}
-                  placeholder="Enter batch (1-24)"
-                />
+                >
+                  <option value="">Select your batch...</option>
+                  {batchOptions.map(batch => <option key={batch} value={batch}>{batch}</option>)}
+                </select>
                 {errors.batchNo && <p className="text-red-400 text-[11px] mt-1.5 font-medium">{errors.batchNo}</p>}
                 <p className="text-[11px] text-muted-foreground/70 mt-1.5 leading-relaxed">
                   Your core timetable will be automatically loaded based on your batch.

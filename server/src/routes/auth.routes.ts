@@ -186,12 +186,17 @@ authRouter.patch('/profile', requireSession, async (req, res, next) => {
 
     res.json({ profile: await publicProfile(updated) });
   } catch (error) {
+    if (error instanceof profiles.ProfileError) {
+      res.status(error.status).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 });
 
 const coursesBody = z.object({
   offeringIds: z.array(z.string().max(80)).max(40),
+  context: z.string().max(200),
 });
 
 /** PUT /api/auth/courses — syncs the user's selection across devices. */
@@ -203,9 +208,13 @@ authRouter.put('/courses', requireSession, async (req, res, next) => {
       return;
     }
 
-    const stored = await profiles.setSelectedCourses(req.session!.sub, parsed.data.offeringIds);
+    const stored = await profiles.setSelectedCourses(req.session!.sub, parsed.data.offeringIds, parsed.data.context);
     res.json({ selectedCourseIds: stored });
   } catch (error) {
+    if (error instanceof profiles.ProfileError) {
+      res.status(error.status).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 });

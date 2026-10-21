@@ -1,3 +1,4 @@
+import bundledHolidays from '../data/timetable/holidays.json';
 import { CourseOffering, Holiday } from '../engine/types';
 import { fetchJson, isApiConfigured } from './api';
 
@@ -68,13 +69,7 @@ export class TimetableLoader {
         }
       }
 
-      try {
-        const module = await import('../data/timetable/holidays.json');
-        return module.default as Holiday[];
-      } catch (error) {
-        console.warn('Failed to load holidays data', error);
-        return [];
-      }
+      return bundledHolidays as Holiday[];
     })();
 
     this.holidayCache = loadPromise;
@@ -93,7 +88,7 @@ export class TimetableLoader {
     const loadPromise = (async () => {
       if (isApiConfigured()) {
         try {
-          const courses = await fetchJson<CourseOffering[]>('/api/timetable/courses');
+          const courses = await fetchJson<CourseOffering[]>('/api/timetable/courses', { fresh: true });
           if (courses.length > 0) return courses;
         } catch {
           // fall through to the bundled JSON
@@ -136,7 +131,19 @@ export class TimetableLoader {
       const courses = await fetchJson<CourseOffering[]>('/api/timetable/courses', { fresh: true });
       if (courses.length === 0) return null;
       this.allCoursesCache = Promise.resolve(courses);
+      this.courseCache.clear();
       return courses;
+    } catch {
+      return null;
+    }
+  }
+
+  static async refreshHolidays(): Promise<Holiday[] | null> {
+    if (!isApiConfigured()) return null;
+    try {
+      const holidays = await fetchJson<Holiday[]>('/api/holidays', { fresh: true });
+      this.holidayCache = Promise.resolve(holidays);
+      return holidays;
     } catch {
       return null;
     }
