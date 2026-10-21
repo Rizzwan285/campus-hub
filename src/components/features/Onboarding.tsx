@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserStore, UserProfile } from '@/store/useUserStore';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, Sparkles, ArrowLeft } from 'lucide-react';
+import { GraduationCap, BookOpen, UtensilsCrossed, Users, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -124,9 +124,7 @@ export function Onboarding() {
             )}
 
             {/* Logo / Icon */}
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 mb-5 shadow-lg shadow-primary/10">
-              <Sparkles className="w-8 h-8 text-primary" />
-            </div>
+            <img src={`${import.meta.env.BASE_URL}favicon.svg?v=transparent-cc`} alt="Campus Companion" className="w-16 h-16 mx-auto mb-5" />
             
             <h1 className="text-3xl font-bold text-foreground tracking-tight">
               Campus Companion

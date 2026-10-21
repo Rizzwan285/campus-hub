@@ -59,7 +59,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div className="flex items-center gap-2.5 mb-1.5">
-            <img src="/favicon.svg" alt="Campus Companion" className="h-6 w-6 rounded-md shadow-xs" />
+            <img src={`${import.meta.env.BASE_URL}favicon.svg?v=transparent-cc`} alt="Campus Companion" className="h-6 w-6" />
             <span className="text-sm font-semibold text-primary/80 tracking-wide uppercase">Campus Companion</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
