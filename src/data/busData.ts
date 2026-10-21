@@ -41,10 +41,28 @@ export interface BusSchedule {
  * what is typed in `/admin` and what is written here read identically.
  */
 function departures(spec: string[]): { times: string[]; positions: number[] } {
-  return {
-    times: spec.map((entry) => entry.replace(/\*$/, '').trim()),
-    positions: spec.flatMap((entry, index) => (entry.endsWith('*') ? [index] : [])),
-  };
+  const times: string[] = [];
+  const positions: number[] = [];
+
+  spec.forEach((entry, index) => {
+    if (entry.endsWith('[x2]')) {
+      times.push(entry.replace(/\[x2\]$/, '').trim());
+      positions.push(index);
+    } else if (entry.endsWith('*')) {
+      if (entry.startsWith('8:37') || entry.startsWith('12:10')) {
+        // Nila Parking bus: preserve the asterisk for display note, not a doubled bus
+        times.push(entry.trim());
+      } else {
+        // Bold multi-bus notation in the source circular
+        times.push(entry.replace(/\*$/, '').trim());
+        positions.push(index);
+      }
+    } else {
+      times.push(entry.trim());
+    }
+  });
+
+  return { times, positions };
 }
 
 /** The legacy string view: every distinct time that has a marked position. */
@@ -97,17 +115,17 @@ const wiseParkEvening: BusRoute = {
   description: `Sahyadri (6:15 PM) → Nila Gate → Wise Park Junction (6:45 PM) → Nila Manogata (7:00 PM) (${CONSTRUCTION_NOTE})`
 };
 
-// `*` = the circular prints this time in bold: more than one bus leaves.
+// `*` on bold times = multiple buses leave. `*` on 8:37* / 12:10* = goes up to Nila parking only.
 const WORKING_N2S = departures([
-  "7:45*", "8:30*", "8:55", "9:25", "9:45", "10:20", "10:45", "11:15", "11:50*", "12:15", "12:30*",
+  "7:45*", "8:30*", "8:55", "9:00", "9:25", "9:45", "10:20", "10:45", "11:15", "11:50*", "12:15", "12:30*",
   "1:00*", "1:30*", "1:45*", "2:15", "2:45", "3:20", "3:45", "4:30", "5:00", "5:15*",
   "5:45", "6:00", "6:30", "7:00", "7:30", "8:00*", "8:30", "9:00", "10:00", "11:00", "12:00"
 ]);
 
 const WORKING_S2N = departures([
-  "7:45", "8:15", "8:30*", "8:55*", "9:25", "9:45", "10:20*", "10:45", "11:15", "11:50*",
+  "7:45", "8:15", "8:30*", "8:45", "8:55*", "9:00", "9:25", "9:45", "10:20*", "10:45", "11:15", "11:50*",
   "12:15", "12:30*", "1:00*", "1:30*", "1:45", "1:55", "2:15", "2:45", "3:20", "3:45", "4:30",
-  "5:00", "5:15*", "5:45", "6:00", "6:30", "7:00", "7:30", "8:00", "9:15", "10:15", "11:15"
+  "5:00", "5:15*", "5:45", "6:00", "6:30", "7:00", "7:30", "8:00", "8:37*", "9:15", "10:15", "11:15", "12:10*"
 ]);
 
 // Working Days (Monday – Thursday)
@@ -162,7 +180,7 @@ const SATURDAY_N2S = departures([
 const SATURDAY_S2N = departures([
   "7:30", "8:00", "8:30", "9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00",
   "12:30", "1:00", "1:30", "2:00", "2:30", "3:00", "3:30", "4:00", "4:30", "5:00",
-  "5:30", "6:00", "6:30", "7:00", "7:30", "8:15", "9:15", "10:15", "11:15"
+  "5:30", "6:00", "6:30", "7:00", "7:30", "8:00", "8:15", "8:37*", "9:15", "10:15", "11:15", "12:10*"
 ]);
 
 // Saturdays & Holidays

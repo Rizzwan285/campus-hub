@@ -12,6 +12,7 @@
  */
 export function resolveDepartMinutes(times: string[]): (number | null)[] {
   let isAfternoonOrLater = false;
+  let isPostMidnight = false;
   let prevHour = 0;
 
   return times.map((raw) => {
@@ -24,23 +25,32 @@ export function resolveDepartMinutes(times: string[]): (number | null)[] {
 
     if (clean.includes('am')) {
       if (hours === 12) hours = 0;
+      if (isAfternoonOrLater && prevHour >= 17 && (hours <= 4 || hours === 0)) {
+        isPostMidnight = true;
+      }
     } else if (clean.includes('pm')) {
       if (hours !== 12) hours += 12;
       isAfternoonOrLater = true;
     } else if (hours >= 1 && hours <= 6) {
-      hours += 12;
-      isAfternoonOrLater = true;
+      if (isPostMidnight) {
+        // already post-midnight AM hours
+      } else {
+        hours += 12;
+        isAfternoonOrLater = true;
+      }
     } else if (hours >= 7 && hours <= 11) {
-      if (isAfternoonOrLater) hours += 12;
+      if (isAfternoonOrLater && !isPostMidnight) hours += 12;
     } else if (hours === 12) {
-      if (isAfternoonOrLater && prevHour >= 17 && minutes === 0) {
-        hours = 24; // midnight, end of the schedule
+      if (isAfternoonOrLater && prevHour >= 17) {
+        hours = 0;
+        isPostMidnight = true;
       } else {
         isAfternoonOrLater = true;
       }
     }
 
-    prevHour = hours;
-    return hours * 60 + minutes;
+    const resolvedHours = isPostMidnight ? hours + 24 : hours;
+    prevHour = resolvedHours;
+    return resolvedHours * 60 + minutes;
   });
 }

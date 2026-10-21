@@ -102,4 +102,40 @@ describe('getNextDeparture and formatTimeUntil', () => {
   it('reports a departure already past', () => {
     expect(formatTimeUntil(at(7), at(8))).toBe('Passed');
   });
+
+  it('correctly resolves 8:37* in the evening and 12:10* past midnight', () => {
+    const list = ['12:00', '8:00', '8:37*', '9:15', '10:15', '11:15', '12:10*'];
+    const resolved = resolveDepartures(list, at(18));
+    // 8:37* is 20:37 on Aug 23
+    expect(resolved[2].time).toBe('8:37*');
+    expect(resolved[2].at.getHours()).toBe(20);
+    expect(resolved[2].at.getMinutes()).toBe(37);
+    expect(resolved[2].at.getDate()).toBe(23);
+
+    // 12:10* is 00:10 on Aug 24 (the next day)
+    expect(resolved[6].time).toBe('12:10*');
+    expect(resolved[6].at.getHours()).toBe(0);
+    expect(resolved[6].at.getMinutes()).toBe(10);
+    expect(resolved[6].at.getDate()).toBe(24);
+  });
+
+  it('correctly resolves late-night buggy departures across midnight', () => {
+    const buggyList = ['8:45 PM', '9:30 PM', '10:30 PM', '11:30 PM', '12:30 AM', '1:00 AM', '1:30 AM', '2:00 AM'];
+    const resolved = resolveDepartures(buggyList, at(20));
+    expect(resolved[3].at.getHours()).toBe(23);
+    expect(resolved[3].at.getDate()).toBe(23);
+
+    expect(resolved[4].at.getHours()).toBe(0);
+    expect(resolved[4].at.getMinutes()).toBe(30);
+    expect(resolved[4].at.getDate()).toBe(24);
+
+    expect(resolved[7].at.getHours()).toBe(2);
+    expect(resolved[7].at.getMinutes()).toBe(0);
+    expect(resolved[7].at.getDate()).toBe(24);
+
+    // Strictly increasing
+    for (let i = 1; i < resolved.length; i += 1) {
+      expect(resolved[i].at.getTime()).toBeGreaterThan(resolved[i - 1].at.getTime());
+    }
+  });
 });
