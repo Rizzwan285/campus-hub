@@ -65,15 +65,17 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     index: number,
     direction: 'nilaToSahyadri' | 'sahyadriToNila',
   ): boolean => {
+    const cleanTime = time.replace(/\*$/, '');
     const positions = schedule.multipleBusPositions?.[direction];
     if (positions) return positions.includes(index);
-    return schedule.multipleBusTimings?.[direction]?.includes(time) || false;
+    return schedule.multipleBusTimings?.[direction]?.includes(cleanTime) || false;
   };
 
   const BusTimesList = ({ times, nextBus, direction }: { times: Departure[]; nextBus: Departure | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
     // `times` is the tail of the day still to come, so its first entry sits
     // this far into the full list — only a prefix is ever dropped.
     const offset = schedule[direction].length - times.length;
+    const hasNilaParkingBus = schedule[direction].some((t) => t.includes('*'));
 
     return (
       <div className="space-y-3">
@@ -133,6 +135,13 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
                 );
               })}
             </div>
+
+            {hasNilaParkingBus && (
+              <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5 font-medium">
+                <span className="text-primary font-bold">*</span>
+                <span>This bus goes only up to Nila Parking.</span>
+              </p>
+            )}
           </>
         )}
       </div>

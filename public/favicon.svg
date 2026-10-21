@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="cc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#131d33"/>
+    </linearGradient>
+
+    <linearGradient id="cc-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+
+    <linearGradient id="cc-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="60%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <radialGradient id="cc-glow" cx="45%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22"/>
+      <stop offset="60%" stop-color="#2563eb" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Squircle container -->
+  <rect width="512" height="512" rx="124" fill="url(#cc-bg)"/>
+  <rect width="504" height="504" x="4" y="4" rx="120" fill="none" stroke="#38bdf8" stroke-opacity="0.2" stroke-width="2.5"/>
+
+  <!-- Subtle ambient radiance -->
+  <circle cx="240" cy="256" r="170" fill="url(#cc-glow)"/>
+
+  <!-- Outer 'C' arc (Campus) -->
+  <path d="M 330 140 A 140 140 0 1 0 330 372" 
+        fill="none" 
+        stroke="url(#cc-primary)" 
+        stroke-width="48" 
+        stroke-linecap="round"/>
+
+  <!-- Inner 'C' arc (Companion) -->
+  <path d="M 315 200 A 78 78 0 1 0 315 312" 
+        fill="none" 
+        stroke="url(#cc-cyan)" 
+        stroke-width="36" 
+        stroke-linecap="round"/>
+
+  <!-- Navigational beacon star -->
+  <path d="M 368 256 Q 388 256 388 236 Q 388 256 408 256 Q 388 256 388 276 Q 388 256 368 256 Z" 
+        fill="url(#cc-cyan)"/>
+  <circle cx="388" cy="256" r="3" fill="#ffffff"/>
+</svg>

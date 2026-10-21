@@ -99,6 +99,8 @@ export function resolveDepartures(times: string[], referenceDate: Date): Departu
 
   // Whether the schedule has already crossed midday.
   let isAfternoonOrLater = false;
+  // Whether the schedule has crossed midnight into the early morning of the next day.
+  let isPostMidnight = false;
   // Resolves the trailing 12:00 (midnight) apart from a midday one.
   let prevParsedHour = 0;
 
@@ -118,28 +120,38 @@ export function resolveDepartures(times: string[], referenceDate: Date): Departu
 
     if (isAM) {
       if (hours === 12) hours = 0;
+      if (isAfternoonOrLater && prevParsedHour >= 17 && (hours <= 4 || hours === 0)) {
+        isPostMidnight = true;
+      }
     } else if (isPM) {
       if (hours !== 12) hours += 12;
       isAfternoonOrLater = true;
     } else if (hours >= 1 && hours <= 6) {
-      // 1–6 only ever appear in the afternoon half of a schedule.
-      hours += 12;
-      isAfternoonOrLater = true;
+      if (isPostMidnight) {
+        // already post-midnight AM hours
+      } else {
+        hours += 12;
+        isAfternoonOrLater = true;
+      }
     } else if (hours >= 7 && hours <= 11) {
       // Morning until the list has been through midday, evening after.
-      if (isAfternoonOrLater) hours += 12;
+      if (isAfternoonOrLater && !isPostMidnight) hours += 12;
     } else if (hours === 12) {
       // Midnight only once the evening has been and gone; otherwise midday.
-      if (isAfternoonOrLater && prevParsedHour >= 17 && minutes === 0) {
+      if (isAfternoonOrLater && prevParsedHour >= 17) {
         hours = 0;
-        at.setDate(at.getDate() + 1);
+        isPostMidnight = true;
       } else {
         isAfternoonOrLater = true;
       }
     }
 
+    if (isPostMidnight) {
+      at.setDate(at.getDate() + 1);
+    }
+
     at.setHours(hours, minutes, 0, 0);
-    prevParsedHour = hours;
+    prevParsedHour = isPostMidnight ? hours + 24 : hours;
     return { time: timeStr, at };
   });
 }

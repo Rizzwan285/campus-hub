@@ -26,8 +26,11 @@ const App = () => (
             <Route path="/timetable" element={<Timetable />} />
             <Route path="/campus" element={<Campus />} />
           </Route>
-          {/* The Food page is gone; its mess timings moved to Home. */}
+          {/* Legacy & direct shortcut redirects */}
           <Route path="/food" element={<Navigate to="/" replace />} />
+          <Route path="/buggy" element={<Navigate to="/" replace />} />
+          <Route path="/buggy-timings" element={<Navigate to="/" replace />} />
+          <Route path="/bus-timings" element={<Navigate to="/" replace />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
