@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GraduationCap, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/useAuthStore';
 import { apiFetch, ApiError, isApiConfigured } from '@/services/api';
@@ -72,9 +72,7 @@ export function Login() {
       <div className="w-full max-w-md">
         <div className="bg-card border border-border/60 rounded-2xl shadow-[var(--shadow-card)] overflow-hidden">
           <div className="px-8 pt-8 pb-6 text-center">
-            <div className="inline-flex p-3 bg-primary/10 rounded-2xl mb-4">
-              <GraduationCap className="h-7 w-7 text-primary" />
-            </div>
+            <img src={`${import.meta.env.BASE_URL}favicon.svg?v=transparent-cc`} alt="Campus Companion" className="h-12 w-12 mx-auto mb-4" />
             <h1 className="text-2xl font-bold">Campus Companion</h1>
             <p className="text-sm text-muted-foreground mt-1.5">
               Sign in with your roll number to sync your timetable and mess across devices.
