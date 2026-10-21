@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Calendar, Info } from 'lucide-react';
+import { Home, Calendar, Info, Dumbbell } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
@@ -111,6 +111,7 @@ export function AppLayout() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/timetable', label: 'Timetable', icon: Calendar },
     { path: '/campus', label: 'Campus', icon: Info },
+    { path: '/gym', label: 'Gym', icon: Dumbbell },
   ];
 
   return (
