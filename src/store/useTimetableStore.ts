@@ -1,3 +1,4 @@
+import { academicContext, firstYearBatch } from '../lib/academicProfile';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TimetableLoader } from '../services/timetableLoader';
@@ -99,6 +100,7 @@ interface TimetableState {
   program: string | null;
   branch: string | null;
   selectedCourseIds: string[];
+  selectionContext: string | null;
   previewDate: string; // ISO string to be serializable
   /** The student's own timings, keyed by course code. */
   courseOverrides: Record<string, CourseOverride>;
@@ -151,6 +153,7 @@ interface TimetableState {
 export const useTimetableStore = create<TimetableState>()(
   persist(
     (set, get) => {
+      let initialization = 0;
       // Internal pure recomputation logic (avoids redundant hook dependencies)
       const _recompute = () => {
         const {
@@ -158,7 +161,10 @@ export const useTimetableStore = create<TimetableState>()(
           courseOverrides, coursesAuthoritative,
         } = get();
 
-        if (!loadedCourses.length) return;
+        if (!loadedCourses.length) {
+          set({ resolvedEvents: [], collisions: [], holidaysEncountered: [] });
+          return;
+        }
 
         const selectedSet = new Set(selectedCourseIds);
         // A student's own timings stand in for the official ones — until the
@@ -194,8 +200,12 @@ export const useTimetableStore = create<TimetableState>()(
 
         const profile = useUserStore.getState().profile;
         if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
-          const batchNo = parseInt(profile.batchNo?.replace(/[^0-9]/g, '') || '0', 10);
-          if (batchNo > 0) {
+          const batchNo = firstYearBatch(profile.batchNo);
+          if (!batchNo) {
+            set({ resolvedEvents: [], collisions: [], holidaysEncountered: [] });
+            return;
+          }
+          if (batchNo) {
             const officialRooms = new Map(
               loadedCourses.map(c => [c.courseCode, new Set(c.meetings.map(m => m.room))]),
             );
@@ -254,7 +264,7 @@ export const useTimetableStore = create<TimetableState>()(
                   // A room the student typed into their own timings stays as typed.
                   const typedByStudent =
                     course.isPersonal && !officialRooms.get(course.courseCode)?.has(m.room);
-                  if (customRoom && !typedByStudent) {
+                  if (customRoom && !typedByStudent && course.source !== 'admin' && /\bB\d+\s*-\s*B\d+/i.test(m.room)) {
                     finalRoom = customRoom;
                   }
                   return { ...m, room: finalRoom };
@@ -288,6 +298,7 @@ export const useTimetableStore = create<TimetableState>()(
         program: null,
         branch: null,
         selectedCourseIds: [],
+        selectionContext: null,
         previewDate: new Date().toISOString(),
         courseOverrides: {},
         courseOverridesUnsynced: false,
@@ -304,7 +315,12 @@ export const useTimetableStore = create<TimetableState>()(
         error: null,
 
         initializeTimetable: async (program: string, branch: string) => {
-          set({ isLoading: true, error: null, program, branch });
+          const request = ++initialization;
+          const profile = useUserStore.getState().profile;
+          const context = profile ? academicContext(profile) : null;
+          const changed = get().selectionContext !== null && get().selectionContext !== context;
+          set({ isLoading: true, error: null, program, branch, selectionContext: context,
+            ...(changed ? { selectedCourseIds: [], resolvedEvents: [], collisions: [] } : {}) });
 
           try {
             const [allCoursesRaw, commonData, holidays] = await Promise.all([
@@ -313,6 +329,7 @@ export const useTimetableStore = create<TimetableState>()(
               TimetableLoader.loadHolidays()
             ]);
 
+            if (request !== initialization) return;
             const allCourses = mergeOfferings(allCoursesRaw);
 
             const userState = get();
@@ -321,15 +338,14 @@ export const useTimetableStore = create<TimetableState>()(
             // Evaluate auto-population and commit state in one go
             const profile = useUserStore.getState().profile;
             
-            // If changing program or branch, we should probably reset courses if they are invalid,
-            // but the filtering naturally ignores invalid IDs. For 1st years, we actively manage their core courses.
+            // First-year cores belong to one batch; other years choose their own courses.
             if (program === 'UG' && profile?.yearOfStudy === '1') {
-              const batchNo = parseInt(profile.batchNo?.replace(/[^0-9]/g, '') || '0', 10);
-              let excludedCodes: string[] = ['BT2010']; // Life science not in this semester
+              const batchNo = firstYearBatch(profile.batchNo);
+              const excludedCodes: string[] = ['BT2010']; // Life science not in this semester
               
-              if (batchNo >= 1 && batchNo <= 12) {
+              if (batchNo && batchNo >= 1 && batchNo <= 12) {
                 excludedCodes.push('CY1140', 'EE1110'); // B1-12 gets Physics/Mech, exclude Chem/Elec
-              } else if (batchNo >= 13 && batchNo <= 24) {
+              } else if (batchNo && batchNo >= 13 && batchNo <= 24) {
                 excludedCodes.push('PH1130', 'ME1150'); // B13-24 gets Chem/Elec, exclude Physics/Mech
               }
 
@@ -344,12 +360,12 @@ export const useTimetableStore = create<TimetableState>()(
                 if (ds1010) extraIds.push(ds1010.courseCode);
               }
               
-              // Keep previously selected electives so user doesn't lose GN1003 etc.
+              // Preserve electives on a reload, but never retain excluded cohort cores.
               const previouslySelectedElectives = allCourses
-                .filter(c => c.category?.toLowerCase() !== 'core' && newSelectedIds.includes(c.courseCode))
+                .filter(c => !commonData.some(common => common.courseCode === c.courseCode && common.category?.toLowerCase().includes('core')) && newSelectedIds.includes(c.courseCode))
                 .map(c => c.courseCode);
               
-              newSelectedIds = Array.from(new Set([...commonCoreIds, ...extraIds, ...previouslySelectedElectives]));
+              newSelectedIds = batchNo ? Array.from(new Set([...commonCoreIds, ...extraIds, ...previouslySelectedElectives])) : [];
             }
             
             set({
@@ -362,6 +378,7 @@ export const useTimetableStore = create<TimetableState>()(
             
             _recompute();
           } catch (err) {
+            if (request !== initialization) return;
             set({ 
               isLoading: false, 
               error: err instanceof Error ? err.message : 'Failed to initialize timetable datasets.' 
@@ -384,8 +401,12 @@ export const useTimetableStore = create<TimetableState>()(
           // Nothing to bring up to date until the first load has finished.
           if (!get().loadedCourses.length) return false;
 
-          const fresh = await TimetableLoader.refreshAllCourses();
-          if (!fresh) return false;
+          const [fresh, holidays] = await Promise.all([TimetableLoader.refreshAllCourses(), TimetableLoader.refreshHolidays()]);
+          if (holidays) set({ loadedHolidays: holidays });
+          if (!fresh) {
+            if (holidays) _recompute();
+            return false;
+          }
 
           set({ loadedCourses: mergeOfferings(fresh), coursesAuthoritative: isAuthoritative(fresh) });
           _recompute();
@@ -473,6 +494,7 @@ export const useTimetableStore = create<TimetableState>()(
         program: state.program,
         branch: state.branch,
         selectedCourseIds: state.selectedCourseIds,
+        selectionContext: state.selectionContext,
         previewDate: state.previewDate,
         courseOverrides: state.courseOverrides,
         courseOverridesUnsynced: state.courseOverridesUnsynced

@@ -177,9 +177,11 @@ export function useBusSchedules(): BusSchedules {
 export function useAcademicDaysSync(): void {
   const { data } = useQuery({
     queryKey: ['academic-days'],
-    queryFn: () => fetchJson<AcademicDaysData>('/api/academic-days'),
+    queryFn: () => fetchJson<AcademicDaysData>('/api/academic-days', { fresh: true }),
     enabled: isApiConfigured(),
     ...QUERY_OPTIONS,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { academicContext } from '@/lib/academicProfile';
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUserStore, type UserProfile } from '@/store/useUserStore';
@@ -19,6 +20,7 @@ const serializeOverrides = (overrides: Record<string, CourseOverride>) =>
  */
 export function useAccountBridge(): void {
   const account = useAuthStore((state) => state.account);
+  const isRestoring = useAuthStore((state) => state.isRestoring);
   const syncCourses = useAuthStore((state) => state.syncCourses);
   const syncCourseOverrides = useAuthStore((state) => state.syncCourseOverrides);
 
@@ -47,7 +49,7 @@ export function useAccountBridge(): void {
   // Adopt the server's course selection once per sign-in, so a fresh device
   // inherits the user's picks instead of starting empty.
   const accountFetchedAt = useAuthStore((state) => state.accountFetchedAt);
-  const adopted = useRef<{ accountId: string; fetchedAt: number; overrides: string | null } | null>(null);
+  const adopted = useRef<{ accountId: string; fetchedAt: number; overrides: string | null; selected: string } | null>(null);
   useEffect(() => {
     if (!account) {
       // Signed out. The next sign-in starts from the account again even on this
@@ -57,11 +59,14 @@ export function useAccountBridge(): void {
       return;
     }
 
+    if (isRestoring) return;
     const previous = adopted.current?.accountId === account.id ? adopted.current : null;
     if (previous && previous.fetchedAt === accountFetchedAt) return;
 
     const timetable = useTimetableStore.getState();
-    if (!previous && account.selectedCourseIds.length > 0) {
+    const selected = JSON.stringify(timetable.selectedCourseIds);
+    if (!previous || previous.selected === selected) {
+      useTimetableStore.setState({ selectionContext: academicContext(account) });
       timetable.updateSelectedCourses(account.selectedCourseIds);
     }
 
@@ -81,43 +86,40 @@ export function useAccountBridge(): void {
       overrides = serializeOverrides(useTimetableStore.getState().courseOverrides);
     }
 
-    adopted.current = { accountId: account.id, fetchedAt: accountFetchedAt, overrides };
-  }, [account, accountFetchedAt]);
+    adopted.current = { accountId: account.id, fetchedAt: accountFetchedAt, overrides, selected: JSON.stringify(useTimetableStore.getState().selectedCourseIds) };
+  }, [account, accountFetchedAt, isRestoring]);
 
   // Push local changes back up, debounced so dragging through the course
   // picker does not fire a request per click.
   const selected = useTimetableStore((state) => state.selectedCourseIds);
-  const lastPushed = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!account) return;
+    if (isRestoring || !account || selected !== useTimetableStore.getState().selectedCourseIds) return;
 
     const serialized = JSON.stringify([...selected].sort());
-    if (serialized === lastPushed.current) return;
+
     // Nothing to do if it already matches what the server sent us.
     if (serialized === JSON.stringify([...account.selectedCourseIds].sort())) {
-      lastPushed.current = serialized;
       return;
     }
 
     const timer = setTimeout(() => {
-      lastPushed.current = serialized;
+      if (selected !== useTimetableStore.getState().selectedCourseIds) return;
       void syncCourses(selected).catch(() => {
         // Offline is fine: the local store is still authoritative for the UI,
         // and the next change retries.
-        lastPushed.current = null;
       });
     }, 1200);
 
     return () => clearTimeout(timer);
-  }, [selected, account, syncCourses]);
+  }, [selected, account, syncCourses, isRestoring]);
 
   // Own class timings follow the same path up.
   const overrides = useTimetableStore((state) => state.courseOverrides);
   const lastPushedOverrides = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!account) return;
+    if (isRestoring || !account) return;
 
     const list = Object.values(overrides).sort(byCode);
     const serialized = JSON.stringify(list);
@@ -146,5 +148,5 @@ export function useAccountBridge(): void {
     }, 1200);
 
     return () => clearTimeout(timer);
-  }, [overrides, account, syncCourseOverrides]);
+  }, [overrides, account, syncCourseOverrides, isRestoring]);
 }

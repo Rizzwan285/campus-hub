@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2, UtensilsCrossed, LogOut, ShieldCheck, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/sheet';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
+import { firstYearBatch } from '@/lib/academicProfile';
 
 const MESSES = ['Kedaram', 'Nila'] as const;
 const BRANCHES = ['CSE', 'DS', 'EE', 'ME', 'CE'];
@@ -30,13 +31,19 @@ export function AccountSettings({ open, onOpenChange }: AccountSettingsProps) {
   const [error, setError] = useState('');
   const [saved, setSaved] = useState<string | null>(null);
 
+  const [pendingYear, setPendingYear] = useState<string | null>(null);
+  useEffect(() => { if (!open) setPendingYear(null); }, [open]);
+
   if (!account) return null;
+  const year = pendingYear ?? account.yearOfStudy ?? '';
+  const needsBatch = account.program === 'UG' && year === '1';
 
   const save = async (field: string, patch: Record<string, unknown>) => {
     setSaving(field);
     setError('');
     try {
       await updateAccount(patch);
+      setPendingYear(null);
       setSaved(field);
       setTimeout(() => setSaved((current) => (current === field ? null : current)), 1800);
     } catch {
@@ -75,7 +82,7 @@ export function AccountSettings({ open, onOpenChange }: AccountSettingsProps) {
               {MESSES.map((mess) => (
                 <button
                   key={mess}
-                  disabled={saving === 'mess'}
+                  disabled={saving !== null}
                   onClick={() => save('mess', { mess })}
                   className={`flex-1 text-sm font-medium py-2 px-3 rounded-lg transition-all ${
                     account.mess === mess
@@ -116,11 +123,12 @@ export function AccountSettings({ open, onOpenChange }: AccountSettingsProps) {
                 Branch {saved === 'branch' && <Check className="inline h-3.5 w-3.5 text-green-600" />}
               </label>
               <select
+                disabled={saving !== null}
                 value={account.branch ?? ''}
                 onChange={(event) => void save('branch', { branch: event.target.value })}
                 className={rowClass}
               >
-                <option value="">Select</option>
+                <option value="" disabled>Select</option>
                 {BRANCHES.map((branch) => (
                   <option key={branch} value={branch}>{branch}</option>
                 ))}
@@ -131,17 +139,51 @@ export function AccountSettings({ open, onOpenChange }: AccountSettingsProps) {
                 Year {saved === 'yearOfStudy' && <Check className="inline h-3.5 w-3.5 text-green-600" />}
               </label>
               <select
-                value={account.yearOfStudy ?? ''}
-                onChange={(event) => void save('yearOfStudy', { yearOfStudy: event.target.value })}
+                disabled={saving !== null}
+                aria-label="Year of study"
+                value={year}
+                onChange={(event) => {
+                  const nextYear = event.target.value;
+                  if (account.program === 'UG' && nextYear === '1') {
+                    setPendingYear(nextYear);
+                  } else {
+                    setPendingYear(null);
+                    void save('yearOfStudy', { yearOfStudy: nextYear, batchNo: null });
+                  }
+                }}
                 className={rowClass}
               >
-                <option value="">Select</option>
+                <option value="" disabled>Select</option>
                 {YEARS.map((year) => (
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
             </div>
           </div>
+
+          {needsBatch && (
+            <div>
+              <label htmlFor="account-batch" className="block text-sm font-medium mb-2">Batch number</label>
+              <select
+                id="account-batch"
+                className={rowClass}
+                disabled={saving !== null}
+                value={pendingYear || !firstYearBatch(account.batchNo) ? '' : `B${firstYearBatch(account.batchNo)}`}
+                onChange={(event) => void save('yearOfStudy', { yearOfStudy: '1', batchNo: event.target.value })}
+              >
+                <option value="" disabled>Select your batch</option>
+                {Array.from({ length: 24 }, (_, i) => `B${i + 1}`).map(batch => (
+                  <option key={batch} value={batch}>{batch}</option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground mt-2">
+                Select B1–B24 to save first year and load only your batch's classes.
+              </p>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Changing year, branch or batch clears your course selection. First-year core courses load for the selected batch.
+          </p>
 
           {error && (
             <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">

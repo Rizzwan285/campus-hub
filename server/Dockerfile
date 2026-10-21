@@ -29,6 +29,8 @@ COPY server/scripts/ ./scripts/
 
 # Seed/verify resolve this as ../../src/data from /app/server/scripts.
 COPY src/data/ /app/src/data/
+# Profile validation is shared with the frontend.
+COPY src/lib/academicProfile.ts /app/src/lib/academicProfile.ts
 
 # tsx is a production dependency: TypeScript runs directly, there is no build step.
 USER appuser

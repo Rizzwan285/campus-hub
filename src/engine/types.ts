@@ -22,10 +22,13 @@ export interface CourseOffering {
   courseCode: string;
   courseName: string;
   credits: string;
-  category: 'core' | 'elective' | 'project' | 'backlog' | 'common';
+  /** Workbook categories are free text, including 'institute core', 'sme', and 'hse'. */
+  category: string;
   meetings: TimetableMeeting[];
   /** Only the API sends this, so it also marks data that came from the server. */
   offeringId?: string;
+  /** Approved rooms take precedence over legacy first-year venue corrections. */
+  source?: 'seed' | 'admin';
   /** Set by the store when the student's own timings replace the official ones. */
   isPersonal?: boolean;
 }
