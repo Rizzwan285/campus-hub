@@ -7,6 +7,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import Timetable from "./pages/Timetable";
 import Campus from "./pages/Campus";
+import Gym from "./pages/Gym";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/timetable" element={<Timetable />} />
             <Route path="/campus" element={<Campus />} />
+            <Route path="/gym" element={<Gym />} />
           </Route>
           {/* Legacy & direct shortcut redirects */}
           <Route path="/food" element={<Navigate to="/" replace />} />
