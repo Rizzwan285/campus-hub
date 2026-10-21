@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { getDayType, type DayType } from '@/utils/dateUtils';
+import { getDayType } from '@/utils/dateUtils';
 import { resolveDepartures, getUpcomingDepartures, formatTimeUntil, type Departure } from '@/utils/dateUtils';
 import { useBusSchedules } from '@/hooks/useApiData';
 import { busEffectiveFrom } from '@/data/busData';
@@ -16,21 +16,13 @@ interface BusScheduleCardProps {
   displayDate: Date;
 }
 
-const scheduleOptions: { value: DayType; label: string }[] = [
-  { value: 'weekday', label: 'Working Days' },
-  { value: 'friday', label: 'Fridays' },
-  { value: 'saturday', label: 'Sat / Holidays' },
-  { value: 'sunday', label: 'Sundays' },
-];
-
 export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
   const { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } = useBusSchedules();
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
-  const [selectedView, setSelectedView] = useState<DayType | 'auto'>('auto');
-  const dayType = selectedView === 'auto' ? getDayType(displayDate) : selectedView;
+  const dayType = getDayType(displayDate);
 
-  // Manual schedule lookups show every departure, with no live countdown.
-  const isPreviewMode = displayDate.toDateString() !== currentTime.toDateString() || selectedView !== 'auto';
+  // Preview dates show every departure; today keeps the live countdown.
+  const isPreviewMode = displayDate.toDateString() !== currentTime.toDateString();
   const filterTime = isPreviewMode ? new Date(displayDate) : currentTime;
 
   const schedule = dayType === 'sunday'
@@ -224,33 +216,6 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
             {scheduleLabel} timings · from {busEffectiveFrom}
           </p>
         </div>
-      </div>
-
-      <div role="group" aria-label="Bus schedule day type" className="flex flex-wrap gap-1 p-1 mb-2 bg-muted/50 rounded-lg text-xs border border-border/40">
-        {scheduleOptions.map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            aria-pressed={dayType === value}
-            onClick={() => setSelectedView(selectedView === value ? 'auto' : value)}
-            className={`flex-1 whitespace-nowrap px-2 py-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              dayType === value
-                ? 'bg-background text-foreground font-semibold shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <div className="text-xs text-muted-foreground mb-4">
-        {selectedView === 'auto' ? (
-          <p>Following the selected date.</p>
-        ) : (
-          <button type="button" onClick={() => setSelectedView('auto')} className="underline underline-offset-4 hover:text-foreground">
-            Follow selected date
-          </button>
-        )}
       </div>
 
       <Tabs defaultValue="nila-sahyadri" className="w-full">
