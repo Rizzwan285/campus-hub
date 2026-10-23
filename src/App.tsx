@@ -7,6 +7,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import Timetable from "./pages/Timetable";
 import Campus from "./pages/Campus";
+import Leave from "./pages/Leave";
 import Gym from "./pages/Gym";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/timetable" element={<Timetable />} />
             <Route path="/campus" element={<Campus />} />
+            <Route path="/leave" element={<Leave />} />
             <Route path="/gym" element={<Gym />} />
           </Route>
           {/* Legacy & direct shortcut redirects */}
@@ -33,6 +35,7 @@ const App = () => (
           <Route path="/buggy" element={<Navigate to="/" replace />} />
           <Route path="/buggy-timings" element={<Navigate to="/" replace />} />
           <Route path="/bus-timings" element={<Navigate to="/" replace />} />
+          <Route path="/holidays" element={<Navigate to="/leave" replace />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
