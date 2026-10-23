@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Calendar, Info, Dumbbell } from 'lucide-react';
+import { Home, Calendar, Info, Dumbbell, CalendarOff } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
@@ -114,6 +114,7 @@ export function AppLayout() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/timetable', label: 'Timetable', icon: Calendar },
     { path: '/campus', label: 'Campus', icon: Info },
+    { path: '/leave', label: 'Leave', icon: CalendarOff },
     { path: '/gym', label: 'Gym', icon: Dumbbell },
   ];
 
@@ -168,7 +169,9 @@ export function AppLayout() {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center p-2 min-w-[72px] rounded-xl transition-all duration-200 ${
+              // Shares the row evenly: a fixed min width overflowed a 360px
+              // phone once the fifth tab arrived.
+              `flex flex-col items-center justify-center p-2 flex-1 min-w-0 rounded-xl transition-all duration-200 ${
                 isActive 
                   ? 'text-primary scale-105' 
                   : 'text-muted-foreground hover:text-foreground active:scale-95'

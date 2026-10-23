@@ -3,8 +3,6 @@ import { MessMenuCard } from '@/components/features/MessMenuCard';
 import { ClassTimetableCard } from '@/components/features/ClassTimetableCard';
 import { BusScheduleCard } from '@/components/features/BusScheduleCard';
 import { MessTimingsCard } from '@/components/features/MessTimingsCard';
-import { LibraryTimingsCard } from '@/components/features/LibraryTimingsCard';
-import { HolidaysCard } from '@/components/features/HolidaysCard';
 import type { AppContextType } from '@/components/layout/AppLayout';
 
 const Index = () => {
@@ -17,8 +15,6 @@ const Index = () => {
       {/* Buses and buggies share one card; the buggy list is behind a toggle. */}
       <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
       <MessTimingsCard date={displayDate} />
-      <LibraryTimingsCard currentTime={currentTime} />
-      <HolidaysCard date={displayDate} />
     </div>
   );
 };
