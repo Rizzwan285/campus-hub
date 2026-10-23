@@ -1,4 +1,5 @@
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, MessageSquarePlus } from 'lucide-react';
+import { FEEDBACK_FORM_URL } from '@/lib/feedbackForm';
 
 export function Footer() {
   return (
@@ -11,6 +12,18 @@ export function Footer() {
         </p>
       </div>
       
+      <div className="flex justify-center">
+        <a
+          href={FEEDBACK_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-card text-sm font-medium hover:bg-muted/50 transition-colors"
+        >
+          <MessageSquarePlus className="h-4 w-4 text-primary" />
+          Share feedback or report a problem
+        </a>
+      </div>
+
       <div className="flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground pb-8">
         <p className="font-medium text-foreground/80">
           Created by Muhamed Rizwan (142301026)
