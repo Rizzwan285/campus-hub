@@ -2,8 +2,9 @@ import { useOutletContext } from 'react-router-dom';
 import { MessMenuCard } from '@/components/features/MessMenuCard';
 import { ClassTimetableCard } from '@/components/features/ClassTimetableCard';
 import { BusScheduleCard } from '@/components/features/BusScheduleCard';
-import { BuggyScheduleCard } from '@/components/features/BuggyScheduleCard';
 import { MessTimingsCard } from '@/components/features/MessTimingsCard';
+import { LibraryTimingsCard } from '@/components/features/LibraryTimingsCard';
+import { HolidaysCard } from '@/components/features/HolidaysCard';
 import type { AppContextType } from '@/components/layout/AppLayout';
 
 const Index = () => {
@@ -13,9 +14,11 @@ const Index = () => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <ClassTimetableCard date={displayDate} />
       <MessMenuCard date={displayDate} />
+      {/* Buses and buggies share one card; the buggy list is behind a toggle. */}
       <BusScheduleCard currentTime={currentTime} displayDate={displayDate} />
-      <BuggyScheduleCard currentTime={currentTime} displayDate={displayDate} />
       <MessTimingsCard date={displayDate} />
+      <LibraryTimingsCard currentTime={currentTime} />
+      <HolidaysCard date={displayDate} />
     </div>
   );
 };

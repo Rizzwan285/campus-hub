@@ -10,10 +10,19 @@ export interface AcademicDaysData {
   specialDays: Array<{ date: string; type: string; note: string }>;
 }
 
+/**
+ * The calendar compiled into the bundle: offline fallback for getDayType() and
+ * the starting point for anything that lists holidays (see useAcademicDays()).
+ */
+export const bundledAcademicDays: AcademicDaysData = {
+  holidays: [...holidays2025, ...holidays2026.map(({ date, name }) => ({ date, occasion: name }))],
+  specialDays: specialDays2025,
+};
+
 // getDayType must stay synchronous (it runs in render paths), so server data
 // arrives via this module-level swap — see useAcademicDaysSync().
-let activeHolidays: AcademicDaysData['holidays'] = [...holidays2025, ...holidays2026.map(({ date, name }) => ({ date, occasion: name }))];
-let activeSpecialDays: AcademicDaysData['specialDays'] = specialDays2025;
+let activeHolidays: AcademicDaysData['holidays'] = bundledAcademicDays.holidays;
+let activeSpecialDays: AcademicDaysData['specialDays'] = bundledAcademicDays.specialDays;
 
 export function setAcademicDays(data: AcademicDaysData): void {
   if (data.holidays) activeHolidays = data.holidays;

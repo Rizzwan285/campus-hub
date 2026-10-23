@@ -24,7 +24,7 @@ import {
   sundayBus as staticSundayBus,
   type BusSchedule,
 } from '@/data/busData';
-import { setAcademicDays, type AcademicDaysData } from '@/utils/dateUtils';
+import { bundledAcademicDays, setAcademicDays, type AcademicDaysData } from '@/utils/dateUtils';
 
 const QUERY_OPTIONS = {
   staleTime: 5 * 60 * 1000,
@@ -174,6 +174,29 @@ export function useBusSchedules(): BusSchedules {
  * Keeps the synchronous getDayType() helper fed with server-side holiday data.
  * Mount once near the app root.
  */
+/**
+ * The academic calendar for components that render it (holiday lists), rather
+ * than for getDayType()'s module-level swap.
+ *
+ * Shares `useAcademicDaysSync`'s query key, so mounting this costs no extra
+ * request. Falls back per field: an API that answers with an empty holiday list
+ * must not blank a card that the bundled calendar can still fill.
+ */
+export function useAcademicDays(): AcademicDaysData {
+  const { data } = useQuery({
+    queryKey: ['academic-days'],
+    queryFn: () => fetchJson<AcademicDaysData>('/api/academic-days', { fresh: true }),
+    enabled: isApiConfigured(),
+    placeholderData: bundledAcademicDays,
+    ...QUERY_OPTIONS,
+  });
+
+  return {
+    holidays: data?.holidays?.length ? data.holidays : bundledAcademicDays.holidays,
+    specialDays: data?.specialDays?.length ? data.specialDays : bundledAcademicDays.specialDays,
+  };
+}
+
 export function useAcademicDaysSync(): void {
   const { data } = useQuery({
     queryKey: ['academic-days'],

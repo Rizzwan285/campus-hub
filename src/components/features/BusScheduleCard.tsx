@@ -1,24 +1,37 @@
 import { useState } from 'react';
-import { Bus, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
-import { resolveDepartures, getUpcomingDepartures, formatTimeUntil, type Departure } from '@/utils/dateUtils';
+import { resolveDepartures, formatTimeUntil } from '@/utils/dateUtils';
+import { mergeRides, toRides, type Ride } from '@/lib/transitRides';
 import { useBusSchedules } from '@/hooks/useApiData';
 import { busEffectiveFrom } from '@/data/busData';
+import {
+  workingDaysBuggy,
+  saturdayHolidayBuggy,
+  sundayBuggy,
+  buggyEffectiveFrom,
+  BUGGY_DISCLAIMER,
+} from '@/data/buggyData';
 
 interface BusScheduleCardProps {
   currentTime: Date;
   displayDate: Date;
 }
 
+type Direction = 'nilaToSahyadri' | 'sahyadriToNila';
+
 export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
   const { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } = useBusSchedules();
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
+  const [showBuggies, setShowBuggies] = useState(false);
   const dayType = getDayType(displayDate);
 
   // Preview dates show every departure; today keeps the live countdown.
@@ -33,18 +46,36 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         ? fridayBus
         : workingDaysBus;
 
-  // Preview shows the whole day; otherwise only what is still to come. Either
-  // way the departures keep their resolved instants, so the countdown measures
-  // to the same moment the list is showing.
-  const upcomingNilaToSahyadri = isPreviewMode
-    ? resolveDepartures(schedule.nilaToSahyadri, filterTime)
-    : getUpcomingDepartures(schedule.nilaToSahyadri, filterTime);
-  const upcomingSahyadriToNila = isPreviewMode
-    ? resolveDepartures(schedule.sahyadriToNila, filterTime)
-    : getUpcomingDepartures(schedule.sahyadriToNila, filterTime);
+  // The buggy circular has no separate Friday sheet — Mon–Fri share one
+  // schedule — and strictly no Sunday service. Saturdays and institute
+  // holidays use the holiday sheet; Sundays must never fall back to it.
+  const buggySchedule =
+    dayType === 'sunday'
+      ? sundayBuggy
+      : dayType === 'saturday'
+        ? saturdayHolidayBuggy
+        : workingDaysBuggy;
 
-  const nextNilaToSahyadri = upcomingNilaToSahyadri[0] ?? null;
-  const nextSahyadriToNila = upcomingSahyadriToNila[0] ?? null;
+  const noBuggiesToday = dayType === 'sunday';
+
+  /**
+   * Both schedules for one direction, resolved to real instants and tagged with
+   * their position in their own list.
+   *
+   * The whole day is resolved first and filtered afterwards: `resolveDepartures`
+   * infers am/pm by walking the list, so handing it a tail would reinterpret
+   * every time in it.
+   */
+  const ridesFor = (direction: Direction) => {
+    const busRides = toRides(resolveDepartures(schedule[direction], filterTime), 'bus');
+    const buggyRides = toRides(resolveDepartures(buggySchedule[direction], filterTime), 'buggy');
+    const stillToCome = (ride: Ride) => isPreviewMode || ride.at > filterTime;
+
+    return {
+      bus: busRides.filter(stillToCome),
+      buggy: buggyRides.filter(stillToCome),
+    };
+  };
 
   const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : dayType === 'friday' ? 'Friday' : 'Working Days (Mon–Thu)';
 
@@ -60,89 +91,132 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
    * the 8:30 PM bus too. Falls back to the string list when the API predates
    * `multipleBusPositions`.
    */
-  const isMultipleBus = (
-    time: string,
-    index: number,
-    direction: 'nilaToSahyadri' | 'sahyadriToNila',
-  ): boolean => {
+  const isMultipleBus = (time: string, index: number, direction: Direction): boolean => {
     const cleanTime = time.replace(/\*$/, '');
     const positions = schedule.multipleBusPositions?.[direction];
     if (positions) return positions.includes(index);
     return schedule.multipleBusTimings?.[direction]?.includes(cleanTime) || false;
   };
 
-  const BusTimesList = ({ times, nextBus, direction }: { times: Departure[]; nextBus: Departure | null; direction: 'nilaToSahyadri' | 'sahyadriToNila' }) => {
-    // `times` is the tail of the day still to come, so its first entry sits
-    // this far into the full list — only a prefix is ever dropped.
-    const offset = schedule[direction].length - times.length;
+  const NextRideHero = ({ ride, direction }: { ride: Ride; direction: Direction }) => {
+    const isBuggy = ride.mode === 'buggy';
+
+    return (
+      <div
+        className={`p-4 rounded-lg border-2 ${
+          isBuggy
+            ? 'bg-emerald-500/10 border-emerald-500/40'
+            : 'bg-primary/10 border-primary'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1.5">
+              {isBuggy ? <CarFront className="h-3.5 w-3.5 text-emerald-500" /> : <Bus className="h-3.5 w-3.5 text-primary" />}
+              {isBuggy ? 'Next Buggy' : 'Next Bus'}
+            </p>
+            <div className="flex items-center gap-2">
+              <p className={`text-2xl font-bold ${isBuggy ? 'text-emerald-600 dark:text-emerald-400' : 'text-primary'}`}>
+                {ride.time}
+              </p>
+              {/* The hero hid this, so a doubled next bus looked ordinary. */}
+              {!isBuggy && isMultipleBus(ride.time, ride.index, direction) && (
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+                  x2
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
+            <p className={`text-xl font-semibold ${isBuggy ? 'text-emerald-600 dark:text-emerald-400' : 'text-primary'}`}>
+              {formatTimeUntil(ride.at, currentTime)}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const DepartureList = ({ direction }: { direction: Direction }) => {
+    const { bus, buggy } = ridesFor(direction);
     const hasNilaParkingBus = schedule[direction].some((t) => t.includes('*'));
+
+    // Live view leads with the next of each kind, so those two are lifted out
+    // of the grid below by identity rather than by position.
+    const heroes = isPreviewMode
+      ? []
+      : [bus[0], showBuggies ? buggy[0] : undefined].filter((ride): ride is Ride => Boolean(ride));
+
+    const listed = showBuggies ? mergeRides(bus, buggy) : bus;
+    const grid = listed.filter((ride) => !heroes.includes(ride));
+
+    if (listed.length === 0) {
+      return (
+        <p className="text-center text-muted-foreground py-8">
+          No more {showBuggies ? 'buses or buggies' : 'buses'} today. Check another date or see full schedule.
+        </p>
+      );
+    }
 
     return (
       <div className="space-y-3">
-        {times.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            No more buses today. Check another date or see full schedule.
+        {heroes.map((ride) => (
+          <NextRideHero key={ride.mode} ride={ride} direction={direction} />
+        ))}
+
+        {isPreviewMode && (
+          <p className="text-sm text-center text-muted-foreground mb-2">
+            All scheduled {showBuggies ? 'buses and buggies' : 'buses'} for this day
           </p>
-        ) : (
-          <>
-            {nextBus && !isPreviewMode && (
-              <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Next Bus</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-2xl font-bold text-primary">{nextBus.time}</p>
-                      {/* The hero hid this, so a doubled next bus looked ordinary. */}
-                      {isMultipleBus(nextBus.time, offset, direction) && (
-                        <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-                          x2
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
-                    <p className="text-xl font-semibold text-primary">
-                      {formatTimeUntil(nextBus.at, currentTime)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+        )}
 
-            {isPreviewMode && (
-              <p className="text-sm text-center text-muted-foreground mb-2">
-                All scheduled buses for this day
+        {showBuggies && noBuggiesToday && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs">
+            <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+            <p className="text-muted-foreground">
+              <span className="font-semibold text-foreground">No buggy service on Sundays.</span>{' '}
+              Buggies run on working days and on Saturdays / institute holidays only.
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
+          {grid.map((ride) => (
+            <div
+              key={`${ride.mode}-${ride.index}`}
+              className={`p-3 text-center rounded-lg transition-colors relative ${
+                ride.mode === 'buggy'
+                  ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
+                  : 'bg-muted hover:bg-muted/80'
+              }`}
+            >
+              {ride.mode === 'buggy' ? (
+                <CarFront className="h-3 w-3 mx-auto mb-1 text-emerald-500" />
+              ) : (
+                <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
+              )}
+              <p
+                className={`text-xs sm:text-sm font-medium ${
+                  ride.mode === 'buggy' ? 'text-emerald-700 dark:text-emerald-300' : ''
+                }`}
+              >
+                {ride.time}
               </p>
-            )}
-
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
-              {times.slice(!isPreviewMode && nextBus ? 1 : 0).map((departure, idx) => {
-                const fullIndex = offset + idx + (!isPreviewMode && nextBus ? 1 : 0);
-                return (
-                <div
-                  key={idx}
-                  className="p-3 text-center rounded-lg bg-muted hover:bg-muted/80 transition-colors relative"
-                >
-                  <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
-                  <p className="text-sm font-medium">{departure.time}</p>
-                  {isMultipleBus(departure.time, fullIndex, direction) && (
-                    <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
-                      x2
-                    </Badge>
-                  )}
-                </div>
-                );
-              })}
+              {ride.mode === 'bus' && isMultipleBus(ride.time, ride.index, direction) && (
+                <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
+                  x2
+                </Badge>
+              )}
             </div>
+          ))}
+        </div>
 
-            {hasNilaParkingBus && (
-              <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5 font-medium">
-                <span className="text-primary font-bold">*</span>
-                <span>This bus goes only up to Nila Parking.</span>
-              </p>
-            )}
-          </>
+        {hasNilaParkingBus && (
+          <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5 font-medium">
+            <span className="text-primary font-bold">*</span>
+            <span>This bus goes only up to Nila Parking.</span>
+          </p>
         )}
       </div>
     );
@@ -206,17 +280,46 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
   return (
     <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-primary/8 rounded-xl">
-          <Bus className="h-6 w-6 text-primary" />
+      {/* Stacked on a phone: side by side, the title wrapped to three lines. */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/8 rounded-xl shrink-0">
+            <Bus className="h-6 w-6 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold">Bus &amp; Buggy Schedule</h2>
+            <p className="text-sm text-muted-foreground">
+              {scheduleLabel} timings · from {busEffectiveFrom}
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-semibold">Bus Schedule</h2>
-          <p className="text-sm text-muted-foreground">
-            {scheduleLabel} timings · from {busEffectiveFrom}
-          </p>
+
+        {/* Buggies are off by default: most people are here for the bus. */}
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+          <Label htmlFor="show-buggies" className="text-sm text-muted-foreground cursor-pointer">
+            Show buggies
+          </Label>
+          <Switch
+            id="show-buggies"
+            checked={showBuggies}
+            onCheckedChange={setShowBuggies}
+            className="data-[state=checked]:bg-emerald-500"
+          />
         </div>
       </div>
+
+      {showBuggies && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/50" />
+            Bus
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+            Buggy (electric shuttle)
+          </span>
+        </div>
+      )}
 
       <Tabs defaultValue="nila-sahyadri" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -225,11 +328,11 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </TabsList>
 
         <TabsContent value="nila-sahyadri">
-          <BusTimesList times={upcomingNilaToSahyadri} nextBus={nextNilaToSahyadri} direction="nilaToSahyadri" />
+          <DepartureList direction="nilaToSahyadri" />
         </TabsContent>
 
         <TabsContent value="sahyadri-nila">
-          <BusTimesList times={upcomingSahyadriToNila} nextBus={nextSahyadriToNila} direction="sahyadriToNila" />
+          <DepartureList direction="sahyadriToNila" />
         </TabsContent>
       </Tabs>
 
@@ -317,7 +420,16 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           </Collapsible>
         )
       )}
+
+      {showBuggies && (
+        <div className="mt-6 pt-3 border-t border-border/40 flex items-start gap-2 text-xs text-muted-foreground">
+          <Info className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+          <p>
+            <span className="font-semibold text-foreground">Buggy disclaimer: </span>
+            {BUGGY_DISCLAIMER} Buggy timings are effective from {buggyEffectiveFrom}.
+          </p>
+        </div>
+      )}
     </Card>
   );
 }
-
