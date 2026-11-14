@@ -125,7 +125,7 @@ export function WeeklyGrid({ events, collisions = [], onEventClick }: WeeklyGrid
                         onEventClick(event);
                       }
                     } : undefined}
-                    className={`relative flex flex-col rounded-md border shadow-sm overflow-hidden bg-background ${onEventClick ? 'cursor-pointer active:scale-[0.99] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-ring' : ''} ${hasCollision ? 'border-destructive ring-1 ring-destructive' : 'border-primary/15'}`}
+                    className={`relative flex flex-col rounded-md border shadow-sm overflow-hidden bg-background ${onEventClick ? 'cursor-pointer active:scale-[0.99] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-ring' : ''} ${hasCollision ? 'border-destructive ring-1 ring-destructive' : 'border-primary/15 dark:border-primary/30'}`}
                   >
                     {/* Tint overlay */}
                     <div className={`absolute inset-0 pointer-events-none ${baseColor.split(' ').filter(c => c.startsWith('bg-')).join(' ')}`} />

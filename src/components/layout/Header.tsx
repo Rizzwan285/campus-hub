@@ -16,7 +16,8 @@ interface HeaderProps {
 
 export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpenSettings }: HeaderProps) {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
-  const [isDark, setIsDark] = useState(false);
+  // index.html has already applied the saved (or default dark) theme.
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const logout = useUserStore((state) => state.logout);
 
   useEffect(() => {
@@ -26,14 +27,15 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkMode);
-  }, []);
-
   const toggleDarkMode = () => {
-    document.documentElement.classList.toggle('dark');
-    setIsDark(!isDark);
+    const next = !isDark;
+    document.documentElement.classList.toggle('dark', next);
+    try {
+      localStorage.setItem('mess-bus-theme', next ? 'dark' : 'light');
+    } catch {
+      // Storage unavailable (private mode): the choice lasts for this visit.
+    }
+    setIsDark(next);
   };
 
   const displayDate = selectedDate || currentTime;
@@ -82,7 +84,8 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
             variant="outline"
             size="icon"
             onClick={toggleDarkMode}
-            className="rounded-xl h-9 w-9 border-border/60 hover:bg-muted"
+            className="rounded-xl h-9 w-9 border-border/60 hover:bg-muted hover:text-foreground"
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
@@ -91,7 +94,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
             <Button
               variant="outline"
               onClick={handleToday}
-              className="rounded-xl h-9 border-border/60 hover:bg-muted text-xs"
+              className="rounded-xl h-9 border-border/60 hover:bg-muted hover:text-foreground text-xs"
             >
               <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
               Today
@@ -101,7 +104,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
           <Button
             variant="outline"
             onClick={handleNextDay}
-            className="rounded-xl h-9 border-border/60 hover:bg-muted text-xs"
+            className="rounded-xl h-9 border-border/60 hover:bg-muted hover:text-foreground text-xs"
           >
             Next Day
             <ChevronRight className="h-3.5 w-3.5 ml-1" />
@@ -112,7 +115,7 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
               variant="outline"
               size="icon"
               onClick={onOpenSettings}
-              className="rounded-xl h-9 w-9 border-border/60 hover:bg-muted"
+              className="rounded-xl h-9 w-9 border-border/60 hover:bg-muted hover:text-foreground"
               title="Account & settings"
             >
               <Settings className="h-4 w-4" />

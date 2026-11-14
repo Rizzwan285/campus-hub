@@ -61,6 +61,13 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      // The UI uses 4% and 8% tints (bg-primary/8 on every card's icon tile and
+      // on timetable events). Neither step is in Tailwind's default scale, so
+      // those classes compiled to nothing until they were added here.
+      opacity: {
+        4: "0.04",
+        8: "0.08",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

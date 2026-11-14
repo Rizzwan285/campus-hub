@@ -4,6 +4,7 @@ import * as bus from '../repositories/bus.repository';
 import * as canteen from '../repositories/canteen.repository';
 import * as calendar from '../repositories/calendar.repository';
 import * as timetable from '../repositories/timetable.repository';
+import * as specials from '../repositories/specialServices.repository';
 
 export const contentRouter = Router();
 
@@ -63,6 +64,22 @@ contentRouter.get('/bus/:dayType/upcoming', async (req, res, next) => {
 
     const limit = Math.min(parseInt(String(req.query.limit ?? '5'), 10) || 5, 50);
     res.json(await bus.getUpcomingDepartures(req.params.dayType, direction, afterMinutes, limit));
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * Temporary bus services (exam shuttles and the like).
+ *
+ * Errors are passed on untouched, including the undefined-table one from a
+ * database migration 011 has not reached yet. Answering `[]` there would tell
+ * the client "no services", and the client trusts an empty list over its
+ * bundled copy; a failure makes it fall back to that copy instead.
+ */
+contentRouter.get('/special-services', async (_req, res, next) => {
+  try {
+    res.json(await specials.listSpecialServices());
   } catch (error) {
     next(error);
   }

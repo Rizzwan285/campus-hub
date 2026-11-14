@@ -14,6 +14,7 @@ import { countPendingSuggestions } from '@/services/courseChanges';
 import { useMessData } from '@/hooks/useApiData';
 import { getWeekCycle } from '@/utils/dateUtils';
 import { CourseChangeReview } from '@/components/features/CourseChangeReview';
+import { SpecialServicesEditor } from '@/components/features/SpecialServicesEditor';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
@@ -1133,6 +1134,7 @@ export default function Admin() {
         <TabsContent value="bus" className="space-y-4">
           <Card className="p-5"><BusScheduleEditor /></Card>
           <Card className="p-5"><BusRouteEditor /></Card>
+          <Card className="p-5"><SpecialServicesEditor /></Card>
         </TabsContent>
         <TabsContent value="canteen"><Card className="p-5"><CanteenPriceEditor /></Card></TabsContent>
         <TabsContent value="calendar"><Card className="p-5"><AcademicDaysEditor /></Card></TabsContent>

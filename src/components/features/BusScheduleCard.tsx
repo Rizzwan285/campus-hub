@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info } from 'lucide-react';
+import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info, Star } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,8 +10,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
 import { resolveDepartures, formatTimeUntil } from '@/utils/dateUtils';
-import { mergeRides, toRides, type Ride } from '@/lib/transitRides';
-import { useBusSchedules } from '@/hooks/useApiData';
+import { mergeRides, specialRides, toRides, type Ride } from '@/lib/transitRides';
+import {
+  formatServiceExceptions,
+  formatServiceWindow,
+  servicesRunningOn,
+} from '@/lib/specialServices';
+import { useBusSchedules, useSpecialServices } from '@/hooks/useApiData';
 import { busEffectiveFrom } from '@/data/busData';
 import {
   workingDaysBuggy,
@@ -30,6 +35,7 @@ type Direction = 'nilaToSahyadri' | 'sahyadriToNila';
 
 export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
   const { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } = useBusSchedules();
+  const specialServices = useSpecialServices();
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
   const [showBuggies, setShowBuggies] = useState(false);
   const dayType = getDayType(displayDate);
@@ -58,9 +64,14 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
   const noBuggiesToday = dayType === 'sunday';
 
+  // Exam shuttles and the like: extra buses for a fixed run of dates. They
+  // follow the displayed date, so a skipped day (a Sunday, a holiday) or any
+  // day past the end of the run simply has none.
+  const activeSpecials = servicesRunningOn(specialServices, displayDate);
+
   /**
-   * Both schedules for one direction, resolved to real instants and tagged with
-   * their position in their own list.
+   * Every schedule for one direction, resolved to real instants and tagged with
+   * its position in its own list.
    *
    * The whole day is resolved first and filtered afterwards: `resolveDepartures`
    * infers am/pm by walking the list, so handing it a tail would reinterpret
@@ -73,6 +84,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
     return {
       bus: busRides.filter(stillToCome),
+      special: specialRides(activeSpecials, direction, filterTime).filter(stillToCome),
       buggy: buggyRides.filter(stillToCome),
     };
   };
@@ -100,27 +112,42 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
   const NextRideHero = ({ ride, direction }: { ride: Ride; direction: Direction }) => {
     const isBuggy = ride.mode === 'buggy';
+    const isSpecial = ride.mode === 'special';
+    const accent = isBuggy
+      ? 'text-emerald-600 dark:text-emerald-400'
+      : isSpecial
+        ? 'text-violet-600 dark:text-violet-400'
+        : 'text-primary';
 
     return (
       <div
         className={`p-4 rounded-lg border-2 ${
           isBuggy
             ? 'bg-emerald-500/10 border-emerald-500/40'
-            : 'bg-primary/10 border-primary'
+            : isSpecial
+              ? 'bg-violet-500/10 border-violet-500/50'
+              : 'bg-primary/10 border-primary'
         }`}
       >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1.5">
-              {isBuggy ? <CarFront className="h-3.5 w-3.5 text-emerald-500" /> : <Bus className="h-3.5 w-3.5 text-primary" />}
-              {isBuggy ? 'Next Buggy' : 'Next Bus'}
+              {isBuggy ? (
+                <CarFront className="h-3.5 w-3.5 text-emerald-500" />
+              ) : isSpecial ? (
+                <Star className="h-3.5 w-3.5 text-violet-500" />
+              ) : (
+                <Bus className="h-3.5 w-3.5 text-primary" />
+              )}
+              {/* The next bus may be an extra one; say which, so it is trusted. */}
+              {isBuggy ? 'Next Buggy' : isSpecial ? `Next Bus · ${ride.label ?? 'Special service'}` : 'Next Bus'}
             </p>
             <div className="flex items-center gap-2">
-              <p className={`text-2xl font-bold ${isBuggy ? 'text-emerald-600 dark:text-emerald-400' : 'text-primary'}`}>
+              <p className={`text-2xl font-bold ${accent}`}>
                 {ride.time}
               </p>
               {/* The hero hid this, so a doubled next bus looked ordinary. */}
-              {!isBuggy && isMultipleBus(ride.time, ride.index, direction) && (
+              {ride.mode === 'bus' && isMultipleBus(ride.time, ride.index, direction) && (
                 <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
                   x2
                 </Badge>
@@ -129,7 +156,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground mb-1">Leaves in</p>
-            <p className={`text-xl font-semibold ${isBuggy ? 'text-emerald-600 dark:text-emerald-400' : 'text-primary'}`}>
+            <p className={`text-xl font-semibold ${accent}`}>
               {formatTimeUntil(ride.at, currentTime)}
             </p>
           </div>
@@ -139,16 +166,20 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
   };
 
   const DepartureList = ({ direction }: { direction: Direction }) => {
-    const { bus, buggy } = ridesFor(direction);
+    const { bus, special, buggy } = ridesFor(direction);
     const hasNilaParkingBus = schedule[direction].some((t) => t.includes('*'));
+
+    // An extra bus is still a bus: it competes with the regular ones for
+    // "next bus" instead of getting a hero of its own.
+    const buses = mergeRides(bus, special);
 
     // Live view leads with the next of each kind, so those two are lifted out
     // of the grid below by identity rather than by position.
     const heroes = isPreviewMode
       ? []
-      : [bus[0], showBuggies ? buggy[0] : undefined].filter((ride): ride is Ride => Boolean(ride));
+      : [buses[0], showBuggies ? buggy[0] : undefined].filter((ride): ride is Ride => Boolean(ride));
 
-    const listed = showBuggies ? mergeRides(bus, buggy) : bus;
+    const listed = showBuggies ? mergeRides(bus, special, buggy) : buses;
     const grid = listed.filter((ride) => !heroes.includes(ride));
 
     if (listed.length === 0) {
@@ -162,7 +193,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     return (
       <div className="space-y-3">
         {heroes.map((ride) => (
-          <NextRideHero key={ride.mode} ride={ride} direction={direction} />
+          <NextRideHero key={ride.mode === 'buggy' ? 'buggy' : 'bus'} ride={ride} direction={direction} />
         ))}
 
         {isPreviewMode && (
@@ -185,20 +216,29 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           {grid.map((ride) => (
             <div
               key={`${ride.mode}-${ride.index}`}
+              title={ride.mode === 'special' ? ride.label : undefined}
               className={`p-3 text-center rounded-lg transition-colors relative ${
                 ride.mode === 'buggy'
                   ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
-                  : 'bg-muted hover:bg-muted/80'
+                  : ride.mode === 'special'
+                    ? 'bg-violet-500/10 border border-violet-500/40 hover:bg-violet-500/20'
+                    : 'bg-muted hover:bg-muted/80'
               }`}
             >
               {ride.mode === 'buggy' ? (
                 <CarFront className="h-3 w-3 mx-auto mb-1 text-emerald-500" />
+              ) : ride.mode === 'special' ? (
+                <Star className="h-3 w-3 mx-auto mb-1 text-violet-500" />
               ) : (
                 <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
               )}
               <p
                 className={`text-xs sm:text-sm font-medium ${
-                  ride.mode === 'buggy' ? 'text-emerald-700 dark:text-emerald-300' : ''
+                  ride.mode === 'buggy'
+                    ? 'text-emerald-700 dark:text-emerald-300'
+                    : ride.mode === 'special'
+                      ? 'text-violet-700 dark:text-violet-300'
+                      : ''
                 }`}
               >
                 {ride.time}
@@ -307,6 +347,25 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           />
         </div>
       </div>
+
+      {activeSpecials.map((service) => {
+        const exceptions = formatServiceExceptions(service);
+        return (
+          <div
+            key={service.id}
+            className="flex items-start gap-2 p-3 mb-4 rounded-lg bg-violet-500/10 border border-violet-500/30 text-xs"
+          >
+            <Star className="h-4 w-4 text-violet-500 shrink-0 mt-0.5" />
+            <p className="text-muted-foreground">
+              <span className="font-semibold text-foreground">{service.title}</span>
+              {service.note ? ` · ${service.note}` : ''}
+              <br />
+              Extra buses on this day are highlighted below. Runs {formatServiceWindow(service)}
+              {exceptions ? `, except ${exceptions}` : ''}.
+            </p>
+          </div>
+        );
+      })}
 
       {showBuggies && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4 text-xs text-muted-foreground">

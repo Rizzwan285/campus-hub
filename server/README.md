@@ -63,6 +63,7 @@ Read (public):
 | GET | `/api/bus` | All four day-type schedules |
 | GET | `/api/bus/:dayType` | One schedule (`weekday`, `friday`, `saturday_holiday`, `sunday`) |
 | GET | `/api/bus/:dayType/upcoming` | Next departures; `?direction=`, `?after=HH:MM`, `?limit=` |
+| GET | `/api/special-services` | Temporary bus services (exam shuttles), each with its date window and AM/PM departures |
 | GET | `/api/canteen` | Canteen sections with their items |
 | GET | `/api/academic-days` | Holidays and instructional days |
 | GET | `/api/holidays` | Holidays in the timetable engine's shape |
@@ -78,6 +79,10 @@ Write (require `X-Admin-Key`):
 |---|---|
 | PUT | `/api/admin/mess/:messSlug/:weekCycle/:day/:meal` |
 | PUT | `/api/admin/mess-timings/:dayType/:meal` |
+| GET | `/api/admin/special-services` — the uncached list the editor reads |
+| POST | `/api/admin/special-services` — `title`, `startDate`, `endDate`, optional `note`, `skipSundays`, `skipDates`, `nilaToSahyadri`, `sahyadriToNila` |
+| PUT | `/api/admin/special-services/:id` — same body, replaces the service |
+| DELETE | `/api/admin/special-services/:id` |
 | PATCH | `/api/admin/canteen/items/:id` |
 | PUT | `/api/admin/academic-days/:date` |
 | DELETE | `/api/admin/academic-days/:date` |
