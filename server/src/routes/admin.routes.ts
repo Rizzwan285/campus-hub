@@ -6,6 +6,7 @@ import * as mess from '../repositories/mess.repository';
 import * as canteen from '../repositories/canteen.repository';
 import * as calendar from '../repositories/calendar.repository';
 import * as bus from '../repositories/bus.repository';
+import * as specials from '../repositories/specialServices.repository';
 import * as admin from '../repositories/admin.repository';
 import * as profiles from '../repositories/profile.repository';
 import * as changes from '../repositories/courseChanges.repository';
@@ -255,6 +256,140 @@ adminRouter.put('/bus/:dayType/routes/:category', async (req, res, next) => {
 
     await audit(req, 'bus.routes.update', `${dayType}/${category}`, null, { routes }, '/api/bus');
     res.json({ dayType, category, routes });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ------------------------------------------------- bus special services
+
+const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** A real calendar date, not just the right shape ("2026-02-30" is neither). */
+const calendarDate = z
+  .string()
+  .trim()
+  .regex(DATE_KEY, 'Expected YYYY-MM-DD.')
+  .refine((value) => {
+    const parsed = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+  }, 'Not a real date.');
+
+// Unlike the regular timetable these carry AM/PM, so "9:05am" and "9:05 AM"
+// are accepted and stored the one way the card prints them.
+const SPECIAL_TIME = /^(1[0-2]|[1-9]):([0-5]\d)\s*(AM|PM)$/i;
+
+const specialTime = z
+  .string()
+  .trim()
+  .regex(SPECIAL_TIME, 'Use H:MM AM or H:MM PM, e.g. 9:05 AM.')
+  .transform((value) => {
+    const [, hours, minutes, meridiem] = value.match(SPECIAL_TIME)!;
+    return `${hours}:${minutes} ${meridiem.toUpperCase()}`;
+  });
+
+const specialServiceBody = z
+  .object({
+    title: z.string().trim().min(1).max(60),
+    note: z
+      .string()
+      .trim()
+      .max(200)
+      .nullable()
+      .optional()
+      .transform((value) => value || null),
+    startDate: calendarDate,
+    endDate: calendarDate,
+    skipSundays: z.boolean().default(true),
+    skipDates: z.array(calendarDate).max(60).default([]),
+    nilaToSahyadri: z.array(specialTime).max(30).default([]),
+    sahyadriToNila: z.array(specialTime).max(30).default([]),
+  })
+  .refine((body) => body.endDate >= body.startDate, {
+    message: 'The last day cannot be before the first day.',
+    path: ['endDate'],
+  })
+  .refine((body) => body.nilaToSahyadri.length + body.sahyadriToNila.length > 0, {
+    message: 'Add at least one departure.',
+    path: ['nilaToSahyadri'],
+  });
+
+function specialServiceId(raw: string): number | null {
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+/**
+ * The uncached list for the editor. The public /api/special-services carries
+ * `max-age=60`, so reading that back straight after a save could show the
+ * browser's copy from before it.
+ */
+adminRouter.get('/special-services', async (_req, res, next) => {
+  try {
+    res.json(await specials.listSpecialServices());
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.post('/special-services', async (req, res, next) => {
+  try {
+    const body = specialServiceBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const created = await specials.createSpecialService(body.data);
+    await audit(req, 'bus.special.create', String(created.id), null, created, '/api/special-services');
+    res.status(201).json(created);
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.put('/special-services/:id', async (req, res, next) => {
+  try {
+    const id = specialServiceId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'Invalid service id.' });
+      return;
+    }
+    const body = specialServiceBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: z.prettifyError(body.error) });
+      return;
+    }
+
+    const updated = await specials.updateSpecialService(id, body.data);
+    if (!updated) {
+      res.status(404).json({ error: 'No such special service.' });
+      return;
+    }
+
+    await audit(req, 'bus.special.update', String(id), null, updated, '/api/special-services');
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.delete('/special-services/:id', async (req, res, next) => {
+  try {
+    const id = specialServiceId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'Invalid service id.' });
+      return;
+    }
+
+    const deleted = await specials.deleteSpecialService(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'No such special service.' });
+      return;
+    }
+
+    await audit(req, 'bus.special.delete', String(id), deleted, null, '/api/special-services');
+    res.status(204).end();
   } catch (error) {
     next(error);
   }

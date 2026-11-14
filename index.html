@@ -23,6 +23,16 @@
   <meta name="twitter:title" content="Campus Companion" />
   <meta name="twitter:description" content="Real-time mess menu, timings, and campus bus schedules" />
   <meta name="twitter:image" content="/og-image.png" />
+
+  <!-- Dark is the default. Runs before first paint so there is no flash of
+       the light theme; only an explicit "light" choice opts out. -->
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('mess-bus-theme'); } catch (e) { /* private mode */ }
+      if (saved !== 'light') document.documentElement.classList.add('dark');
+    })();
+  </script>
 </head>
 
 <body>

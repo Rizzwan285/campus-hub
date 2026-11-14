@@ -28,8 +28,8 @@ export function EventCard({ event, left, width, isCollision, onClick }: EventCar
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
         <div 
-          className={`absolute h-[calc(100%-8px)] my-[4px] rounded-md border overflow-hidden shadow-sm transition-all hover:z-20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer group bg-background
-            ${isCollision ? 'ring-2 ring-destructive ring-offset-1 border-destructive' : 'border-primary/15'}
+          className={`absolute h-[calc(100%-8px)] my-[4px] rounded-md border overflow-hidden shadow-sm transition-all hover:z-20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer group bg-background dark:bg-card
+            ${isCollision ? 'ring-2 ring-destructive ring-offset-1 border-destructive' : 'border-primary/15 dark:border-primary/30'}
           `}
           style={{
             left: `${left}%`,

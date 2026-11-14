@@ -24,6 +24,7 @@ import {
   sundayBus as staticSundayBus,
   type BusSchedule,
 } from '@/data/busData';
+import { bundledSpecialServices, type SpecialService } from '@/data/specialServiceData';
 import { bundledAcademicDays, setAcademicDays, type AcademicDaysData } from '@/utils/dateUtils';
 
 const QUERY_OPTIONS = {
@@ -166,6 +167,35 @@ export function useBusSchedules(): BusSchedules {
   });
 
   return data ?? STATIC_BUS_SCHEDULES;
+}
+
+// ---------------------------------------------------------------- special services
+
+/**
+ * Temporary bus services (exam shuttles and the like).
+ *
+ * Deliberately *not* merged field by field like the hooks above. When the API
+ * answers, its list is the whole truth — an empty array means the developer
+ * removed the service, and falling back to the bundled copy would bring it
+ * back. The bundled list is only for first paint and for an API that did not
+ * answer; it cannot go stale for long because every entry expires by date.
+ */
+export function useSpecialServices(): SpecialService[] {
+  const { data } = useQuery({
+    queryKey: ['special-services'],
+    queryFn: async () => {
+      const api = await fetchJson<SpecialService[]>('/api/special-services', { fresh: true });
+      if (!Array.isArray(api)) throw new Error('Unexpected /api/special-services payload');
+      return api;
+    },
+    enabled: isApiConfigured(),
+    placeholderData: bundledSpecialServices,
+    ...QUERY_OPTIONS,
+    // A service pulled or corrected mid-exams should reach an open tab.
+    refetchOnWindowFocus: true,
+  });
+
+  return data ?? bundledSpecialServices;
 }
 
 // ---------------------------------------------------------------- academic calendar

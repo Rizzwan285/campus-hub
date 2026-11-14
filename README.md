@@ -18,6 +18,7 @@ live content editing through `/admin`.
 
 - **Mess Menu** — 4-week rotating menu with daily breakfast, lunch, snacks, and dinner
 - **Bus Schedule** — Weekday, Friday, Saturday/holiday and Sunday timetables for campus, town, and Wise Park routes
+- **Exam shuttles** — Temporary extra buses appear on the bus card only on the dates they run, and drop off by themselves afterwards
 - **Mess Timings** — Separate timings for weekdays and weekends
 - **Date Preview** — Browse any date's menu and bus schedule
 - **Class Timetable** — Pick your courses; the weekly grid resolves slots, rooms and clashes
@@ -558,7 +559,8 @@ down; the two do not conflict.
 
 The point of the backend is that content no longer needs a code change and a
 redeploy. Sign in as the developer account and edit at **`/admin`**: mess menus
-and timings, bus departures and special routes, canteen prices, course slots,
+and timings, bus departures and special routes, temporary services such as an
+exam shuttle (Bus tab → **Special services**), canteen prices, course slots,
 holidays and instructional days, plus students' timing suggestions under
 **Requests**.
 
