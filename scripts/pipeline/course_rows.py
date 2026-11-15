@@ -230,9 +230,10 @@ def _blocks(sheet, header_index, columns, headers, filename):
             continue                # an empty row; it does not end the block
         elif current is not None and (index <= merged_until or not name):
             current['rows'].append(index)
-        elif has_schedule:
+        elif has_schedule and name:
             # A slot or room on a row with a name but no code, outside any
             # course's merged rows: nothing says which course it belongs to.
+            # (A row with neither code nor name is a footnote, not a course.)
             blocks.append({'code': None, 'rows': [index], 'orphan': True})
             current = None
 
