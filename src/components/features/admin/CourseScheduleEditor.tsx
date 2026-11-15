@@ -408,7 +408,7 @@ export function CourseScheduleEditor({ semesterId, courseId, slots, onClose }: E
                     onDuplicate={() => { setAssignments((list) => [...list.slice(0, index + 1), { ...assignment, batches: undefined }, ...list.slice(index + 1)]); touch(); }}
                   />
                 ))}
-                <Button variant="outline" size="sm" onClick={() => { setAssignments((list) => [...list, { slot: firstSlot, days: null, room: list[0]?.room ?? '' }]); touch(); }} className="rounded-lg">
+                <Button variant="outline" size="sm" onClick={() => { setAssignments((list) => [...list, { slot: firstSlot, days: null, room: '' }]); touch(); }} className="rounded-lg">
                   <Plus className="h-4 w-4" /> Add a slot
                 </Button>
               </div>
@@ -428,7 +428,9 @@ export function CourseScheduleEditor({ semesterId, courseId, slots, onClose }: E
 
             {/* ---------------- right: the result, and where it came from ---------------- */}
             <div className="space-y-4 min-w-0">
-              <div>
+              {/* Pinned on wide screens, so the result stays in view while the
+                  slots further down the left column are being changed. */}
+              <div className="lg:sticky lg:top-0 z-10 bg-background lg:pb-2">
                 <h3 className="text-sm font-semibold mb-2">Weekly preview · {meetings.length} class{meetings.length === 1 ? '' : 'es'}</h3>
                 <WeekPreview meetings={meetings} />
               </div>

@@ -27,6 +27,8 @@ _SCHEDULING_WORDS = re.compile(
     re.IGNORECASE,
 )
 
+_EXAM_REMARK_RE = re.compile(r'exam\s*slot\s*:?\s*[A-Za-z0-9-]+', re.IGNORECASE)
+
 # header text (lower-cased) -> field
 _COLUMN_RULES = [
     ('code', lambda h: h == 'code' or h.startswith('course code') or h == 'course no'),
@@ -104,13 +106,28 @@ def _vertical_merges(merges, column):
     return {r1: r2 for (r1, c1, r2, c2) in merges if c1 <= column <= c2 and r2 > r1}
 
 
+_EMAIL_ONLY_RE = re.compile(r'^[\w.+-]+@[\w-]+(?:\.[\w-]+)+$')
+
+
 def _split_people(*cells):
     people = []
     for cell in cells:
+        previous = None
         for piece in re.split(r'[\n;]+', str(cell or '')):
             piece = clean_text(piece).strip(',')
-            if piece and piece not in ('-', 'NA', 'N.A.') and piece not in people:
+            if not piece or piece in ('-', 'NA', 'N.A.'):
+                continue
+            # "Swapnil Hingmire" on one line and the address on the next is
+            # one person, not two.
+            if previous is not None and _EMAIL_ONLY_RE.match(piece) and '@' not in people[previous]:
+                people[previous] = f'{people[previous]} ({piece})'
+                previous = None
+                continue
+            if piece not in people:
                 people.append(piece)
+                previous = len(people) - 1
+            else:
+                previous = None
     return people
 
 
@@ -422,7 +439,8 @@ def _finish(course):
             + ', '.join(sorted({a['batches'] for a in assignments if a.get('batches')}, key=_batch_sort)) + '.'))
 
     for remark in course['remarks']:
-        if _SCHEDULING_WORDS.search(remark):
+        # "Exam slot: D" is about the exam, not about when the course meets.
+        if _SCHEDULING_WORDS.search(_EXAM_REMARK_RE.sub(' ', remark)):
             course['issues'].append(issue(
                 'remark', REVIEW, f'Remark may affect the schedule: "{remark[:300]}"', text=remark))
 
