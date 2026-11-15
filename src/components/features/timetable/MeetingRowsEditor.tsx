@@ -1,6 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { WEEK_DAYS, meetingProblem } from '@/engine/courseTimings';
+import { WEEK_DAYS, meetingProblem, weekdayOfDate } from '@/engine/courseTimings';
 import type { TimetableMeeting } from '@/engine/types';
 import { newRowKey, type MeetingRow } from './meetingRows';
 
@@ -64,16 +64,30 @@ export function MeetingRowsEditor({ rows, onChange, template }: MeetingRowsEdito
                   <option key={type.value} value={type.value}>{type.label}</option>
                 ))}
               </select>
-              <select
-                aria-label="Day"
-                value={row.day}
-                onChange={(event) => update(row.key, { day: event.target.value as TimetableMeeting['day'] })}
-                className={`${field} flex-1 min-w-0`}
-              >
-                {WEEK_DAYS.map((day) => (
-                  <option key={day} value={day}>{day}</option>
-                ))}
-              </select>
+              {row.recurrence?.type === 'once' ? (
+                <input
+                  type="date"
+                  aria-label="Date of this one-time class"
+                  value={row.date ?? ''}
+                  onChange={(event) => {
+                    const date = event.target.value;
+                    // The weekday follows from the date; it is not a second choice.
+                    update(row.key, { date, day: weekdayOfDate(date) ?? row.day });
+                  }}
+                  className={`${field} flex-1 min-w-0`}
+                />
+              ) : (
+                <select
+                  aria-label="Day"
+                  value={row.day}
+                  onChange={(event) => update(row.key, { day: event.target.value as TimetableMeeting['day'] })}
+                  className={`${field} flex-1 min-w-0`}
+                >
+                  {WEEK_DAYS.map((day) => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -111,6 +125,22 @@ export function MeetingRowsEditor({ rows, onChange, template }: MeetingRowsEdito
                 className={`${field} flex-1 min-w-[8rem]`}
               />
             </div>
+
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={row.recurrence?.type === 'once'}
+                onChange={(event) =>
+                  update(
+                    row.key,
+                    event.target.checked
+                      ? { recurrence: { type: 'once' }, date: row.date ?? '' }
+                      : { recurrence: { type: 'weekly' }, date: undefined },
+                  )
+                }
+              />
+              One time only, on a date (an extra or make-up class)
+            </label>
 
             {problem && <p className="text-xs text-red-500">{problem}</p>}
           </div>
