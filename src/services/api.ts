@@ -164,3 +164,36 @@ export async function fetchJson<T>(path: string, options: { fresh?: boolean } = 
     clearTimeout(timer);
   }
 }
+
+/**
+ * Uploads a file as the raw request body (authenticated). Used by the semester
+ * importer; `apiFetch` only speaks JSON.
+ */
+export async function apiUpload<T>(path: string, file: Blob, timeoutMs = 60_000): Promise<T> {
+  const apiUrl = getApiUrl();
+  if (!apiUrl) throw new ApiUnavailableError('VITE_API_URL is not configured');
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const headers: Record<string, string> = { Accept: 'application/json', 'Content-Type': 'application/octet-stream' };
+  const token = readStoredToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  try {
+    const response = await fetch(`${apiUrl}${path}`, { method: 'PUT', headers, body: file, signal: controller.signal });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new ApiError(
+        response.status,
+        typeof payload?.error === 'string' ? payload.error : `Upload failed (${response.status})`,
+        payload,
+      );
+    }
+    return payload as T;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiUnavailableError(`PUT ${path} failed: ${error instanceof Error ? error.message : String(error)}`);
+  } finally {
+    clearTimeout(timer);
+  }
+}

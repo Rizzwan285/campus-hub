@@ -6,6 +6,13 @@
  */
 import { apiFetch } from './api';
 import type { TimetableMeeting } from '@/engine/types';
+import type { ChangeKind, MeetingDelta } from '@/engine/courseTimings';
+
+/**
+ * `optional`   each student who has the course accepts or declines it.
+ * `compulsory` it becomes the official timetable for everyone.
+ */
+export type ApprovalMode = 'optional' | 'compulsory';
 
 export type SuggestionStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'superseded';
 
@@ -25,14 +32,54 @@ export interface CourseChangeRequest {
   decidedAt: string | null;
   decidedByRoll: string | null;
   decisionNote: string | null;
+  semesterId?: number | null;
+  approvalMode?: ApprovalMode | null;
+  changeKind?: ChangeKind | null;
+  /** The change against the official timings at approval. */
+  delta?: MeetingDelta | null;
+  corrected?: boolean;
+  proposalState?: 'open' | 'official' | 'outdated' | 'closed' | null;
+  proposalStateNote?: string | null;
 }
 
 export interface ReviewItem extends CourseChangeRequest {
   requesterName: string | null;
+  semesterName?: string | null;
   enrolledCount: number;
   personalEditCount: number;
   /** The official meetings now, i.e. what approving would replace. */
   currentMeetings: TimetableMeeting[] | null;
+  /** How students answered an optional change. */
+  responses?: { accepted: number; rejected: number; notified: number };
+  /** The email to the developer about this request: sent, pending, failed. */
+  emailStatus?: string | null;
+  emailError?: string | null;
+}
+
+export interface EmailStatus {
+  provider: string;
+  configured: boolean;
+  missing: string[];
+  outbox: Array<{
+    id: number; requestId: number | null; subject: string; status: string; attempts: number;
+    lastError: string | null; createdAt: string; sentAt: string | null;
+  }>;
+}
+
+export function getEmailStatus() {
+  return apiFetch<EmailStatus>('/api/admin/emails');
+}
+
+export function retryEmails(id?: number) {
+  return apiFetch<{ queued: number; sent: number; failed: number }>('/api/admin/emails/retry', {
+    method: 'POST', body: id ? { id } : {},
+  });
+}
+
+export function closeOptionalChange(id: number, note: string) {
+  return apiFetch<{ request: CourseChangeRequest }>(`/api/admin/course-changes/${id}/close`, {
+    method: 'POST', body: { note: note.trim() || undefined },
+  });
 }
 
 export function listMySuggestions() {
@@ -58,10 +105,20 @@ export function countPendingSuggestions() {
   return apiFetch<{ pending: number }>('/api/admin/course-changes/count');
 }
 
-export function approveSuggestion(id: number, note: string, meetings?: TimetableMeeting[]) {
-  return apiFetch<{ request: CourseChangeRequest; offeringsUpdated: number; alsoClosed: number }>(
+export function approveSuggestion(
+  id: number,
+  note: string,
+  options: {
+    mode: ApprovalMode;
+    /** Corrected meetings to approve instead of the ones proposed. */
+    meetings?: TimetableMeeting[];
+    /** Fingerprint of the official timings the reviewer was shown. */
+    expectedFingerprint?: string;
+  },
+) {
+  return apiFetch<{ request: CourseChangeRequest; offeringsUpdated: number; alsoClosed: number; notified: number }>(
     `/api/admin/course-changes/${id}/approve`,
-    { method: 'POST', body: { note: note.trim() || undefined, meetings } },
+    { method: 'POST', body: { note: note.trim() || undefined, ...options } },
   );
 }
 

@@ -153,12 +153,13 @@ interface TimetableState {
   /** The account now holds exactly what is stored locally. */
   markCourseOverridesSynced: () => void;
   /**
-   * Applies an approved optional change to this student's timetable: only the
-   * classes it names, on top of whatever they see now, saved as their own
-   * timings. Reports `outdated` rather than guessing when a class the change
-   * moves is no longer there.
+   * What an approved optional change would do to this student's timetable:
+   * only the classes it names, on top of whatever they see now. Saves
+   * nothing - the caller records the answer first, then saves the result with
+   * saveCourseOverride. Reports `outdated` rather than guessing when a class
+   * the change moves is no longer there.
    */
-  applyProposal: (courseCode: string, delta: MeetingDelta) => DeltaOutcome & { baseFingerprint?: string };
+  previewProposal: (courseCode: string, delta: MeetingDelta) => DeltaOutcome & { baseFingerprint?: string };
 }
 
 export const useTimetableStore = create<TimetableState>()(
@@ -542,7 +543,7 @@ export const useTimetableStore = create<TimetableState>()(
 
         markCourseOverridesSynced: () => set({ courseOverridesUnsynced: false }),
 
-        applyProposal: (courseCode: string, delta: MeetingDelta) => {
+        previewProposal: (courseCode: string, delta: MeetingDelta) => {
           const official = get().loadedCourses.find(c => c.courseCode === courseCode);
           if (!official) return { status: 'outdated', missing: delta.remove };
 
@@ -555,7 +556,6 @@ export const useTimetableStore = create<TimetableState>()(
 
           const outcome = applyDelta(current, delta);
           if (outcome.status !== 'applied') return outcome;
-          get().saveCourseOverride(courseCode, outcome.meetings);
           return { ...outcome, baseFingerprint: baseFingerprintFor(official, authoritative) };
         }
       };
