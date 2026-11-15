@@ -41,11 +41,14 @@ export function CourseChangeReview({ focusRequestId }: { focusRequestId?: number
     staleTime: 15_000,
   });
 
-  // A request opened from the notification email may already be decided.
+  // A request opened from the notification email may already be decided, in
+  // which case it is in the history. Checked once, when the link is opened:
+  // deciding it here must not then pull the reviewer away from the queue.
+  const focusChecked = useRef(false);
   useEffect(() => {
-    if (focusRequestId && data && scope === 'pending' && !data.some((item) => item.id === focusRequestId)) {
-      setScope('decided');
-    }
+    if (focusChecked.current || !focusRequestId || !data || scope !== 'pending') return;
+    focusChecked.current = true;
+    if (!data.some((item) => item.id === focusRequestId)) setScope('decided');
   }, [focusRequestId, data, scope]);
 
   return (
