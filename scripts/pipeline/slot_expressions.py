@@ -332,7 +332,8 @@ def parse_room_cell(raw):
         # "B19-B24 (mon)": the day only repeats what the slot already says.
         room = _DAY_HINT_RE.sub('', room.strip())
     room = _HEADCOUNT_RE.sub(' ', room)
-    room = re.sub(r'\s*\+\s*', ' + ', room)
+    # "C06-105 + Lab" reads better spaced; "(DS+ME+CE)" is a label and stays as written.
+    room = ' + '.join(split_top_level(room, '+')) or room
     room = re.sub(r'\(\s+', '(', re.sub(r'\s+\)', ')', room))
     room = re.sub(r'(?<=\w)\(', ' (', clean_text(room))
     batches = ', '.join(f'B{a}-B{b}' for a, b in ranges) or None
