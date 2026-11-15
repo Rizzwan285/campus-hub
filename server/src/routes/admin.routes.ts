@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import { z } from 'zod';
 import { requireAdmin } from '../middleware/auth';
 import { invalidate } from '../middleware/cache';
@@ -10,11 +10,22 @@ import * as specials from '../repositories/specialServices.repository';
 import * as admin from '../repositories/admin.repository';
 import * as profiles from '../repositories/profile.repository';
 import * as changes from '../repositories/courseChanges.repository';
+import { syncDraftFromLive } from '../repositories/semesters.repository';
+import { pool } from '../db';
+import { deliverDueEmails, emailStatus, listOutbox, retryEmails } from '../services/email.service';
 import { meetingListSchema } from './schemas';
+import { semestersRouter } from './semesters.routes';
 
 export const adminRouter = Router();
 
 adminRouter.use(requireAdmin);
+
+// Semester import, review and publishing. Parses its own (larger) bodies.
+adminRouter.use('/semesters', semestersRouter);
+
+// Every other admin route takes a small JSON body. Parsed here rather than
+// app-wide so nothing is read from a client that has not passed requireAdmin.
+adminRouter.use(express.json({ limit: '256kb' }));
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] as const;
@@ -599,6 +610,18 @@ adminRouter.put('/courses/:offeringId/schedule', async (req, res, next) => {
     }
 
     await admin.replaceMeetings(offeringId, body.data.rawSlot ?? null, meetings);
+    // The semester's draft follows the live edit, or the next publish would undo it.
+    try {
+      const client = await pool.connect();
+      try {
+        await syncDraftFromLive(client, [offeringId], req.session?.roll ?? 'api-key');
+      } finally {
+        client.release();
+      }
+    } catch (error) {
+      // No draft table before migration 012; the live edit above still stands.
+      if (!['42P01', '42703'].includes((error as { code?: string }).code ?? '')) throw error;
+    }
     const after = await admin.getMeetings(offeringId);
 
     await audit(req, 'course.schedule.update', offeringId, before, after, '/api/timetable');
@@ -638,16 +661,24 @@ function requestId(raw: string): number | null {
 
 const approveBody = z.object({
   note: z.string().trim().max(500).optional(),
+  /**
+   * `optional`   students who have the course each accept or decline it; the
+   *              official timetable does not change.
+   * `compulsory` it becomes the official timetable for everyone.
+   * Older clients send no mode; approval then meant compulsory.
+   */
+  mode: z.enum(['optional', 'compulsory']).default('compulsory'),
   /** Corrected meetings to apply instead of the ones the student proposed. */
   meetings: meetingListSchema.min(1, 'Keep at least one class.').optional(),
+  /** Fingerprint of the official timings the reviewer saw; refuses a stale approval. */
+  expectedFingerprint: z.string().max(64).optional(),
 });
 
 /**
  * POST /api/admin/course-changes/:id/approve
  *
- * Rewrites the course's official timings for everyone who has it. Students'
- * own corrections made against the old timings stop applying on their next
- * load, so nobody is left looking at the timings this replaces.
+ * Authenticated like every admin route: the link in the notification email
+ * only opens this panel, it cannot approve anything by itself.
  */
 adminRouter.post('/course-changes/:id/approve', async (req, res, next) => {
   try {
@@ -665,7 +696,9 @@ adminRouter.post('/course-changes/:id/approve', async (req, res, next) => {
     const decision = await changes.approveRequest(id, {
       adminRoll: req.session?.roll ?? 'api-key',
       note: body.data.note || null,
+      mode: body.data.mode,
       meetings: body.data.meetings,
+      expectedFingerprint: body.data.expectedFingerprint,
     });
     if (!decision.ok) {
       res.status(decision.status).json({ error: decision.error });
@@ -673,16 +706,36 @@ adminRouter.post('/course-changes/:id/approve', async (req, res, next) => {
     }
 
     const { request } = decision;
-    await audit(
-      req,
-      'course.change.approve',
-      `${request.courseCode} #${request.id}`,
-      request.baseMeetings,
-      { meetings: request.appliedMeetings, offerings: decision.offeringIds },
-      '/api/timetable',
-    );
+    const details = {
+      mode: request.approvalMode,
+      delta: request.delta,
+      corrected: request.corrected,
+      offerings: decision.offeringIds,
+      notified: decision.notified,
+    };
+    if (request.approvalMode === 'compulsory') {
+      // The official timetable changed: drop its cached copies.
+      await audit(req, 'course.change.approve', `${request.courseCode} #${request.id}`,
+        request.approvedBaseMeetings, details, '/api/timetable');
+    } else {
+      // Nothing public changed, and audit() without a prefix would empty the
+      // whole response cache.
+      await profiles.recordAudit({
+        actorId: req.session?.sub ?? null,
+        actorRoll: req.session?.roll ?? 'api-key',
+        action: 'course.change.approve-optional',
+        target: `${request.courseCode} #${request.id}`,
+        before: request.approvedBaseMeetings,
+        after: details,
+      });
+    }
 
-    res.json({ request, offeringsUpdated: decision.offeringIds.length, alsoClosed: decision.alsoClosed });
+    res.json({
+      request,
+      offeringsUpdated: decision.offeringIds.length,
+      alsoClosed: decision.alsoClosed,
+      notified: decision.notified,
+    });
   } catch (error) {
     next(error);
   }
@@ -720,6 +773,60 @@ adminRouter.post('/course-changes/:id/reject', async (req, res, next) => {
       after: { note: decision.request.decisionNote },
     });
     res.json({ request: decision.request });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/** POST /api/admin/course-changes/:id/close — stops offering an optional change. */
+adminRouter.post('/course-changes/:id/close', async (req, res, next) => {
+  try {
+    const id = requestId(req.params.id);
+    const body = z.object({ note: z.string().trim().max(300).optional() }).safeParse(req.body ?? {});
+    if (!id || !body.success) {
+      res.status(400).json({ error: 'Invalid request.' });
+      return;
+    }
+    const closed = await changes.closeProposal(id, req.session?.roll ?? 'api-key', body.data.note || null);
+    if (!closed) {
+      res.status(409).json({ error: 'That is not an open optional update.' });
+      return;
+    }
+    await profiles.recordAudit({
+      actorId: req.session?.sub ?? null,
+      actorRoll: req.session?.roll ?? 'api-key',
+      action: 'course.change.close-optional',
+      target: `${closed.courseCode} #${id}`,
+      after: { note: closed.proposalStateNote },
+    });
+    res.json({ request: closed });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ------------------------------------------------- notification emails
+
+/** Whether email is set up, and the recent deliveries with any failures. */
+adminRouter.get('/emails', async (_req, res, next) => {
+  try {
+    res.json({ ...emailStatus(), outbox: await listOutbox() });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/** POST /api/admin/emails/retry — re-queues failed deliveries (one, or all) and sends now. */
+adminRouter.post('/emails/retry', async (req, res, next) => {
+  try {
+    const body = z.object({ id: z.number().int().positive().optional() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: 'Invalid request.' });
+      return;
+    }
+    const queued = await retryEmails(body.data.id);
+    const result = await deliverDueEmails();
+    res.json({ queued, ...result });
   } catch (error) {
     next(error);
   }

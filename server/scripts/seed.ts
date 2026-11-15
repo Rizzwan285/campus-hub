@@ -13,6 +13,8 @@ import { Client } from 'pg';
 import { config } from '../src/config';
 import { sslConfig } from '../src/ssl';
 import { resolveDepartMinutes } from '../src/utils/busTime';
+import { ensureSemesterForSeed, semesterCode } from '../src/repositories/semesters.repository';
+import { DEFAULT_SEMESTER_CONFIG } from '../../src/engine/courseSchedule';
 
 import {
   workingDaysBus,
@@ -282,17 +284,31 @@ async function main() {
   try {
     await client.query('begin');
 
+    // The bundled timetable is one semester. Everything the seed does to
+    // courses is confined to it: semesters imported and published through
+    // /admin are never touched, in either mode.
+    const bundledMetadata = JSON.parse(fs.readFileSync(path.join(TIMETABLE_DIR, 'metadata.json'), 'utf8'));
+    const bundledSemester: string = bundledMetadata.semester ?? 'unknown';
+
     if (reset) {
+      await client.query(
+        `delete from course_offerings
+          where semester_id is null
+             or semester_id in (select id from semesters where code = $1)`,
+        [semesterCode(bundledSemester)],
+      );
+      await client.query(
+        'delete from semester_courses where semester_id in (select id from semesters where code = $1)',
+        [semesterCode(bundledSemester)],
+      );
       // Deletes rather than truncates: truncate restarts identity, and
       // canteen_items / mess_menu_entries hang off those generated ids.
       await client.query(`
-        delete from course_meetings;
         delete from canteen_items;
         delete from mess_menu_entries;
         delete from mess_common_items;
         delete from bus_departures;
         delete from bus_routes;
-        delete from course_offerings;
         delete from canteen_sections;
         delete from mess_timings;
         delete from messes;
@@ -495,8 +511,12 @@ async function main() {
     note('academic_days', daysWritten, dayCustom);
 
     // ---- timetable (schedules are admin-editable) ------------------------
-    const metadata = JSON.parse(fs.readFileSync(path.join(TIMETABLE_DIR, 'metadata.json'), 'utf8'));
-    const semester: string = metadata.semester ?? 'unknown';
+    const metadata = bundledMetadata;
+    const semester = bundledSemester;
+    const slotDefinitions = JSON.parse(fs.readFileSync(path.join(TIMETABLE_DIR, 'slots.json'), 'utf8'));
+    // On a fresh database this is the first semester, and becomes the current
+    // one. Where semesters already exist it is only created if missing.
+    const semesterId = await ensureSemesterForSeed(client, semester, slotDefinitions, DEFAULT_SEMESTER_CONFIG);
 
     const offerings: unknown[][] = [];
     const meetingsByOffering = new Map<string, unknown[][]>();
@@ -552,8 +572,13 @@ async function main() {
       if (!skip.has(offeringId)) meetingRows.push(...rows);
     }
 
+    await client.query('update course_offerings set semester_id = $2 where id = any($1::text[]) and semester_id is null', [
+      offerings.map((row) => row[0]), semesterId,
+    ]);
     await client.query(
-      "delete from course_meetings where offering_id in (select id from course_offerings where source = 'seed')",
+      `delete from course_meetings
+        where offering_id in (select id from course_offerings where source = 'seed' and id = any($1::text[]))`,
+      [offerings.map((row) => row[0])],
     );
     await bulkInsert(
       client, 'course_meetings',
@@ -581,6 +606,13 @@ async function main() {
         ['slots', fs.readFileSync(path.join(TIMETABLE_DIR, 'slots.json'), 'utf8')],
       ],
       ['key'], ['value']);
+
+    // Selections and corrections saved before semesters existed belong to
+    // the bundled one, and the admin's draft catalogue starts from what is live.
+    await client.query('update user_courses set semester_id = $1 where semester_id is null', [semesterId]);
+    await client.query('update user_course_overrides set semester_id = $1 where semester_id is null', [semesterId]);
+    await client.query('update course_change_requests set semester_id = $1 where semester_id is null', [semesterId]);
+    await client.query('select backfill_semester_catalogue($1)', [semesterId]);
 
     await client.query('commit');
 

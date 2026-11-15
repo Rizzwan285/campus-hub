@@ -1,4 +1,5 @@
 import { query } from '../db';
+import { getActiveSemesterId } from './semesters.repository';
 
 export interface TimetableMeeting {
   type: string;
@@ -8,6 +9,12 @@ export interface TimetableMeeting {
   room: string;
   instructors: string[];
   recurrence: { type: string };
+  /** The slot this class came from, when it came from one. */
+  slot?: string;
+  /** Batches the class is for ("B1-B6"); absent means everyone. */
+  batches?: string;
+  /** YYYY-MM-DD, for a one-time class (recurrence.type 'once'). */
+  date?: string;
 }
 
 export interface CourseOffering {
@@ -50,13 +57,35 @@ interface MeetingRow {
   room: string | null;
   instructors: string[];
   recurrence: string;
+  slot_code?: string | null;
+  batches?: string | null;
+  on_date?: string | null;
 }
+
+/**
+ * Offerings matching `where`, limited to one semester.
+ *
+ * `semesterId` null means the database has no semesters yet (migration 012 has
+ * not run): the queries then name no semester column at all, which is what
+ * they did before, so the timetable keeps loading through that window.
+ */
+/** Runs a query: the pool by default, or a transaction's own connection. */
+export type Run = <T>(text: string, params?: unknown[]) => Promise<T[]>;
 
 async function buildOfferings(
   where: string,
   params: unknown[],
+  semesterId: number | null,
+  run: Run = query,
 ): Promise<CourseOffering[]> {
-  const offerings = await query<OfferingRow>(
+  if (semesterId !== null) {
+    params = [...params, semesterId];
+    where = `${where ? `${where} and` : 'where'} semester_id = $${params.length}`;
+  }
+  const extraColumns =
+    semesterId !== null ? `, slot_code, batches, to_char(on_date, 'YYYY-MM-DD') as on_date` : '';
+
+  const offerings = await run<OfferingRow>(
     `select id, program, branch, course_code, course_name, credits, category, raw_slot, source
        from course_offerings
       ${where}
@@ -67,7 +96,7 @@ async function buildOfferings(
   if (offerings.length === 0) return [];
 
   const ids = offerings.map((row) => row.id);
-  const meetings = await query<MeetingRow>(
+  const meetings = await run<MeetingRow>(
     `select offering_id,
             type,
             day,
@@ -75,7 +104,7 @@ async function buildOfferings(
             to_char(end_time,   'HH24:MI') as end_time,
             room,
             instructors,
-            recurrence
+            recurrence${extraColumns}
        from course_meetings
       where offering_id = any($1::text[])
       order by offering_id, sort_order`,
@@ -93,6 +122,9 @@ async function buildOfferings(
       room: row.room ?? '',
       instructors: row.instructors ?? [],
       recurrence: { type: row.recurrence },
+      ...(row.slot_code ? { slot: row.slot_code } : {}),
+      ...(row.batches ? { batches: row.batches } : {}),
+      ...(row.on_date ? { date: row.on_date } : {}),
     });
     byOffering.set(row.offering_id, list);
   }
@@ -112,23 +144,35 @@ async function buildOfferings(
   }));
 }
 
-export async function getCoursesByBranch(program: string, branch: string) {
-  return buildOfferings('where program = $1 and branch = $2', [program, branch]);
+/**
+ * Public reads serve the current semester unless told otherwise. `undefined`
+ * resolves it; a number names a semester explicitly (an upcoming catalogue).
+ */
+async function scope(semesterId?: number | null): Promise<number | null> {
+  return semesterId === undefined ? getActiveSemesterId() : semesterId;
 }
 
-export async function getAllCourses() {
-  return buildOfferings('', []);
+export async function getCoursesByBranch(program: string, branch: string, semesterId?: number | null) {
+  return buildOfferings('where program = $1 and branch = $2', [program, branch], await scope(semesterId));
 }
 
-/** Every offering of the given course codes, across all programs and branches. */
-export async function getOfferingsByCodes(courseCodes: string[]) {
+export async function getAllCourses(semesterId?: number | null) {
+  return buildOfferings('', [], await scope(semesterId));
+}
+
+/** Every offering of the given course codes in a semester, across all programs and branches. */
+export async function getOfferingsByCodes(courseCodes: string[], semesterId?: number | null, run?: Run) {
   if (courseCodes.length === 0) return [];
-  return buildOfferings('where course_code = any($1::text[])', [courseCodes]);
+  return buildOfferings('where course_code = any($1::text[])', [courseCodes], await scope(semesterId), run);
 }
 
 export async function getBranches(): Promise<Record<string, string[]>> {
+  const semesterId = await getActiveSemesterId();
   const rows = await query<{ program: string; branch: string }>(
-    'select distinct program, branch from course_offerings order by program, branch',
+    `select distinct program, branch from course_offerings
+      ${semesterId !== null ? 'where semester_id = $1' : ''}
+      order by program, branch`,
+    semesterId !== null ? [semesterId] : [],
   );
 
   const grouped: Record<string, string[]> = {};
