@@ -10,9 +10,13 @@
 const REQUEST_TIMEOUT_MS = 6000;
 
 export class ApiUnavailableError extends Error {
-  constructor(message: string) {
+  /** The HTTP status when the server did answer; undefined when it could not be reached. */
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
     super(message);
     this.name = 'ApiUnavailableError';
+    this.status = status;
   }
 }
 
@@ -147,7 +151,7 @@ export async function fetchJson<T>(path: string, options: { fresh?: boolean } = 
     });
 
     if (!response.ok) {
-      throw new ApiUnavailableError(`GET ${path} responded ${response.status}`);
+      throw new ApiUnavailableError(`GET ${path} responded ${response.status}`, response.status);
     }
 
     return (await response.json()) as T;
