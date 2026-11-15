@@ -10,6 +10,7 @@ import { contentRouter } from './routes/content.routes';
 import { adminRouter } from './routes/admin.routes';
 import { authRouter } from './routes/auth.routes';
 import { courseChangesRouter } from './routes/courseChanges.routes';
+import { notificationsRouter } from './routes/notifications.routes';
 
 export function createApp() {
   const app = express();
@@ -25,7 +26,15 @@ export function createApp() {
   });
 
   app.use(compression());
-  app.use(express.json({ limit: '256kb' }));
+
+  // Admin routes parse their own bodies, after the admin check: the semester
+  // importer accepts multi-megabyte uploads, and those must never be read
+  // from a client that has not proved it is the developer.
+  const jsonBody = express.json({ limit: '256kb' });
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/admin/')) next();
+    else jsonBody(req, res, next);
+  });
 
   app.use(
     cors({
@@ -57,6 +66,7 @@ export function createApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/course-changes', courseChangesRouter);
+  app.use('/api/notifications', notificationsRouter);
 
   // Content is identical for every visitor, so it is cached and ETagged.
   // Mounted last so the per-user routes above are never served from the cache.
@@ -71,6 +81,15 @@ export function createApp() {
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (err.message.includes('not allowed by CORS')) {
       res.status(403).json({ error: err.message });
+      return;
+    }
+    // body-parser's own errors carry the status to answer with (413 for an
+    // oversized upload, 400 for malformed JSON); they are the client's doing.
+    const status = (err as Error & { status?: number }).status;
+    if (status && status >= 400 && status < 500) {
+      res.status(status).json({
+        error: status === 413 ? 'That file or request is too large.' : 'The request could not be read.',
+      });
       return;
     }
     console.error(`[${req.method} ${req.path}]`, err);

@@ -5,6 +5,7 @@ import * as canteen from '../repositories/canteen.repository';
 import * as calendar from '../repositories/calendar.repository';
 import * as timetable from '../repositories/timetable.repository';
 import * as specials from '../repositories/specialServices.repository';
+import * as semesters from '../repositories/semesters.repository';
 
 export const contentRouter = Router();
 
@@ -120,6 +121,45 @@ contentRouter.get('/timetable/branches', async (_req, res, next) => {
 contentRouter.get('/timetable/metadata', async (_req, res, next) => {
   try {
     res.json(await timetable.getMetadata());
+  } catch (error) {
+    next(error);
+  }
+});
+
+/** The current semester and any published ahead of it. */
+contentRouter.get('/timetable/semesters', async (_req, res, next) => {
+  try {
+    res.json(await semesters.listPublicSemesters());
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * GET /api/timetable/snapshot[?semester=<code>]
+ *
+ * One published semester, whole: which semester and version it is, its slot
+ * table and rules, and every course. The client keeps the last snapshot it
+ * received, so a published semester survives an API outage without the app
+ * having to be rebuilt - and because the snapshot names its semester, a
+ * client that cannot reach the API can tell stale data from current.
+ *
+ * Without `semester` this is the current one. Drafts are never served.
+ */
+contentRouter.get('/timetable/snapshot', async (req, res, next) => {
+  try {
+    const code = typeof req.query.semester === 'string' ? req.query.semester : null;
+    const semester = code ? await semesters.getSemesterByCode(code) : await semesters.getActiveSemester();
+    if (!semester || (semester.status !== 'active' && semester.status !== 'published')) {
+      res.status(404).json({ error: code ? `No published semester "${code}".` : 'No semester is current yet.' });
+      return;
+    }
+    res.json({
+      semester: semesters.toPublicSemester(semester),
+      slots: semester.slotDefinitions,
+      config: semester.config,
+      courses: await timetable.getAllCourses(semester.id),
+    });
   } catch (error) {
     next(error);
   }

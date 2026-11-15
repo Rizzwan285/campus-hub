@@ -13,25 +13,28 @@
     "verify": "tsx scripts/verify.ts",
     "typecheck": "tsc --noEmit",
     "set-admin": "tsx scripts/set-admin.ts",
-    "seed:reset": "tsx scripts/seed.ts --reset"
+    "seed:reset": "tsx scripts/seed.ts --reset",
+    "test": "vitest run"
   },
   "dependencies": {
-    "tsx": "^4.20.6",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "pg": "^8.16.3",
+    "tsx": "^4.20.6",
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/node": "^24.9.2",
     "@types/pg": "^8.15.6",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^2.1.9"
   },
   "engines": {
     "node": ">=20"

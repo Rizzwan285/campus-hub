@@ -21,6 +21,9 @@ WORKDIR /app/server
 RUN addgroup -g 1001 -S appgroup && \
     adduser -S appuser -u 1001 -G appgroup
 
+# The semester importer (scripts/pipeline) is Python, standard library only.
+RUN apk add --no-cache python3
+
 COPY --from=deps /app/server/node_modules ./node_modules
 COPY server/package.json server/tsconfig.json ./
 COPY server/src/ ./src/
@@ -29,8 +32,12 @@ COPY server/scripts/ ./scripts/
 
 # Seed/verify resolve this as ../../src/data from /app/server/scripts.
 COPY src/data/ /app/src/data/
-# Profile validation is shared with the frontend.
+# Shared with the frontend: profile validation, and the timetable logic the
+# API uses to expand schedules and compare meetings.
 COPY src/lib/academicProfile.ts /app/src/lib/academicProfile.ts
+COPY src/engine/types.ts src/engine/courseTimings.ts src/engine/courseSchedule.ts /app/src/engine/
+# The importer the API runs on uploaded workbooks.
+COPY scripts/pipeline/ /app/scripts/pipeline/
 
 # tsx is a production dependency: TypeScript runs directly, there is no build step.
 USER appuser
