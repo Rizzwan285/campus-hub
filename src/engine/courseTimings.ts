@@ -39,18 +39,37 @@ export const WEEK_DAYS: MeetingDay[] = [
 
 /**
  * A meeting's identity for comparison: everything a student sees and nothing
- * they don't (instructors). Must stay in step with meetingKey() in
- * server/src/repositories/courseChanges.repository.ts.
+ * they don't (instructors). The API imports this module, so both sides
+ * compare meetings the same way.
  */
-function meetingKey(meeting: TimetableMeeting): string {
-  return [
+export function meetingKey(meeting: TimetableMeeting): string {
+  const parts = [
     meeting.type,
     meeting.day,
     meeting.startTime,
     meeting.endTime,
     (meeting.room ?? '').trim(),
     meeting.recurrence?.type ?? 'weekly',
-  ].join('|');
+  ];
+  // Appended only when present, so the fingerprint of every meeting that
+  // predates these fields is unchanged - students' saved corrections are
+  // compared against fingerprints taken before they existed.
+  if (meeting.date) parts.push(`on:${meeting.date}`);
+  if (meeting.batches?.trim()) parts.push(`for:${meeting.batches.trim()}`);
+  return parts.join('|');
+}
+
+/**
+ * The same class regardless of where it is held: its type, day, time, how
+ * often it meets and who it is for - everything in meetingKey() but the room.
+ */
+function sessionKey(meeting: TimetableMeeting): string {
+  const parts = [
+    meeting.type, meeting.day, meeting.startTime, meeting.endTime, meeting.recurrence?.type ?? 'weekly',
+  ];
+  if (meeting.date) parts.push(`on:${meeting.date}`);
+  if (meeting.batches?.trim()) parts.push(`for:${meeting.batches.trim()}`);
+  return parts.join('|');
 }
 
 /** cyrb53: a small, well-distributed 53-bit string hash. */
@@ -113,7 +132,8 @@ export function compareMeetings(a: TimetableMeeting, b: TimetableMeeting): numbe
   return (
     WEEK_DAYS.indexOf(a.day) - WEEK_DAYS.indexOf(b.day) ||
     a.startTime.localeCompare(b.startTime) ||
-    a.endTime.localeCompare(b.endTime)
+    a.endTime.localeCompare(b.endTime) ||
+    (a.date ?? '').localeCompare(b.date ?? '')
   );
 }
 
@@ -164,6 +184,15 @@ export function diffMeetings(before: TimetableMeeting[], after: TimetableMeeting
 }
 
 const CLOCK_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** The weekday a YYYY-MM-DD calendar date falls on, or null if it is not a real date. */
+export function weekdayOfDate(date: string): MeetingDay | null {
+  if (!DATE_KEY.test(date)) return null;
+  const parsed = new Date(`${date}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) return null;
+  return WEEK_DAYS[(parsed.getUTCDay() + 6) % 7];
+}
 
 /** Why a meeting cannot be saved, or null if it can. The server checks the same. */
 export function meetingProblem(meeting: TimetableMeeting): string | null {
@@ -172,5 +201,90 @@ export function meetingProblem(meeting: TimetableMeeting): string | null {
   }
   if (meeting.endTime <= meeting.startTime) return 'Ends before it starts.';
   if (meeting.room.length > 120) return 'Room name is too long.';
+  if (meeting.recurrence?.type === 'once') {
+    if (!meeting.date || weekdayOfDate(meeting.date) === null) return 'Pick the date of this one-time class.';
+  }
   return null;
+}
+
+// ---------------------------------------------------------------- changes as deltas
+
+/**
+ * A change to a course expressed as the classes it removes and the classes it
+ * adds, rather than as a whole new list. That is what lets one change be
+ * applied to a timetable that has moved on since - a student's own timings, or
+ * another branch's offering - without wiping out what the change never touched.
+ */
+export interface MeetingDelta {
+  remove: TimetableMeeting[];
+  add: TimetableMeeting[];
+}
+
+export type ChangeKind = 'addition' | 'deletion' | 'modification';
+
+export function deltaBetween(before: TimetableMeeting[], after: TimetableMeeting[]): MeetingDelta {
+  const changes = diffMeetings(before, after);
+  return {
+    remove: changes.filter((change) => change.kind === 'removed').map((change) => change.meeting),
+    add: changes.filter((change) => change.kind === 'added').map((change) => change.meeting),
+  };
+}
+
+export function changeKind(delta: MeetingDelta): ChangeKind {
+  if (delta.remove.length === 0) return 'addition';
+  if (delta.add.length === 0) return 'deletion';
+  return 'modification';
+}
+
+export type DeltaOutcome =
+  /** Applied: `meetings` is the result. */
+  | { status: 'applied'; meetings: TimetableMeeting[] }
+  /** Every part of the change is already there; nothing to do. */
+  | { status: 'already'; meetings: TimetableMeeting[] }
+  /** A class the change moves or removes is no longer in the list. */
+  | { status: 'outdated'; missing: TimetableMeeting[] };
+
+/**
+ * Applies a change to a list of meetings, touching only the classes it names.
+ *
+ * Refuses when a class the change removes is not in the list any more: the
+ * change was written against timings that have since moved, and removing
+ * "whatever is closest" would be a guess. Applying the same change twice is
+ * safe - the second time reports `already`.
+ *
+ * A class to remove is found by its exact identity first. Failing that, by
+ * its day and time alone, if exactly one class sits there: the same course is
+ * listed by several branches in different rooms, and a student may have
+ * renamed a room in their own copy, but "Tuesday 8:00 is cancelled" still
+ * means that class.
+ */
+export function applyDelta(meetings: TimetableMeeting[], delta: MeetingDelta): DeltaOutcome {
+  const remaining = [...meetings];
+  const missing: TimetableMeeting[] = [];
+
+  for (const gone of delta.remove) {
+    let index = remaining.findIndex((meeting) => meetingKey(meeting) === meetingKey(gone));
+    if (index === -1) {
+      const sameSession = remaining
+        .map((meeting, position) => (sessionKey(meeting) === sessionKey(gone) ? position : -1))
+        .filter((position) => position !== -1);
+      if (sameSession.length === 1) index = sameSession[0];
+    }
+    if (index === -1) missing.push(gone);
+    else remaining.splice(index, 1);
+  }
+
+  const present = new Set(meetings.map(meetingKey));
+  const toAdd = delta.add.filter((meeting) => !present.has(meetingKey(meeting)));
+
+  if (missing.length > 0) {
+    // Fully applied already: the removals are gone and the additions are in.
+    if (missing.length === delta.remove.length && toAdd.length === 0) {
+      return { status: 'already', meetings };
+    }
+    return { status: 'outdated', missing };
+  }
+  if (delta.remove.length === 0 && toAdd.length === 0) return { status: 'already', meetings };
+
+  return { status: 'applied', meetings: [...remaining, ...toAdd].sort(compareMeetings) };
 }

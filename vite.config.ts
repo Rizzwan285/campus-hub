@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -13,6 +14,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [react()],
+  test: {
+    // The API has its own suite and its own config: `cd server && npm test`.
+    exclude: ["**/node_modules/**", "**/dist/**", "server/**", "puppeteer-debug/**", "tmp/**"],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
