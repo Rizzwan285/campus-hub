@@ -18,6 +18,8 @@ export interface AccountProfile {
   selectedCourseIds: string[];
   /** Absent from servers that predate personal timings. */
   courseOverrides?: CourseOverride[];
+  /** The semester the selection and timings belong to; absent before semesters existed. */
+  semesterId?: number | null;
 }
 
 interface LoginResponse {
@@ -120,10 +122,15 @@ export const useAuthStore = create<AuthState>()(
       async syncCourses(offeringIds) {
         const previous = get().account;
         const context = previous ? academicContext(previous) : undefined;
-        const data = await apiFetch<{ selectedCourseIds: string[] }>('/api/auth/courses', {
+        // Sent so the server can refuse a selection made for a semester that
+        // has since ended, instead of filing it under the new one.
+        const semesterId = useTimetableStore.getState().semester?.id ?? undefined;
+        const data = await apiFetch<{ selectedCourseIds: string[]; newNotifications?: number }>('/api/auth/courses', {
           method: 'PUT',
-          body: { offeringIds, context },
+          body: { offeringIds, context, semesterId },
         });
+        // Courses just added may come with approved changes waiting in the inbox.
+        if (data.newNotifications) window.dispatchEvent(new Event('campus:notifications-changed'));
         const account = get().account;
         if (account && account.id === previous?.id && academicContext(account) === context) {
           set({ account: { ...account, selectedCourseIds: data.selectedCourseIds } });
