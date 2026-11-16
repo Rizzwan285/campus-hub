@@ -3,6 +3,7 @@ import { ImportantLinksCard } from '@/components/features/ImportantLinksCard';
 import { LibraryTimingsCard } from '@/components/features/LibraryTimingsCard';
 import { FeedbackCard } from '@/components/features/FeedbackCard';
 import { AmulCafeCard } from '@/components/features/AmulCafeCard';
+import { ContactsCard } from '@/components/features/ContactsCard';
 import type { AppContextType } from '@/components/layout/AppLayout';
 
 const Campus = () => {
@@ -12,6 +13,7 @@ const Campus = () => {
     <div className="max-w-3xl mx-auto w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <LibraryTimingsCard currentTime={currentTime} />
       <AmulCafeCard />
+      <ContactsCard />
       <ImportantLinksCard />
       <FeedbackCard />
     </div>

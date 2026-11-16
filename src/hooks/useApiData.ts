@@ -3,7 +3,7 @@
  * both instant first paint and offline/error fallback. Components receive the
  * exact shapes they consumed before the backend existed.
  */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchJson, isApiConfigured } from '@/services/api';
 import {
@@ -25,6 +25,8 @@ import {
   type BusSchedule,
 } from '@/data/busData';
 import { bundledSpecialServices, type SpecialService } from '@/data/specialServiceData';
+import type { ContactCategory } from '@/data/contactsData';
+import { fallbackContacts, parseContacts, saveContacts } from '@/lib/contacts';
 import { bundledAcademicDays, setAcademicDays, type AcademicDaysData } from '@/utils/dateUtils';
 
 const QUERY_OPTIONS = {
@@ -196,6 +198,32 @@ export function useSpecialServices(): SpecialService[] {
   });
 
   return data ?? bundledSpecialServices;
+}
+
+// ---------------------------------------------------------------- contacts
+
+/**
+ * The Contacts directory on the Campus page.
+ *
+ * Like special services, an answer from the API — even an empty one — wins
+ * outright. Each answer is also kept on the device, so without the API the
+ * card shows the last list it sent, or the bundled one on a first visit.
+ */
+export function useContacts(): ContactCategory[] {
+  const fallback = useMemo(fallbackContacts, []);
+  const { data } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: async () => {
+      const list = parseContacts(await fetchJson<unknown>('/api/contacts'));
+      saveContacts(list);
+      return list;
+    },
+    enabled: isApiConfigured(),
+    placeholderData: fallback,
+    ...QUERY_OPTIONS,
+  });
+
+  return data ?? fallback;
 }
 
 // ---------------------------------------------------------------- academic calendar

@@ -24,7 +24,8 @@ live content editing through `/admin`.
 - **Class Timetable** — Pick your courses; the weekly grid resolves slots, rooms and clashes
 - **Timing corrections** — When a professor moves, adds or cancels a class, fix it in your own timetable at once, or suggest the change for everyone taking the course
 - **Sign-in** — Roll number only, no password; profile, course picks and your own timings sync across devices
-- **Developer tools** — Edit mess menus, timings, bus schedules and course slots live at `/admin`, and approve or reject students' timing suggestions, no redeploy
+- **Contacts** — Auto drivers, medical and restaurant numbers on the Campus page; tap a number to call, open a restaurant's map, and still see them offline
+- **Developer tools** — Edit mess menus, timings, bus schedules, contacts and course slots live at `/admin`, and approve or reject students' timing suggestions, no redeploy
 - **Dark Mode** — Toggle between light and dark themes
 - **Real-time Clock** — Live time display with next-bus countdown
 

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox, GraduationCap,
+  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox, GraduationCap, Contact,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { getWeekCycle } from '@/utils/dateUtils';
 import { CourseChangeReview } from '@/components/features/CourseChangeReview';
 import { SpecialServicesEditor } from '@/components/features/SpecialServicesEditor';
 import { SemestersAdmin } from '@/components/features/admin/SemestersAdmin';
+import { ContactsAdmin } from '@/components/features/admin/ContactsAdmin';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
@@ -1134,6 +1135,7 @@ export default function Admin() {
           <TabsTrigger value="timings"><Clock className="h-4 w-4 mr-1" />Timings</TabsTrigger>
           <TabsTrigger value="bus"><Bus className="h-4 w-4 mr-1" />Bus</TabsTrigger>
           <TabsTrigger value="canteen"><IndianRupee className="h-4 w-4 mr-1" />Canteen</TabsTrigger>
+          <TabsTrigger value="contacts"><Contact className="h-4 w-4 mr-1" />Contacts</TabsTrigger>
           <TabsTrigger value="calendar"><CalendarDays className="h-4 w-4 mr-1" />Days</TabsTrigger>
           <TabsTrigger value="edits"><FileDiff className="h-4 w-4 mr-1" />Edits</TabsTrigger>
           <TabsTrigger value="audit"><History className="h-4 w-4 mr-1" />Log</TabsTrigger>
@@ -1153,6 +1155,7 @@ export default function Admin() {
           <Card className="p-5"><SpecialServicesEditor /></Card>
         </TabsContent>
         <TabsContent value="canteen"><Card className="p-5"><CanteenPriceEditor /></Card></TabsContent>
+        <TabsContent value="contacts"><Card className="p-5"><ContactsAdmin /></Card></TabsContent>
         <TabsContent value="calendar"><Card className="p-5"><AcademicDaysEditor /></Card></TabsContent>
         <TabsContent value="edits" className="space-y-4">
           <Card className="p-5"><Customizations /></Card>

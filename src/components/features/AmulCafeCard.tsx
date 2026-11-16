@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { amulCafe, amulMenuSections } from '@/data/amulCafeData';
+import { telHref } from '@/lib/contactPhone';
 
 export function AmulCafeCard() {
   return (
@@ -38,7 +39,7 @@ export function AmulCafeCard() {
       </div>
 
       <Button asChild className="w-full sm:w-auto mt-4">
-        <a href={`tel:${amulCafe.phone}`}>
+        <a href={telHref(amulCafe.phone) ?? `tel:${amulCafe.phone}`}>
           <Phone className="h-4 w-4 mr-2" aria-hidden="true" />
           Call to order: {amulCafe.phone}
         </a>
