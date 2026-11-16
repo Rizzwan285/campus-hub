@@ -1,5 +1,5 @@
-import { BookOpen, Clock, ExternalLink, MapPin, Search } from 'lucide-react';
-import { FeatureCard, FeatureCardHeader } from './FeatureCard';
+import { BookOpen, Clock, MapPin, Search } from 'lucide-react';
+import { ExternalLinkRow, FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeUntil } from '@/utils/dateUtils';
 import {
@@ -20,7 +20,7 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
   const { open, changesAt } = getLibraryStatus(currentTime);
 
   return (
-    <FeatureCard id="library-timings">
+    <FeatureCard id="library-timings" accent="teal">
       <FeatureCardHeader
         icon={BookOpen}
         title="Library Timings"
@@ -34,20 +34,24 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
                 : 'bg-muted text-muted-foreground'
             }`}
           >
+            <span className="relative mr-1.5 flex h-2 w-2" aria-hidden="true">
+              {open && <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping" />}
+              <span className={`relative inline-flex h-2 w-2 rounded-full ${open ? 'bg-emerald-500' : 'bg-muted-foreground/60'}`} />
+            </span>
             {open ? 'Open now' : 'Closed'}
           </Badge>
         }
       />
 
-      <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
+      <div className="p-4 rounded-xl bg-gradient-to-br from-teal-500/15 to-transparent border border-teal-500/30 mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <Clock className="h-4 w-4 text-primary shrink-0" />
+          <Clock className="h-4 w-4 text-teal-600 dark:text-teal-300 shrink-0" aria-hidden="true" />
           <p className="font-semibold">{LIBRARY_TIMINGS_LABEL}</p>
         </div>
         <p className="text-xs text-muted-foreground">{LIBRARY_DAYS_LABEL}</p>
         <p className="text-sm mt-2">
           {open ? 'Closes in ' : 'Opens in '}
-          <span className="font-semibold text-primary">
+          <span className="font-semibold text-teal-700 dark:text-teal-300">
             {formatTimeUntil(changesAt, currentTime)}
           </span>
         </p>
@@ -71,20 +75,14 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
         ))}
       </div>
 
-      <a
-        href={LIBRARY_OPAC_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-4 flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors"
-      >
-        <Search className="h-5 w-5 text-primary shrink-0" aria-hidden="true" />
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm">Library Web OPAC</p>
-          <p className="text-xs text-muted-foreground">Browse the catalogue, borrow and renew library books</p>
-        </div>
-        <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
-        <span className="sr-only">(opens in a new tab)</span>
-      </a>
+      <div className="mt-4">
+        <ExternalLinkRow
+          href={LIBRARY_OPAC_URL}
+          icon={Search}
+          title="Library Web OPAC"
+          description="Browse the catalogue, borrow and renew library books"
+        />
+      </div>
     </FeatureCard>
   );
 }

@@ -8,7 +8,7 @@ const CALENDARS = ['2027', '2026'];
 /** The academic calendar PDFs and the institute's forms page. */
 export function AcademicDocumentsCard() {
   return (
-    <FeatureCard id="academic-documents">
+    <FeatureCard id="academic-documents" accent="blue">
       <FeatureCardHeader icon={NotebookText} title="Academic documents" subtitle="Calendars and forms from the academic section" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {CALENDARS.map((year) => (

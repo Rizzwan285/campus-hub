@@ -40,7 +40,7 @@ function SlotList({ slots }: { slots: Slot[] }) {
       {slots.map((slot) => (
         <li key={slot.time} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4 py-3">
           <span className="flex items-center gap-2 font-medium tabular-nums shrink-0">
-            <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+            <Clock className="h-4 w-4 text-rose-500 dark:text-rose-300" aria-hidden="true" />
             {slot.time}
           </span>
           {slot.common ? (
@@ -58,7 +58,7 @@ const subheading = 'text-xs font-semibold uppercase tracking-wider text-muted-fo
 
 export function GymTimingsCard() {
   return (
-    <FeatureCard id="gym-timings">
+    <FeatureCard id="gym-timings" accent="rose">
       <FeatureCardHeader
         icon={Dumbbell}
         title="Gym Timings"
@@ -70,7 +70,7 @@ export function GymTimingsCard() {
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium px-3 py-1.5 rounded-lg border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors shrink-0"
           >
-            <FileText className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+            <FileText className="h-3.5 w-3.5 text-rose-500 dark:text-rose-300" aria-hidden="true" />
             <span className="hidden sm:inline">Official Circular</span>
             <span className="sm:hidden">PDF</span>
             <ExternalLink className="h-3 w-3" aria-hidden="true" />
@@ -79,8 +79,8 @@ export function GymTimingsCard() {
         }
       />
 
-      <p className="flex items-start gap-2 text-sm mb-4 p-3 rounded-xl bg-primary/5 border border-primary/20">
-        <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+      <p className="flex items-start gap-2 text-sm mb-4 p-3 rounded-xl bg-gradient-to-br from-rose-500/15 to-transparent border border-rose-500/30">
+        <Info className="h-4 w-4 text-rose-600 dark:text-rose-300 shrink-0 mt-0.5" aria-hidden="true" />
         <span>
           Gym Instructor is available from <strong>6:00 AM to 8:30 AM</strong>.
         </span>
@@ -122,7 +122,7 @@ export function GymTimingsCard() {
 
               <div className="rounded-xl border border-border/50 px-3.5 py-3">
                 <p className="flex items-center gap-2 font-medium mb-2 tabular-nums">
-                  <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <Clock className="h-4 w-4 text-rose-500 dark:text-rose-300" aria-hidden="true" />
                   6:00 pm – 8:00 pm <span className="text-muted-foreground font-normal">(Team Allotments)</span>
                 </p>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-sm divide-y divide-border/30 sm:divide-y-0">

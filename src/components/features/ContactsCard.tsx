@@ -78,7 +78,7 @@ export function ContactsCard() {
   if (categories.length === 0) return null;
 
   return (
-    <FeatureCard id="contacts">
+    <FeatureCard id="contacts" accent="amber">
       <FeatureCardHeader icon={ContactIcon} title="Contacts" subtitle="Tap a number to call" />
 
       <Accordion type="multiple">

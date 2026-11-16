@@ -5,7 +5,7 @@ import { FEEDBACK_FORM_URL } from '@/lib/feedbackForm';
 
 export function FeedbackCard() {
   return (
-    <FeatureCard id="feedback">
+    <FeatureCard id="feedback" accent="emerald">
       <FeatureCardHeader icon={MessageSquarePlus} title="Feedback" subtitle="Tell me what to fix or add" />
 
       <p className="text-sm text-muted-foreground mb-4">
