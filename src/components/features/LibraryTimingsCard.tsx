@@ -1,4 +1,4 @@
-import { BookOpen, Clock, MapPin } from 'lucide-react';
+import { BookOpen, Clock, ExternalLink, MapPin, Search } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeUntil } from '@/utils/dateUtils';
@@ -8,6 +8,9 @@ import {
   LIBRARY_DAYS_LABEL,
   LIBRARY_TIMINGS_LABEL,
 } from '@/data/libraryData';
+
+/** The library's online catalogue (Web OPAC). */
+const LIBRARY_OPAC_URL = 'https://library.iitpkd.ac.in/';
 
 interface LibraryTimingsCardProps {
   currentTime: Date;
@@ -72,6 +75,20 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
           </div>
         ))}
       </div>
+
+      <a
+        href={LIBRARY_OPAC_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors"
+      >
+        <Search className="h-5 w-5 text-primary shrink-0" aria-hidden="true" />
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-sm">Library Web OPAC</h3>
+          <p className="text-xs text-muted-foreground">Browse the catalogue, borrow and renew library books</p>
+        </div>
+        <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+      </a>
     </Card>
   );
 }

@@ -3,6 +3,11 @@ import { Card } from '@/components/ui/card';
 import { docUrl } from '@/lib/documentUrl';
 
 const campusLinks = [
+  {
+    title: 'Academic Guidelines and Forms',
+    description: 'Forms such as the Bonafide Certificate, Signed Transcript and Course Completion Certificate requests',
+    href: 'https://iitpkd.ac.in/academics-downloads',
+  },
   { title: 'SAC Website', description: 'Student Affairs Council', href: 'https://saciitpkd.github.io/website/' },
   { title: 'Moodle', description: 'Learning Management System', href: 'https://lms.iitpkd.ac.in/' },
   { title: 'Fedena', description: 'Records Portal', href: 'https://records.iitpkd.ac.in/' },
