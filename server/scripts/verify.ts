@@ -7,6 +7,11 @@
  */
 import fs from 'fs';
 import path from 'path';
+import type { MessResponse } from '../src/repositories/mess.repository';
+import type { CanteenSection } from '../src/repositories/canteen.repository';
+import type { AcademicDaysResponse } from '../src/repositories/calendar.repository';
+import type { CourseOffering } from '../src/repositories/timetable.repository';
+import type { CourseOffering as BundledCourse } from '../../src/engine/types';
 
 import {
   workingDaysBus,
@@ -98,7 +103,7 @@ async function main() {
   console.log(`Verifying ${API} against src/data\n`);
 
   // ---- mess ----------------------------------------------------------
-  const mess = await get<any>('/api/mess');
+  const mess = await get<MessResponse>('/api/mess');
   checkWeekMenu('kedaram week13', mess.messes.kedaram.menus.week13, week1and3Menu);
   checkWeekMenu('kedaram week24', mess.messes.kedaram.menus.week24, week2and4Menu);
   checkWeekMenu('nila', mess.messes.nila.menus.all, nilaMessMenu);
@@ -119,7 +124,7 @@ async function main() {
   checkBus('sunday', bus.sunday, sundayBus);
 
   // ---- canteen -------------------------------------------------------
-  const canteen = await get<any[]>('/api/canteen');
+  const canteen = await get<CanteenSection[]>('/api/canteen');
   check('canteen section count', canteen.length, canteenSections.length);
   canteenSections.forEach((expected, index) => {
     const actual = canteen[index];
@@ -129,13 +134,13 @@ async function main() {
     check(`canteen[${index}].endHour`, actual?.endHour, expected.endHour);
     check(
       `canteen[${index}].items`,
-      actual?.items?.map((i: any) => ({ name: i.name, price: i.price, variant: i.variant })),
+      actual?.items?.map((i) => ({ name: i.name, price: i.price, variant: i.variant })),
       expected.items.map((i) => ({ name: i.name, price: i.price, variant: i.variant })),
     );
   });
 
   // ---- academic days --------------------------------------------------
-  const academic = await get<any>('/api/academic-days');
+  const academic = await get<AcademicDaysResponse>('/api/academic-days');
   const timetableHolidays: Array<{ date: string; name: string }> = JSON.parse(
     fs.readFileSync(path.join(TIMETABLE_DIR, 'holidays.json'), 'utf8'),
   );
@@ -157,8 +162,8 @@ async function main() {
     const dir = path.join(TIMETABLE_DIR, program);
     for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
       const branch = path.basename(file, '.json');
-      const expected: any[] = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
-      const actual = await get<any[]>(`/api/timetable/${program}/${branch}`);
+      const expected: BundledCourse[] = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
+      const actual = await get<CourseOffering[]>(`/api/timetable/${program}/${branch}`);
 
       check(`${program}/${branch} course count`, actual.length, expected.length);
 
@@ -170,7 +175,7 @@ async function main() {
         check(`${program}/${branch} ${course.courseCode} credits`, got?.credits, course.credits ?? null);
         check(
           `${program}/${branch} ${course.courseCode} meetings`,
-          got?.meetings?.map((m: any) => ({
+          got?.meetings?.map((m) => ({
             type: m.type,
             day: m.day,
             startTime: m.startTime,
@@ -179,7 +184,7 @@ async function main() {
             instructors: m.instructors,
             recurrence: m.recurrence,
           })),
-          (course.meetings ?? []).map((m: any) => ({
+          (course.meetings ?? []).map((m) => ({
             type: m.type,
             day: m.day,
             startTime: m.startTime,

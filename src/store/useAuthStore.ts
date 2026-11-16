@@ -138,12 +138,15 @@ export const useAuthStore = create<AuthState>()(
       },
 
       async syncCourseOverrides(overrides) {
+        const previous = get().account;
+        const semesterId = useTimetableStore.getState().semester?.id ?? undefined;
         const data = await apiFetch<{ courseOverrides: CourseOverride[] }>('/api/auth/course-overrides', {
           method: 'PUT',
-          body: { overrides },
+          body: { overrides, semesterId },
         });
         const account = get().account;
-        if (account) {
+        if (account && account.id === previous?.id &&
+            useTimetableStore.getState().semester?.id === semesterId) {
           set({ account: { ...account, courseOverrides: data.courseOverrides } });
         }
       },

@@ -1,6 +1,15 @@
+import assert from 'node:assert/strict';
+import type { CatalogueCourse, ImportSummary, PublicSemester, PublishResult, Semester, listSnapshots } from '../src/repositories/semesters.repository';
+import type { CourseOffering } from '../src/repositories/timetable.repository';
+import type { PublicProfile } from '../src/repositories/profile.repository';
+import type { SlotDefinitions } from '../../src/engine/courseSchedule';
+
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { contextOf, startHarness, type Harness } from './helpers/harness';
 import { meeting, parsedCourse, parsedImport, publishSemester } from './helpers/fixtures';
+
+type Snapshot = { semester: PublicSemester; slots: SlotDefinitions; courses: CourseOffering[] };
+type ApiError = { error: string; details?: unknown };
 
 let h: Harness;
 let admin: { id: string; token: string };
@@ -14,8 +23,10 @@ beforeAll(async () => {
 afterAll(async () => h.close());
 
 const courseByCode = async (semesterId: number, code: string) => {
-  const list = await h.api('GET', `/api/admin/semesters/${semesterId}/courses`, { token: admin.token });
-  return list.body.find((course: { courseCode: string }) => course.courseCode === code);
+  const list = await h.api<CatalogueCourse[]>('GET', `/api/admin/semesters/${semesterId}/courses`, { token: admin.token });
+  const course = list.body.find((entry) => entry.courseCode === code);
+  if (!course) throw new Error(`Missing course ${code} in semester ${semesterId}`);
+  return course;
 };
 
 describe('semester lifecycle: draft, review, publish, activate', () => {
@@ -23,25 +34,25 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
   let code: string;
 
   it('is admin-only, and reads no upload from anyone else', async () => {
-    expect((await h.api('GET', '/api/admin/semesters')).status).toBe(401);
-    expect((await h.api('GET', '/api/admin/semesters', { token: student.token })).status).toBe(403);
+    expect((await h.api<Semester[]>('GET', '/api/admin/semesters')).status).toBe(401);
+    expect((await h.api<Semester[]>('GET', '/api/admin/semesters', { token: student.token })).status).toBe(403);
     const big = { junk: 'x'.repeat(600_000) };
     expect((await h.api('POST', '/api/admin/semesters/1/import-parsed', { body: big })).status).toBe(401);
     expect((await h.api('POST', '/api/admin/semesters/1/import-parsed', { token: student.token, body: big })).status).toBe(403);
   });
 
   it('creates a draft, and refuses a second one with the same name', async () => {
-    const created = await h.api('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Aug-Dec 2026' } });
+    const created = await h.api<Semester>('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Aug-Dec 2026' } });
     expect(created.status).toBe(201);
     expect(created.body).toMatchObject({ code: 'aug-dec-2026', status: 'draft', slotsConfirmed: false, publishedVersion: 0 });
     id = created.body.id;
     code = created.body.code;
-    const again = await h.api('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Aug-Dec 2026' } });
+    const again = await h.api<Semester>('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Aug-Dec 2026' } });
     expect(again.status).toBe(409);
   });
 
   it('imports courses and sorts them into ok, needs review and invalid', async () => {
-    const imported = await h.api('POST', `/api/admin/semesters/${id}/import-parsed`, {
+    const imported = await h.api<ImportSummary>('POST', `/api/admin/semesters/${id}/import-parsed`, {
       token: admin.token,
       body: parsedImport([
         parsedCourse({ code: 'CS101', rawSlot: 'B+PA1', assignments: [
@@ -63,21 +74,21 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
 
     const cs101 = await courseByCode(id, 'CS101');
     // Rooms are per slot: the lecture slot and the lab slot keep their own venue.
-    expect(cs101.meetings.map((m: any) => `${m.slot} ${m.day} ${m.room}`)).toEqual([
+    expect(cs101.meetings.map((m) => `${m.slot} ${m.day} ${m.room}`)).toEqual([
       'B Monday A01-212', 'PA1 Monday Nila CS Lab', 'B Tuesday A01-212', 'B Friday A01-212',
     ]);
     const cs103 = await courseByCode(id, 'CS103');
-    expect(cs103.meetings.every((m: any) => m.startTime === '13:00')).toBe(true);
+    expect(cs103.meetings.every((m) => m.startTime === '13:00')).toBe(true);
     expect(cs103.reviewStatus).toBe('needs_review');
   });
 
   it('will not publish before the slot table is confirmed or while a course is invalid', async () => {
-    let publish = await h.api('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
+    let publish = await h.api<ApiError>('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
     expect(publish.status).toBe(409);
     expect(publish.body.error).toMatch(/slot table/i);
 
     await h.api('PATCH', `/api/admin/semesters/${id}`, { token: admin.token, body: { slotsConfirmed: true } });
-    publish = await h.api('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
+    publish = await h.api<ApiError>('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
     expect(publish.status).toBe(409);
     expect(publish.body.details).toEqual([expect.objectContaining({ courseCode: 'CS102' })]);
 
@@ -88,7 +99,7 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
 
   it('accepts a manual correction made with structured slots, days and rooms', async () => {
     const cs102 = await courseByCode(id, 'CS102');
-    const saved = await h.api('PUT', `/api/admin/semesters/${id}/courses/${cs102.id}`, {
+    const saved = await h.api<CatalogueCourse>('PUT', `/api/admin/semesters/${id}/courses/${cs102.id}`, {
       token: admin.token,
       body: {
         schedule: {
@@ -102,24 +113,24 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
     });
     expect(saved.status).toBe(200);
     expect(saved.body).toMatchObject({ reviewStatus: 'ok', manual: true });
-    expect(saved.body.meetings.map((m: any) => `${m.day} ${m.startTime} ${m.room}`)).toEqual([
+    expect(saved.body.meetings.map((m) => `${m.day} ${m.startTime} ${m.room}`)).toEqual([
       'Monday 09:00 A01-212', 'Friday 10:00 A01-118', 'Saturday 10:00 Seminar Hall',
     ]);
 
     // Choosing a day the slot does not meet on is an error, not a silent drop.
-    const wrong = await h.api('PUT', `/api/admin/semesters/${id}/courses/${cs102.id}`, {
+    const wrong = await h.api<CatalogueCourse>('PUT', `/api/admin/semesters/${id}/courses/${cs102.id}`, {
       token: admin.token,
       body: { schedule: { assignments: [{ slot: 'B', days: ['Wednesday'], room: '' }], custom: [] } },
     });
     expect(wrong.body.reviewStatus).toBe('invalid');
-    await h.api('PUT', `/api/admin/semesters/${id}/courses/${cs102.id}`, {
+    await h.api<CatalogueCourse>('PUT', `/api/admin/semesters/${id}/courses/${cs102.id}`, {
       token: admin.token,
       body: { schedule: { assignments: [{ slot: 'B', days: ['Monday'], room: 'A01-212' }], custom: [] } },
     });
   });
 
   it('publishes atomically as version 1, without yet changing what students see', async () => {
-    const publish = await h.api('POST', `/api/admin/semesters/${id}/publish`, {
+    const publish = await h.api<PublishResult>('POST', `/api/admin/semesters/${id}/publish`, {
       token: admin.token, body: { note: 'First release' },
     });
     expect(publish.status).toBe(200);
@@ -127,8 +138,8 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
     expect(publish.body.semester.status).toBe('published');
 
     // Published is not active: there is still no current semester.
-    expect((await h.api('GET', '/api/timetable/snapshot')).status).toBe(404);
-    const upcoming = await h.api('GET', `/api/timetable/snapshot?semester=${code}`);
+    expect((await h.api<Snapshot>('GET', '/api/timetable/snapshot')).status).toBe(404);
+    const upcoming = await h.api<Snapshot>('GET', `/api/timetable/snapshot?semester=${code}`);
     expect(upcoming.status).toBe(200);
     expect(upcoming.body.courses).toHaveLength(3);
     expect(upcoming.body.semester).toMatchObject({ name: 'Aug-Dec 2026', status: 'published', version: 1 });
@@ -138,27 +149,27 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
   });
 
   it('never serves a draft publicly', async () => {
-    const draft = await h.api('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Draft Only 2030' } });
+    const draft = await h.api<Semester>('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Draft Only 2030' } });
     expect((await h.api('GET', `/api/timetable/snapshot?semester=${draft.body.code}`)).status).toBe(404);
-    const listed = await h.api('GET', '/api/timetable/semesters');
-    expect(listed.body.map((entry: any) => entry.code)).toEqual(['aug-dec-2026']);
+    const listed = await h.api<PublicSemester[]>('GET', '/api/timetable/semesters');
+    expect(listed.body.map((entry) => entry.code)).toEqual(['aug-dec-2026']);
   });
 
   it('activates, and the legacy course endpoints then serve this semester', async () => {
-    const activated = await h.api('POST', `/api/admin/semesters/${id}/activate`, { token: admin.token });
+    const activated = await h.api<{ semester: Semester; archived: Semester | null }>('POST', `/api/admin/semesters/${id}/activate`, { token: admin.token });
     expect(activated.status).toBe(200);
     expect(activated.body.semester.status).toBe('active');
 
-    const snapshot = await h.api('GET', '/api/timetable/snapshot');
+    const snapshot = await h.api<Snapshot>('GET', '/api/timetable/snapshot');
     expect(snapshot.body.semester.code).toBe(code);
     expect(Object.keys(snapshot.body.slots)).toEqual(['A', 'B', 'J', 'PA1']);
-    const courses = await h.api('GET', '/api/timetable/courses');
-    expect(courses.body.map((course: any) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS103']);
+    const courses = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    expect(courses.body.map((course) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS103']);
     expect(courses.body[0].offeringId).toMatch(/^aug-dec-2026\//);
   });
 
   it('keeps a manual correction through a re-import of unchanged files', async () => {
-    const again = await h.api('POST', `/api/admin/semesters/${id}/import-parsed`, {
+    const again = await h.api<ImportSummary>('POST', `/api/admin/semesters/${id}/import-parsed`, {
       token: admin.token,
       body: parsedImport([
         parsedCourse({ code: 'CS101', rawSlot: 'B+PA1', assignments: [
@@ -181,7 +192,7 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
   });
 
   it('flags a manual correction for revalidation when its source row changes, without discarding it', async () => {
-    const changed = await h.api('POST', `/api/admin/semesters/${id}/import-parsed`, {
+    const changed = await h.api<ImportSummary>('POST', `/api/admin/semesters/${id}/import-parsed`, {
       token: admin.token,
       body: parsedImport([
         parsedCourse({ code: 'CS101', rawSlot: 'B+PA1', assignments: [
@@ -198,39 +209,41 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
 
     const cs102 = await courseByCode(id, 'CS102');
     expect(cs102.reviewStatus).toBe('needs_review');
-    expect(cs102.issues.map((issue: any) => issue.code)).toContain('source_changed');
+    expect(cs102.issues.map((issue) => issue.code)).toContain('source_changed');
     expect(cs102.meetings).toHaveLength(1); // still the admin's Monday-only B
 
     // Nothing reached students yet: the import only touched the draft.
-    const live = await h.api('GET', '/api/timetable/courses');
-    expect(live.body.map((course: any) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS103']);
+    const live = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    expect(live.body.map((course) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS103']);
 
-    const reset = await h.api('POST', `/api/admin/semesters/${id}/courses/${cs102.id}/reset`, { token: admin.token });
+    const reset = await h.api<CatalogueCourse>('POST', `/api/admin/semesters/${id}/courses/${cs102.id}/reset`, { token: admin.token });
     expect(reset.body.manual).toBe(false);
-    expect(reset.body.meetings.map((m: any) => m.slot)).toEqual(['J', 'J']);
+    expect(reset.body.meetings.map((m) => m.slot)).toEqual(['J', 'J']);
   });
 
   it('publishes the changes as version 2 and can roll back to version 1', async () => {
-    const second = await h.api('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
+    const second = await h.api<PublishResult>('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
     expect(second.body, JSON.stringify(second.body)).toMatchObject({ version: 2 });
-    let live = await h.api('GET', '/api/timetable/courses');
-    expect(live.body.map((course: any) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS104']);
+    let live = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    expect(live.body.map((course) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS104']);
 
-    const rollback = await h.api('POST', `/api/admin/semesters/${id}/rollback`, { token: admin.token, body: { version: 1 } });
+    const rollback = await h.api<PublishResult>('POST', `/api/admin/semesters/${id}/rollback`, { token: admin.token, body: { version: 1 } });
     expect(rollback.status).toBe(200);
     expect(rollback.body.version).toBe(3);
-    live = await h.api('GET', '/api/timetable/courses');
-    expect(live.body.map((course: any) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS103']);
-    expect(live.body.find((course: any) => course.id === 'CS102').meetings).toHaveLength(1);
+    live = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    expect(live.body.map((course) => course.id).sort()).toEqual(['CS101', 'CS102', 'CS103']);
+    expect(live.body.find((course) => course.id === 'CS102')?.meetings).toHaveLength(1);
 
-    const detail = await h.api('GET', `/api/admin/semesters/${id}`, { token: admin.token });
-    expect(detail.body.snapshots.map((s: any) => `${s.version}:${s.kind}`)).toEqual(['3:rollback', '2:publish', '1:publish']);
-    expect((await h.api('POST', `/api/admin/semesters/${id}/rollback`, { token: admin.token, body: { version: 99 } })).status).toBe(404);
+    const detail = await h.api<{ snapshots: Awaited<ReturnType<typeof listSnapshots>> }>('GET', `/api/admin/semesters/${id}`, { token: admin.token });
+    expect(detail.body.snapshots.map((s) => `${s.version}:${s.kind}`)).toEqual(['3:rollback', '2:publish', '1:publish']);
+    expect((await h.api<PublishResult>('POST', `/api/admin/semesters/${id}/rollback`, { token: admin.token, body: { version: 99 } })).status).toBe(404);
   });
 
   it('writes an edit made in the old slot editor back into the draft, so a publish keeps it', async () => {
-    const live = await h.api('GET', '/api/timetable/courses');
-    const offeringId = live.body.find((course: any) => course.id === 'CS101').offeringId;
+    const live = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    const offering = live.body.find((course) => course.id === 'CS101');
+    assert.ok(offering);
+    const offeringId = offering.offeringId;
     const edit = await h.api('PUT', `/api/admin/courses/${encodeURIComponent(offeringId)}/schedule`, {
       token: admin.token,
       body: { meetings: [{ type: 'lecture', day: 'Thursday', startTime: '16:00', endTime: '17:00', room: 'A01-001' }] },
@@ -238,11 +251,11 @@ describe('semester lifecycle: draft, review, publish, activate', () => {
     expect(edit.status).toBe(200);
     const draft = await courseByCode(id, 'CS101');
     expect(draft).toMatchObject({ manual: true, dirty: false });
-    expect(draft.meetings.map((m: any) => m.day)).toEqual(['Thursday']);
+    expect(draft.meetings.map((m) => m.day)).toEqual(['Thursday']);
 
-    await h.api('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
-    const after = await h.api('GET', '/api/timetable/courses');
-    expect(after.body.find((course: any) => course.id === 'CS101').meetings.map((m: any) => m.day)).toEqual(['Thursday']);
+    await h.api<PublishResult>('POST', `/api/admin/semesters/${id}/publish`, { token: admin.token, body: {} });
+    const after = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    expect(after.body.find((course) => course.id === 'CS101')?.meetings.map((m) => m.day)).toEqual(['Thursday']);
   });
 });
 
@@ -261,7 +274,7 @@ describe('semester isolation of student data', () => {
       body: { overrides: [{ courseCode: 'CS101', meetings: [meeting('Friday', '15:00', '16:00')], baseFingerprint: 'abc', savedAt: new Date().toISOString() }] },
     });
     expect(override.status).toBe(200);
-    const me = await h.api('GET', '/api/auth/me', { token: student.token });
+    const me = await h.api<{ profile: PublicProfile }>('GET', '/api/auth/me', { token: student.token });
     expect(me.body.profile).toMatchObject({ semesterId: first, selectedCourseIds: ['CS101', 'CS102'] });
     expect(me.body.profile.courseOverrides).toHaveLength(1);
   });
@@ -271,33 +284,33 @@ describe('semester isolation of student data', () => {
       parsedCourse({ code: 'CS101', rawSlot: 'A', assignments: [{ slot: 'A', days: null, room: 'N305' }] }),
       parsedCourse({ code: 'CS201', rawSlot: 'J', assignments: [{ slot: 'J', days: null, room: 'A01-007' }] }),
     ]);
-    const me = await h.api('GET', '/api/auth/me', { token: student.token });
+    const me = await h.api<{ profile: PublicProfile }>('GET', '/api/auth/me', { token: student.token });
     expect(me.body.profile.selectedCourseIds).toEqual(['CS101', 'CS102']);
-    const current = await h.api('GET', '/api/timetable/snapshot');
+    const current = await h.api<Snapshot>('GET', '/api/timetable/snapshot');
     expect(current.body.semester.name).toBe('Aug-Dec 2026');
-    const listed = await h.api('GET', '/api/timetable/semesters');
-    expect(listed.body.map((entry: any) => `${entry.name}:${entry.status}`)).toEqual([
+    const listed = await h.api<PublicSemester[]>('GET', '/api/timetable/semesters');
+    expect(listed.body.map((entry) => `${entry.name}:${entry.status}`)).toEqual([
       'Aug-Dec 2026:active', 'Jan-May 2027:published',
     ]);
   });
 
   it('activating it starts students fresh and archives the old semester intact', async () => {
-    const activated = await h.api('POST', `/api/admin/semesters/${second.id}/activate`, { token: admin.token });
-    expect(activated.body.archived.name).toBe('Aug-Dec 2026');
+    const activated = await h.api<{ semester: Semester; archived: Semester | null }>('POST', `/api/admin/semesters/${second.id}/activate`, { token: admin.token });
+    expect(activated.body.archived?.name).toBe('Aug-Dec 2026');
 
-    const me = await h.api('GET', '/api/auth/me', { token: student.token });
+    const me = await h.api<{ profile: PublicProfile }>('GET', '/api/auth/me', { token: student.token });
     // The reused code CS101 inherits neither the selection nor the correction.
     expect(me.body.profile).toMatchObject({ semesterId: second.id, selectedCourseIds: [], courseOverrides: [] });
-    const courses = await h.api('GET', '/api/timetable/courses');
-    expect(courses.body.map((course: any) => course.id).sort()).toEqual(['CS101', 'CS201']);
-    expect(courses.body.find((c: any) => c.id === 'CS101').meetings[0].room).toBe('N305');
+    const courses = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+    expect(courses.body.map((course) => course.id).sort()).toEqual(['CS101', 'CS201']);
+    expect(courses.body.find((c) => c.id === 'CS101')?.meetings[0].room).toBe('N305');
 
     // Nothing of the old semester was deleted.
     expect(await h.sql('select 1 from course_offerings where semester_id = $1', [first])).toHaveLength(3);
     expect(await h.sql('select 1 from user_courses where semester_id = $1', [first])).toHaveLength(2);
     expect(await h.sql('select 1 from user_course_overrides where semester_id = $1', [first])).toHaveLength(1);
-    const all = await h.api('GET', '/api/admin/semesters', { token: admin.token });
-    expect(all.body.find((s: any) => s.id === first).status).toBe('archived');
+    const all = await h.api<Semester[]>('GET', '/api/admin/semesters', { token: admin.token });
+    expect(all.body.find((s) => s.id === first)?.status).toBe('archived');
   });
 
   it('refuses a selection written by a tab still on the old semester', async () => {
@@ -311,10 +324,23 @@ describe('semester isolation of student data', () => {
     expect(fresh.body).toMatchObject({ selectedCourseIds: ['CS201'], semesterId: second.id });
   });
 
+  it('refuses stale personal timings without erasing either semester', async () => {
+    const stale = await h.api('PUT', '/api/auth/course-overrides', {
+      token: student.token, body: { semesterId: first, overrides: [] },
+    });
+    expect(stale.status).toBe(409);
+    expect(await h.sql('select 1 from user_course_overrides where user_id = $1 and semester_id = $2', [student.id, first])).toHaveLength(1);
+    expect(await h.sql('select 1 from user_course_overrides where user_id = $1 and semester_id = $2', [student.id, second.id])).toHaveLength(0);
+    const fresh = await h.api('PUT', '/api/auth/course-overrides', {
+      token: student.token, body: { semesterId: second.id, overrides: [] },
+    });
+    expect(fresh.status).toBe(200);
+  });
+
   it('activation is reversible: going back restores the earlier semester and its student data', async () => {
     const back = await h.api('POST', `/api/admin/semesters/${first}/activate`, { token: admin.token });
     expect(back.status).toBe(200);
-    const me = await h.api('GET', '/api/auth/me', { token: student.token });
+    const me = await h.api<{ profile: PublicProfile }>('GET', '/api/auth/me', { token: student.token });
     expect(me.body.profile.selectedCourseIds.sort()).toEqual(['CS101', 'CS102']);
     expect(me.body.profile.courseOverrides).toHaveLength(1);
     expect((await h.api('POST', `/api/admin/semesters/${first}/activate`, { token: admin.token })).status).toBe(409);
@@ -323,7 +349,7 @@ describe('semester isolation of student data', () => {
 
 describe('uploads', () => {
   it('rejects anything that is not a named .xlsx/.docx zip container', async () => {
-    const draft = await h.api('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Upload Test 2031' } });
+    const draft = await h.api<Semester>('POST', '/api/admin/semesters', { token: admin.token, body: { name: 'Upload Test 2031' } });
     const id = draft.body.id;
     const put = (name: string, raw: Buffer) =>
       h.api('PUT', `/api/admin/semesters/${id}/files/${encodeURIComponent(name)}`, { token: admin.token, raw });
