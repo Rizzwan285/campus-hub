@@ -1,5 +1,5 @@
 import { ExternalLink, MapPin, Phone, Contact as ContactIcon } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useContacts } from '@/hooks/useApiData';
 import { withContacts } from '@/lib/contacts';
@@ -78,16 +78,8 @@ export function ContactsCard() {
   if (categories.length === 0) return null;
 
   return (
-    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
-      <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 bg-primary/8 rounded-xl">
-          <ContactIcon className="h-6 w-6 text-primary" aria-hidden="true" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Contacts</h2>
-          <p className="text-sm text-muted-foreground">Tap a number to call</p>
-        </div>
-      </div>
+    <FeatureCard id="contacts">
+      <FeatureCardHeader icon={ContactIcon} title="Contacts" subtitle="Tap a number to call" />
 
       <Accordion type="multiple">
         {categories.map((category, index) => (
@@ -114,6 +106,6 @@ export function ContactsCard() {
           </AccordionItem>
         ))}
       </Accordion>
-    </Card>
+    </FeatureCard>
   );
 }

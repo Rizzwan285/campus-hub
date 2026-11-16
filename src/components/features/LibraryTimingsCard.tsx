@@ -1,5 +1,5 @@
 import { BookOpen, Clock, ExternalLink, MapPin, Search } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeUntil } from '@/utils/dateUtils';
 import {
@@ -20,29 +20,24 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
   const { open, changesAt } = getLibraryStatus(currentTime);
 
   return (
-    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/8 rounded-xl">
-            <BookOpen className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold">Library Timings</h2>
-            <p className="text-sm text-muted-foreground">Nila &amp; Sahyadri libraries</p>
-          </div>
-        </div>
-
-        <Badge
-          variant="outline"
-          className={`shrink-0 ${
-            open
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-              : 'bg-muted text-muted-foreground'
-          }`}
-        >
-          {open ? 'Open now' : 'Closed'}
-        </Badge>
-      </div>
+    <FeatureCard id="library-timings">
+      <FeatureCardHeader
+        icon={BookOpen}
+        title="Library Timings"
+        subtitle="Nila & Sahyadri libraries"
+        aside={
+          <Badge
+            variant="outline"
+            className={`shrink-0 ${
+              open
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                : 'bg-muted text-muted-foreground'
+            }`}
+          >
+            {open ? 'Open now' : 'Closed'}
+          </Badge>
+        }
+      />
 
       <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
         <div className="flex items-center gap-2 mb-1">
@@ -84,11 +79,12 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
       >
         <Search className="h-5 w-5 text-primary shrink-0" aria-hidden="true" />
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm">Library Web OPAC</h3>
+          <p className="font-medium text-sm">Library Web OPAC</p>
           <p className="text-xs text-muted-foreground">Browse the catalogue, borrow and renew library books</p>
         </div>
         <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+        <span className="sr-only">(opens in a new tab)</span>
       </a>
-    </Card>
+    </FeatureCard>
   );
 }

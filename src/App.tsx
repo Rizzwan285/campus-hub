@@ -8,9 +8,10 @@ import Index from "./pages/Index";
 import Timetable from "./pages/Timetable";
 import Campus from "./pages/Campus";
 import Leave from "./pages/Leave";
-import Gym from "./pages/Gym";
+import Academics from "./pages/Academics";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import { LEGACY_REDIRECTS } from "./routes";
 
 const queryClient = new QueryClient();
 
@@ -26,16 +27,14 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route path="/" element={<Index />} />
             <Route path="/timetable" element={<Timetable />} />
+            <Route path="/academics" element={<Academics />} />
             <Route path="/campus" element={<Campus />} />
             <Route path="/leave" element={<Leave />} />
-            <Route path="/gym" element={<Gym />} />
           </Route>
-          {/* Legacy & direct shortcut redirects */}
-          <Route path="/food" element={<Navigate to="/" replace />} />
-          <Route path="/buggy" element={<Navigate to="/" replace />} />
-          <Route path="/buggy-timings" element={<Navigate to="/" replace />} />
-          <Route path="/bus-timings" element={<Navigate to="/" replace />} />
-          <Route path="/holidays" element={<Navigate to="/leave" replace />} />
+          {/* Old and shortcut addresses (src/routes.ts), e.g. /gym -> /campus#gym. */}
+          {LEGACY_REDIRECTS.map(({ from, to }) => (
+            <Route key={from} path={from} element={<Navigate to={to} replace />} />
+          ))}
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

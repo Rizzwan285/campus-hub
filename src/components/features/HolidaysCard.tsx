@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CalendarDays, ChevronsDown, PartyPopper } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Badge } from '@/components/ui/badge';
 import { useAcademicDays } from '@/hooks/useApiData';
 import { formatDaysAway, holidayWindow, type HolidayEntry } from '@/lib/holidayList';
@@ -125,18 +125,12 @@ export function HolidaysCard({ date }: HolidaysCardProps) {
   const tentativeShown = rows.some((entry) => entry.tentative && !entry.past);
 
   return (
-    <Card id="holidays" className="scroll-mt-6 p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] rounded-2xl">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-primary/8 rounded-xl">
-          <CalendarDays className="h-6 w-6 text-primary" aria-hidden="true" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Institute holidays</h2>
-          <p className="text-sm text-muted-foreground">
-            Gazetted holidays{years.length ? ` · ${years[0]}${years.length > 1 ? `–${years[years.length - 1]}` : ''}` : ''}
-          </p>
-        </div>
-      </div>
+    <FeatureCard id="holiday-list">
+      <FeatureCardHeader
+        icon={CalendarDays}
+        title="Institute holidays"
+        subtitle={`Gazetted holidays${years.length ? ` · ${years[0]}${years.length > 1 ? `–${years[years.length - 1]}` : ''}` : ''}`}
+      />
 
       {next ? (
         <>
@@ -166,6 +160,6 @@ export function HolidaysCard({ date }: HolidaysCardProps) {
           Mess, bus and buggy schedules follow the Saturday / holiday timings on these days, and classes are not held.
         </p>
       </div>
-    </Card>
+    </FeatureCard>
   );
 }

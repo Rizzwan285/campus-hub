@@ -1,17 +1,22 @@
 import { useOutletContext } from 'react-router-dom';
 import { LeaveFormCard } from '@/components/features/LeaveFormCard';
 import { HolidaysCard } from '@/components/features/HolidaysCard';
+import { PageSection, PageSections } from '@/components/layout/PageSection';
 import type { AppContextType } from '@/components/layout/AppLayout';
 
-/** Everything about being away from campus: when it is a holiday, and how to apply for leave. */
+/** Everything about being away from campus: how to apply for leave, and when it is a holiday. */
 const Leave = () => {
   const { displayDate, openSettings } = useOutletContext<AppContextType>();
 
   return (
-    <div className="max-w-3xl mx-auto w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <LeaveFormCard onChangeMess={openSettings} />
-      <HolidaysCard date={displayDate} />
-    </div>
+    <PageSections>
+      <PageSection id="leave-form" title="Apply for leave" description="Going out overnight or longer? Fill the form a day ahead.">
+        <LeaveFormCard onChangeMess={openSettings} />
+      </PageSection>
+      <PageSection id="holidays" title="Holidays" description="Days without classes, when holiday timings apply.">
+        <HolidaysCard date={displayDate} />
+      </PageSection>
+    </PageSections>
   );
 };
 

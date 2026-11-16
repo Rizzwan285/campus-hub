@@ -1,20 +1,12 @@
 import { ExternalLink, MessageSquarePlus } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Button } from '@/components/ui/button';
 import { FEEDBACK_FORM_URL } from '@/lib/feedbackForm';
 
 export function FeedbackCard() {
   return (
-    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-primary/8 rounded-xl">
-          <MessageSquarePlus className="h-6 w-6 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Feedback</h2>
-          <p className="text-sm text-muted-foreground">Tell me what to fix or add</p>
-        </div>
-      </div>
+    <FeatureCard id="feedback">
+      <FeatureCardHeader icon={MessageSquarePlus} title="Feedback" subtitle="Tell me what to fix or add" />
 
       <p className="text-sm text-muted-foreground mb-4">
         Spotted a wrong timing, a missing course or a menu that does not match
@@ -33,6 +25,6 @@ export function FeedbackCard() {
           <ExternalLink className="h-4 w-4" />
         </a>
       </Button>
-    </Card>
+    </FeatureCard>
   );
 }

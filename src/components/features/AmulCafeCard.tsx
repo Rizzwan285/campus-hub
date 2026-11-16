@@ -1,5 +1,5 @@
 import { Clock, Coffee, MapPin, Phone, Truck } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { amulCafe, amulMenuSections } from '@/data/amulCafeData';
@@ -7,16 +7,8 @@ import { telHref } from '@/lib/contactPhone';
 
 export function AmulCafeCard() {
   return (
-    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-primary/8 rounded-xl">
-          <Coffee className="h-6 w-6 text-primary" aria-hidden="true" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">{amulCafe.name}</h2>
-          <p className="text-sm text-muted-foreground">Menu &amp; campus delivery</p>
-        </div>
-      </div>
+    <FeatureCard id="amul-cafe">
+      <FeatureCardHeader icon={Coffee} title={amulCafe.name} subtitle="Menu & campus delivery" />
 
       <p className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
         <MapPin className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
@@ -70,6 +62,6 @@ export function AmulCafeCard() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </Card>
+    </FeatureCard>
   );
 }

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Calendar, Info, Dumbbell, CalendarOff } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { NAV_ITEMS } from '@/routes';
 import { getCurrentTimeInKolkata } from '@/utils/dateUtils';
 import { useUserStore } from '@/store/useUserStore';
 import { useTimetableStore } from '@/store/useTimetableStore';
@@ -114,13 +114,7 @@ export function AppLayout() {
     openSettings: accountsEnabled ? () => setSettingsOpen(true) : undefined,
   };
 
-  const navItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/timetable', label: 'Timetable', icon: Calendar },
-    { path: '/campus', label: 'Campus', icon: Info },
-    { path: '/leave', label: 'Leave', icon: CalendarOff },
-    { path: '/gym', label: 'Gym', icon: Dumbbell },
-  ];
+  const navItems = NAV_ITEMS;
 
   return (
     <div className="min-h-screen pb-24 md:pb-0 flex flex-col bg-background">
