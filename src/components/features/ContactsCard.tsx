@@ -25,7 +25,8 @@ const action =
 function ContactRow({ contact }: { contact: Contact }) {
   return (
     <li className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 py-3">
-      <div className="min-w-0 flex-1 basis-40">
+      {/* Narrow enough that a name and one number share a row on a 360px phone. */}
+      <div className="min-w-0 flex-1 basis-32">
         <p className="font-medium break-words">{contact.name}</p>
         {contact.location && (
           <p className="flex items-start gap-1.5 text-xs text-muted-foreground mt-1">
@@ -36,7 +37,7 @@ function ContactRow({ contact }: { contact: Contact }) {
         {contact.note && <p className="text-xs text-muted-foreground mt-1 break-words">{contact.note}</p>}
       </div>
 
-      <div className="flex flex-wrap gap-2 justify-end">
+      <div className="flex flex-wrap gap-2">
         {contact.phones.map((phone) => {
           const href = telHref(phone);
           return href ? (
