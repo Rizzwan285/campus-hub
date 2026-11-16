@@ -1,4 +1,4 @@
-import { ExternalLink, Info, ClipboardList } from 'lucide-react';
+import { ExternalLink, Info, ClipboardList, Settings } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useUserStore } from '@/store/useUserStore';
@@ -9,7 +9,12 @@ const LEAVE_FORMS = {
   kedaram: 'https://docs.google.com/forms/d/e/1FAIpQLSenga-fgK_f1CaFiOHvKoSJDFV29ygZV17c5KBpYwYjnWfhDQ/viewform',
 };
 
-export function LeaveFormCard() {
+interface LeaveFormCardProps {
+  /** Opens Account & settings, where the mess is changed. Absent in local-only mode. */
+  onChangeMess?: () => void;
+}
+
+export function LeaveFormCard({ onChangeMess }: LeaveFormCardProps) {
   const profile = useUserStore((state) => state.profile);
   const userMess = profile?.mess?.toLowerCase() === 'nila' ? 'nila' : 'kedaram';
 
@@ -42,6 +47,24 @@ export function LeaveFormCard() {
           </div>
         </div>
       </div>
+
+      {/* The form follows the mess in the profile, so a stale mess opens the wrong form. */}
+      <p className="flex items-start gap-2 text-xs text-muted-foreground mt-3">
+        <Settings className="h-3.5 w-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+        {onChangeMess ? (
+          <span>
+            Has your mess changed?{' '}
+            <button type="button" onClick={onChangeMess} className="font-medium text-primary underline underline-offset-2 hover:no-underline">
+              Update it in Settings
+            </button>{' '}
+            so this opens your current mess's form.
+          </span>
+        ) : (
+          <span>
+            Has your mess changed? Sign out (top right) and choose your current mess again, so this opens its form.
+          </span>
+        )}
+      </p>
     </Card>
   );
 }

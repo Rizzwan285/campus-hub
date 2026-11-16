@@ -20,6 +20,8 @@ export interface AppContextType {
   currentTime: Date;
   selectedDate: Date | null;
   displayDate: Date;
+  /** Opens Account & settings (where the mess is changed); absent without accounts. */
+  openSettings?: () => void;
 }
 
 export function AppLayout() {
@@ -109,6 +111,7 @@ export function AppLayout() {
     currentTime,
     selectedDate,
     displayDate,
+    openSettings: accountsEnabled ? () => setSettingsOpen(true) : undefined,
   };
 
   const navItems = [
