@@ -37,6 +37,8 @@ import {
   type MessTimings,
 } from '../../src/data/messData';
 import { canteenSections } from '../../src/data/canteenData';
+import { bundledContacts } from '../../src/data/contactsData';
+import { syncBundledContacts } from '../src/repositories/contacts.repository';
 
 const TIMETABLE_DIR = path.resolve(__dirname, '../../src/data/timetable');
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] as const;
@@ -509,6 +511,11 @@ async function main() {
     const daysWritten = await upsert(client, 'academic_days', ['date', 'name', 'kind'],
       academicDays, ['date'], ['name', 'kind'], true);
     note('academic_days', daysWritten, dayCustom);
+
+    // ---- contacts (admin-editable) ---------------------------------------
+    // Rows edited, added or removed in /admin are kept; reset discards them.
+    const contactSync = await syncBundledContacts(client, bundledContacts, { reset });
+    note('contacts', contactSync.written, contactSync.preserved);
 
     // ---- timetable (schedules are admin-editable) ------------------------
     const metadata = bundledMetadata;

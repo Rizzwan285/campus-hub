@@ -5,6 +5,7 @@ import * as canteen from '../repositories/canteen.repository';
 import * as calendar from '../repositories/calendar.repository';
 import * as timetable from '../repositories/timetable.repository';
 import * as specials from '../repositories/specialServices.repository';
+import * as contacts from '../repositories/contacts.repository';
 import * as semesters from '../repositories/semesters.repository';
 
 export const contentRouter = Router();
@@ -81,6 +82,22 @@ contentRouter.get('/bus/:dayType/upcoming', async (req, res, next) => {
 contentRouter.get('/special-services', async (_req, res, next) => {
   try {
     res.json(await specials.listSpecialServices());
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * The Contacts directory on the Campus page.
+ *
+ * Same convention as /special-services: an empty array means the developer
+ * removed every contact and is shown as such, while a database that
+ * migration 014 has not reached fails here, so the client uses its bundled
+ * copy rather than being told there are none.
+ */
+contentRouter.get('/contacts', async (_req, res, next) => {
+  try {
+    res.json(await contacts.listContacts());
   } catch (error) {
     next(error);
   }

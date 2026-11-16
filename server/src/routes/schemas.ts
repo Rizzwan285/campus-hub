@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { weekdayOfDate } from '../../../src/engine/courseTimings';
+import { MAX_LINK_LENGTH, MAX_PHONE_LENGTH, dialableNumber, isHttpsLink } from '../../../src/lib/contactPhone';
 
 export const WEEKDAYS = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
@@ -52,3 +53,80 @@ export const timetableMeetingSchema = z
   });
 
 export const meetingListSchema = z.array(timetableMeetingSchema).max(60);
+
+// ---------------------------------------------------------------- contacts
+
+/**
+ * The messages of a failed parse, once each, without paths or symbols — for
+ * forms where the developer reads the reply as a sentence.
+ */
+export function plainError(error: z.ZodError): string {
+  return [...new Set(error.issues.map((issue) => issue.message))].join(' ');
+}
+
+const optionalText = (max: number, label: string) =>
+  z
+    .string()
+    .trim()
+    .max(max, `${label} can be at most ${max} characters.`)
+    .nullable()
+    .optional()
+    .transform((value) => value || null);
+
+export const contactCategoryBody = z.object({
+  name: z
+    .string({ error: 'Enter a name for the category.' })
+    .trim()
+    .min(1, 'Enter a name for the category.')
+    .max(60, 'A category name can be at most 60 characters.'),
+});
+
+export const contactBody = z.object({
+  categoryId: z.number({ error: 'Choose a category.' }).int().positive('Choose a category.'),
+  name: z
+    .string({ error: 'Enter a name.' })
+    .trim()
+    .min(1, 'Enter a name.')
+    .max(80, 'A name can be at most 80 characters.'),
+  phones: z
+    .array(z.string().trim(), { error: 'Add at least one phone number.' })
+    .transform((phones) => phones.filter(Boolean))
+    .superRefine((phones, ctx) => {
+      if (phones.length === 0) ctx.addIssue({ code: 'custom', message: 'Add at least one phone number.' });
+      if (phones.length > 5) ctx.addIssue({ code: 'custom', message: 'A contact can have at most five numbers.' });
+      const seen = new Set<string>();
+      for (const phone of phones) {
+        const dialable = dialableNumber(phone);
+        if (!dialable) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `“${phone.slice(0, MAX_PHONE_LENGTH)}” does not look like a phone number. Use a 10-digit number, or include the country code (+91…).`,
+          });
+        } else if (seen.has(dialable)) {
+          ctx.addIssue({ code: 'custom', message: `${phone} is listed twice.` });
+        } else {
+          seen.add(dialable);
+        }
+      }
+    }),
+  location: optionalText(160, 'A location'),
+  link: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .transform((value) => value || null)
+    .refine((value) => value === null || isHttpsLink(value), {
+      message: `A link must be a full address starting with https:// (at most ${MAX_LINK_LENGTH} characters).`,
+    }),
+  note: optionalText(200, 'A note'),
+});
+
+/** A new order for a list: every id in it, once, first to last. */
+export const contactOrderBody = z.object({
+  ids: z
+    .array(z.number().int().positive(), { error: 'Send the new order as a list of ids.' })
+    .min(1, 'Send the new order as a list of ids.')
+    .max(500)
+    .refine((ids) => new Set(ids).size === ids.length, { message: 'Each item can appear only once.' }),
+});

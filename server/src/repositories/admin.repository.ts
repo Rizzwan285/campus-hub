@@ -1,4 +1,5 @@
 import { pool, query } from '../db';
+import { listContactCustomizations } from './contacts.repository';
 
 export type MeetingDay =
   | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -211,7 +212,7 @@ export interface Customization {
  * `npm run seed` preserves exactly these; `npm run seed:reset` discards them.
  */
 export async function listCustomizations(): Promise<Customization[]> {
-  const [menu, timings, canteen, days, courses, busTimes, busRoutes] = await Promise.all([
+  const [menu, timings, canteen, days, courses, busTimes, busRoutes, contacts] = await Promise.all([
     query<{ label: string; customized_at: string | null }>(
       `select messes.slug || ' · ' || m.week_cycle || ' · ' || m.day_of_week || ' · ' || m.meal as label,
               m.customized_at
@@ -247,6 +248,11 @@ export async function listCustomizations(): Promise<Customization[]> {
          from bus_routes where source = 'admin'
         group by day_type, category`,
     ),
+    // Listing edits must not fail before migration 014 has created the table.
+    listContactCustomizations().catch((error: { code?: string }) => {
+      if (error.code === '42P01') return [];
+      throw error;
+    }),
   ]);
 
   const group = (kind: string, rows: Array<{ label: string; customized_at: string | null }>) =>
@@ -260,6 +266,7 @@ export async function listCustomizations(): Promise<Customization[]> {
     ...group('Course schedule', courses),
     ...group('Bus departures', busTimes),
     ...group('Bus routes', busRoutes),
+    ...group('Contact', contacts),
   ];
 }
 

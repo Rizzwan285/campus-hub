@@ -10,6 +10,7 @@ import path from 'path';
 import type { MessResponse } from '../src/repositories/mess.repository';
 import type { CanteenSection } from '../src/repositories/canteen.repository';
 import type { AcademicDaysResponse } from '../src/repositories/calendar.repository';
+import type { ContactCategory } from '../src/repositories/contacts.repository';
 import type { CourseOffering } from '../src/repositories/timetable.repository';
 import type { CourseOffering as BundledCourse } from '../../src/engine/types';
 
@@ -33,6 +34,7 @@ import {
   type WeekMenu,
 } from '../../src/data/messData';
 import { canteenSections } from '../../src/data/canteenData';
+import { bundledContacts } from '../../src/data/contactsData';
 
 const API = process.env.API ?? 'http://localhost:4000';
 const TIMETABLE_DIR = path.resolve(__dirname, '../../src/data/timetable');
@@ -138,6 +140,24 @@ async function main() {
       expected.items.map((i) => ({ name: i.name, price: i.price, variant: i.variant })),
     );
   });
+
+  // ---- contacts --------------------------------------------------------
+  // Ids differ (database ids against bundled keys), so compare the content.
+  const contactList = await get<ContactCategory[]>('/api/contacts');
+  const contactContent = (categories: Array<{ name: string; contacts: Array<{
+    name: string; phones: string[]; location?: string | null; link?: string | null; note?: string | null;
+  }> }>) =>
+    categories.map((category) => ({
+      name: category.name,
+      contacts: category.contacts.map((contact) => ({
+        name: contact.name,
+        phones: contact.phones,
+        location: contact.location ?? null,
+        link: contact.link ?? null,
+        note: contact.note ?? null,
+      })),
+    }));
+  check('contacts', contactContent(contactList), contactContent(bundledContacts));
 
   // ---- academic days --------------------------------------------------
   const academic = await get<AcademicDaysResponse>('/api/academic-days');

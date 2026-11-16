@@ -7,13 +7,14 @@ import * as canteen from '../repositories/canteen.repository';
 import * as calendar from '../repositories/calendar.repository';
 import * as bus from '../repositories/bus.repository';
 import * as specials from '../repositories/specialServices.repository';
+import * as contactsRepo from '../repositories/contacts.repository';
 import * as admin from '../repositories/admin.repository';
 import * as profiles from '../repositories/profile.repository';
 import * as changes from '../repositories/courseChanges.repository';
 import { syncDraftFromLive } from '../repositories/semesters.repository';
 import { pool } from '../db';
 import { deliverDueEmails, emailStatus, listOutbox, retryEmails } from '../services/email.service';
-import { meetingListSchema } from './schemas';
+import { contactBody, contactCategoryBody, contactOrderBody, meetingListSchema, plainError } from './schemas';
 import { semestersRouter } from './semesters.routes';
 
 export const adminRouter = Router();
@@ -400,6 +401,210 @@ adminRouter.delete('/special-services/:id', async (req, res, next) => {
     }
 
     await audit(req, 'bus.special.delete', String(id), deleted, null, '/api/special-services');
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ---------------------------------------------------------------- contacts
+
+const CONTACTS_CACHE = '/api/contacts';
+
+function positiveId(raw: string): number | null {
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+/** Uncached, with empty categories and provenance; the public list has neither. */
+adminRouter.get('/contacts', async (_req, res, next) => {
+  try {
+    res.json(await contactsRepo.listContactsForAdmin());
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.post('/contacts/categories', async (req, res, next) => {
+  try {
+    const body = contactCategoryBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: plainError(body.error) });
+      return;
+    }
+    const created = await contactsRepo.createCategory(body.data.name);
+    await audit(req, 'contacts.category.create', created.name, null, { name: created.name }, CONTACTS_CACHE);
+    res.status(201).json(created);
+  } catch (error) {
+    if (error instanceof contactsRepo.ContactConflict) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
+    next(error);
+  }
+});
+
+adminRouter.put('/contacts/categories/:id', async (req, res, next) => {
+  try {
+    const id = positiveId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'That category does not exist.' });
+      return;
+    }
+    const body = contactCategoryBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: plainError(body.error) });
+      return;
+    }
+    const renamed = await contactsRepo.renameCategory(id, body.data.name);
+    if (!renamed) {
+      res.status(404).json({ error: 'That category no longer exists. Reload the list.' });
+      return;
+    }
+    await audit(req, 'contacts.category.rename', String(id), { name: renamed.before }, { name: renamed.after },
+      CONTACTS_CACHE);
+    res.json({ id, name: renamed.after });
+  } catch (error) {
+    if (error instanceof contactsRepo.ContactConflict) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
+    next(error);
+  }
+});
+
+adminRouter.delete('/contacts/categories/:id', async (req, res, next) => {
+  try {
+    const id = positiveId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'That category does not exist.' });
+      return;
+    }
+    const outcome = await contactsRepo.deleteCategory(id);
+    if (outcome === 'not_found') {
+      res.status(404).json({ error: 'That category no longer exists. Reload the list.' });
+      return;
+    }
+    if (outcome === 'not_empty') {
+      res.status(409).json({ error: 'Move or delete the contacts in this category first.' });
+      return;
+    }
+    await audit(req, 'contacts.category.delete', String(id), null, null, CONTACTS_CACHE);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+/** The order of the categories themselves. */
+adminRouter.put('/contacts/order', async (req, res, next) => {
+  try {
+    const body = contactOrderBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: plainError(body.error) });
+      return;
+    }
+    if (!(await contactsRepo.reorderCategories(body.data.ids))) {
+      res.status(409).json({ error: 'The categories changed since you loaded them. Reload and try again.' });
+      return;
+    }
+    await audit(req, 'contacts.category.reorder', 'categories', null, { ids: body.data.ids }, CONTACTS_CACHE);
+    res.json({ ids: body.data.ids });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/** The order of the contacts inside one category. */
+adminRouter.put('/contacts/categories/:id/order', async (req, res, next) => {
+  try {
+    const id = positiveId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'That category does not exist.' });
+      return;
+    }
+    const body = contactOrderBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: plainError(body.error) });
+      return;
+    }
+    const reordered = await contactsRepo.reorderContacts(id, body.data.ids);
+    if (reordered === null) {
+      res.status(404).json({ error: 'That category no longer exists. Reload the list.' });
+      return;
+    }
+    if (!reordered) {
+      res.status(409).json({ error: 'The contacts changed since you loaded them. Reload and try again.' });
+      return;
+    }
+    await audit(req, 'contacts.contact.reorder', String(id), null, { ids: body.data.ids }, CONTACTS_CACHE);
+    res.json({ ids: body.data.ids });
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.post('/contacts', async (req, res, next) => {
+  try {
+    const body = contactBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: plainError(body.error) });
+      return;
+    }
+    const created = await contactsRepo.createContact(body.data);
+    if (!created) {
+      res.status(404).json({ error: 'That category no longer exists. Reload the list.' });
+      return;
+    }
+    await audit(req, 'contacts.contact.create', String(created.id), null, created, CONTACTS_CACHE);
+    res.status(201).json(created);
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.put('/contacts/:id', async (req, res, next) => {
+  try {
+    const id = positiveId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'That contact does not exist.' });
+      return;
+    }
+    const body = contactBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: plainError(body.error) });
+      return;
+    }
+    const before = await contactsRepo.getContact(id);
+    if (!before) {
+      res.status(404).json({ error: 'That contact no longer exists. Reload the list.' });
+      return;
+    }
+    const updated = await contactsRepo.updateContact(id, body.data);
+    if (!updated) {
+      res.status(404).json({ error: 'That category no longer exists. Reload the list.' });
+      return;
+    }
+    await audit(req, 'contacts.contact.update', String(id), before, updated, CONTACTS_CACHE);
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+adminRouter.delete('/contacts/:id', async (req, res, next) => {
+  try {
+    const id = positiveId(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: 'That contact does not exist.' });
+      return;
+    }
+    const deleted = await contactsRepo.deleteContact(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'That contact no longer exists. Reload the list.' });
+      return;
+    }
+    await audit(req, 'contacts.contact.delete', String(id), deleted, null, CONTACTS_CACHE);
     res.status(204).end();
   } catch (error) {
     next(error);

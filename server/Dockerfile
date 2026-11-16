@@ -32,9 +32,10 @@ COPY server/scripts/ ./scripts/
 
 # Seed/verify resolve this as ../../src/data from /app/server/scripts.
 COPY src/data/ /app/src/data/
-# Shared with the frontend: profile validation, and the timetable logic the
-# API uses to expand schedules and compare meetings.
-COPY src/lib/academicProfile.ts /app/src/lib/academicProfile.ts
+# Shared with the frontend: profile validation, the phone-number rules for
+# Contacts, and the timetable logic the API uses to expand schedules and
+# compare meetings.
+COPY src/lib/academicProfile.ts src/lib/contactPhone.ts /app/src/lib/
 COPY src/engine/types.ts src/engine/courseTimings.ts src/engine/courseSchedule.ts /app/src/engine/
 # The importer the API runs on uploaded workbooks.
 COPY scripts/pipeline/ /app/scripts/pipeline/

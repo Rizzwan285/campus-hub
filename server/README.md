@@ -64,6 +64,7 @@ Read (public):
 | GET | `/api/bus/:dayType` | One schedule (`weekday`, `friday`, `saturday_holiday`, `sunday`) |
 | GET | `/api/bus/:dayType/upcoming` | Next departures; `?direction=`, `?after=HH:MM`, `?limit=` |
 | GET | `/api/special-services` | Temporary bus services (exam shuttles), each with its date window and AM/PM departures |
+| GET | `/api/contacts` | The Campus page's Contacts directory: categories in order, each with its contacts (name, phone numbers, optional location, link and note). Empty categories are left out; `[]` means everything was removed. Fails (rather than answering `[]`) before migration 014 |
 | GET | `/api/canteen` | Canteen sections with their items |
 | GET | `/api/academic-days` | Holidays and instructional days |
 | GET | `/api/holidays` | Holidays in the timetable engine's shape |
@@ -83,6 +84,15 @@ Write (require `X-Admin-Key`):
 | POST | `/api/admin/special-services` — `title`, `startDate`, `endDate`, optional `note`, `skipSundays`, `skipDates`, `nilaToSahyadri`, `sahyadriToNila` |
 | PUT | `/api/admin/special-services/:id` — same body, replaces the service |
 | DELETE | `/api/admin/special-services/:id` |
+| GET | `/api/admin/contacts` — the uncached list the editor reads, with empty categories |
+| POST | `/api/admin/contacts` — `categoryId`, `name`, `phones` (1–5), optional `location`, `link` (https only), `note` |
+| PUT | `/api/admin/contacts/:id` — same body, replaces the contact (a new `categoryId` moves it) |
+| DELETE | `/api/admin/contacts/:id` |
+| POST | `/api/admin/contacts/categories` — `name` |
+| PUT | `/api/admin/contacts/categories/:id` — `name` (rename) |
+| DELETE | `/api/admin/contacts/categories/:id` — refused with 409 while it has contacts |
+| PUT | `/api/admin/contacts/order` — `ids`: every category, in the new order |
+| PUT | `/api/admin/contacts/categories/:id/order` — `ids`: every contact in it, in the new order |
 | PATCH | `/api/admin/canteen/items/:id` |
 | PUT | `/api/admin/academic-days/:date` |
 | DELETE | `/api/admin/academic-days/:date` |
@@ -125,6 +135,14 @@ curl -X PUT localhost:4000/api/admin/mess/kedaram/week13/Monday/Dinner \
 - **RLS** is enabled everywhere. Content tables allow public reads; `profiles`
   and `user_courses` have no anon policy, so the browser's anon key cannot reach
   them via PostgREST. The API connects as `postgres` and bypasses RLS.
+- **Contacts** (migration 014). `contact_categories` and `contacts` are
+  seed-managed like the canteen: `bundle_key` names a row that ships in
+  `src/data/contactsData.ts`, and the seed refreshes only rows still marked
+  `source = 'seed'`, never moving an existing row. Deleting a bundled row in
+  /admin sets `removed_at` so a reseed cannot bring it back; `seed:reset`
+  restores the bundled list. Phone numbers are stored as typed and must dial
+  by the rules in `src/lib/contactPhone.ts`, which the app also uses to build
+  `tel:` links (`+91` added to ten-digit numbers).
 - **Timing changes** (migration 009). A student's own timings for a course live
   in `user_course_overrides` and change nobody else's timetable. A suggestion in
   `course_change_requests` changes the course for everyone only once approved,
@@ -216,6 +234,15 @@ and cancel the run in progress.
 Step-by-step instructions, including the Vercel migration, are in
 [../DEPLOYMENT.md](../DEPLOYMENT.md).
 
+## Contacts directory
+
+Migration **014** creates the Contacts tables and loads the supplied auto
+driver, medical and restaurant numbers, so `npm run migrate` alone is enough;
+no seed is needed. Deploy the API with `src/lib/contactPhone.ts` beside the
+other shared modules (the root `server/Dockerfile` copies it). Until 014 is
+applied, `/api/contacts` fails and the app shows its bundled copy. Edit the
+list from **/admin → Contacts**.
+
 ## Semester management and timetable notifications
 
 The `semester-management` branch adds migrations **012** (semester catalogues,
@@ -243,7 +270,8 @@ enrollees get inbox entries. Notification read/response state is persisted.
    intended connection before running migrations. Check the current migration
    ledger; the new files are applied by `npm run migrate` from `server/`.
    **Do not use `seed:reset`**. No seed is required to adopt existing data.
-2. Deploy the API with root `src/engine`, `src/lib/academicProfile.ts`, and
+2. Deploy the API with root `src/engine`, `src/lib/academicProfile.ts`,
+   `src/lib/contactPhone.ts`, and
    `scripts/pipeline` available alongside `server/`. The repository-root build
    using `server/Dockerfile` includes these assets and Python. A native Node
    deployment must retain the same relative paths and have Python 3 available.
@@ -285,7 +313,8 @@ admin workspace. Only use institute files actually released for that semester.
 ### Validation and compatibility
 
 Run `npm test` from `server/` for the isolated PGlite API suite, including the
-legacy 001–011 migration upgrade and deployment-before-migration cases.
+legacy 001–011 migration upgrade and deployment-before-migration cases
+(including the Contacts list before migration 014).
 Run root `npm test`, both TypeScript configs, and `npm run build` for the client.
 Importer tests: `python3 -m unittest discover -s scripts/pipeline/tests -v`.
 The suites do not contact production or send real provider email.
