@@ -215,3 +215,84 @@ and cancel the run in progress.
 
 Step-by-step instructions, including the Vercel migration, are in
 [../DEPLOYMENT.md](../DEPLOYMENT.md).
+
+## Semester management and timetable notifications
+
+The `semester-management` branch adds migrations **012** (semester catalogues,
+publication history and isolated student data) and **013** (approval modes,
+notifications and email outbox). Existing offerings, selections, personal edits
+and request history are adopted into the existing semester; do not reset/seed
+production to enable this feature.
+
+Admin workflow: **Semesters → Create → Upload XLSX/DOCX → Import → Review courses
+→ Confirm slot table → Publish → Make current**. Publishing makes the catalogue
+available for upcoming-semester browsing; activation changes the student
+semester. Fix blocking errors before publishing. Manual corrections survive
+unchanged imports. Versions support rollback, and old semesters/student data
+remain stored. Ordinary course corrections also update the draft so publishing
+it again preserves them.
+
+The Requests tab offers optional approval, compulsory approval and rejection.
+Optional acceptance affects the student's own timetable. Compulsory approval
+updates the official timetable. Existing enrollees get one grouped alert; later
+enrollees get inbox entries. Notification read/response state is persisted.
+
+### Rollout
+
+1. Back up the target database using your existing backup process and verify the
+   intended connection before running migrations. Check the current migration
+   ledger; the new files are applied by `npm run migrate` from `server/`.
+   **Do not use `seed:reset`**. No seed is required to adopt existing data.
+2. Deploy the API with root `src/engine`, `src/lib/academicProfile.ts`, and
+   `scripts/pipeline` available alongside `server/`. The repository-root build
+   using `server/Dockerfile` includes these assets and Python. A native Node
+   deployment must retain the same relative paths and have Python 3 available.
+3. Configure mail below, then deploy the frontend with the intended
+   `VITE_API_URL`. Check CORS and actual network responses; fallback can mask a
+   misconfigured connection. The web app saves the latest published snapshot
+   for offline use without requiring a rebuild per semester.
+4. Verify `/api/health`, the active `/api/timetable/snapshot`, and the Semesters
+   screen. Review a test request using an appropriate test account and confirm
+   provider delivery/outbox status. Never approve a fabricated schedule into
+   a real course as a deployment check.
+
+Required existing API variables: `DATABASE_URL`, `SESSION_SECRET`; use
+`DIRECT_URL` for migrations where required by your pooler. Preserve configured
+`CORS_ORIGIN`, `ADMIN_ROLL_NUMBER` and hosting-assigned port.
+
+Additional variables:
+
+| Variable | Purpose |
+|---|---|
+| `PYTHON_BIN` | Python interpreter; defaults to `python3`, standard library only |
+| `EMAIL_PROVIDER` | `none` (default), `log` (local testing), `resend`, or `brevo` |
+| `EMAIL_API_KEY` | Provider credential; API-only secret |
+| `EMAIL_FROM` | Provider-verified sender |
+| `ADMIN_NOTIFY_EMAIL` | Developer recipient; without it, no email is queued |
+| `APP_URL` | Public frontend origin, used for authenticated request links |
+
+Email requests and outbox entries are saved transactionally. Delivery retries
+run in the API process; the admin Requests panel exposes status and retry.
+`log` does not deliver externally. Configuring a recipient later does not
+retroactively queue requests submitted without one. Email links never approve
+anything on GET. No real provider delivery was verified during local testing.
+
+If hosted Python is unavailable, run
+`python3 scripts/pipeline/import_semester.py --dir <files-directory> --semester
+"Jan-May 2027" --out <output.json>` locally and upload the parsed JSON in the
+admin workspace. Only use institute files actually released for that semester.
+
+### Validation and compatibility
+
+Run `npm test` from `server/` for the isolated PGlite API suite, including the
+legacy 001–011 migration upgrade and deployment-before-migration cases.
+Run root `npm test`, both TypeScript configs, and `npm run build` for the client.
+Importer tests: `python3 -m unittest discover -s scripts/pipeline/tests -v`.
+The suites do not contact production or send real provider email.
+
+The new client tags personal timing writes with `semesterId`; stale writes get
+409. Older clients omitting it retain compatibility. Notification caches are
+account-specific, and semester switches refresh account selections before sync.
+After deployment, test an existing saved account, offline reopening, first-year
+batch filtering and a second account on the same browser. PGlite does not
+substitute for real node-pg/provider/host-runtime verification.

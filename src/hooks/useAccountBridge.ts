@@ -21,6 +21,11 @@ const serializeOverrides = (overrides: Record<string, CourseOverride>) =>
 export function useAccountBridge(): void {
   const account = useAuthStore((state) => state.account);
   const isRestoring = useAuthStore((state) => state.isRestoring);
+  const semesterId = useTimetableStore(state => state.semester?.id);
+  const semesterMismatch = account?.semesterId != null && semesterId != null && account.semesterId !== semesterId;
+  useEffect(() => {
+    if (semesterMismatch && !isRestoring) void useAuthStore.getState().restore();
+  }, [semesterMismatch, semesterId, isRestoring]);
   const syncCourses = useAuthStore((state) => state.syncCourses);
   const syncCourseOverrides = useAuthStore((state) => state.syncCourseOverrides);
 
@@ -49,7 +54,7 @@ export function useAccountBridge(): void {
   // Adopt the server's course selection once per sign-in, so a fresh device
   // inherits the user's picks instead of starting empty.
   const accountFetchedAt = useAuthStore((state) => state.accountFetchedAt);
-  const adopted = useRef<{ accountId: string; fetchedAt: number; overrides: string | null; selected: string } | null>(null);
+  const adopted = useRef<{ accountId: string; semesterId?: number | null; fetchedAt: number; overrides: string | null; selected: string } | null>(null);
   useEffect(() => {
     if (!account) {
       // Signed out. The next sign-in starts from the account again even on this
@@ -59,8 +64,9 @@ export function useAccountBridge(): void {
       return;
     }
 
-    if (isRestoring) return;
-    const previous = adopted.current?.accountId === account.id ? adopted.current : null;
+    if (isRestoring || semesterMismatch) return;
+    const previous = adopted.current?.accountId === account.id && adopted.current.semesterId === account.semesterId
+      ? adopted.current : null;
     if (previous && previous.fetchedAt === accountFetchedAt) return;
 
     const timetable = useTimetableStore.getState();
@@ -86,15 +92,15 @@ export function useAccountBridge(): void {
       overrides = serializeOverrides(useTimetableStore.getState().courseOverrides);
     }
 
-    adopted.current = { accountId: account.id, fetchedAt: accountFetchedAt, overrides, selected: JSON.stringify(useTimetableStore.getState().selectedCourseIds) };
-  }, [account, accountFetchedAt, isRestoring]);
+    adopted.current = { accountId: account.id, semesterId: account.semesterId, fetchedAt: accountFetchedAt, overrides, selected: JSON.stringify(useTimetableStore.getState().selectedCourseIds) };
+  }, [account, accountFetchedAt, isRestoring, semesterMismatch]);
 
   // Push local changes back up, debounced so dragging through the course
   // picker does not fire a request per click.
   const selected = useTimetableStore((state) => state.selectedCourseIds);
 
   useEffect(() => {
-    if (isRestoring || !account || selected !== useTimetableStore.getState().selectedCourseIds) return;
+    if (isRestoring || semesterMismatch || !account || selected !== useTimetableStore.getState().selectedCourseIds) return;
 
     const serialized = JSON.stringify([...selected].sort());
 
@@ -112,14 +118,14 @@ export function useAccountBridge(): void {
     }, 1200);
 
     return () => clearTimeout(timer);
-  }, [selected, account, syncCourses, isRestoring]);
+  }, [selected, account, syncCourses, isRestoring, semesterMismatch]);
 
   // Own class timings follow the same path up.
   const overrides = useTimetableStore((state) => state.courseOverrides);
   const lastPushedOverrides = useRef<string | null>(null);
 
   useEffect(() => {
-    if (isRestoring || !account) return;
+    if (isRestoring || semesterMismatch || !account) return;
 
     const list = Object.values(overrides).sort(byCode);
     const serialized = JSON.stringify(list);
@@ -148,5 +154,5 @@ export function useAccountBridge(): void {
     }, 1200);
 
     return () => clearTimeout(timer);
-  }, [overrides, account, syncCourseOverrides, isRestoring]);
+  }, [overrides, account, syncCourseOverrides, isRestoring, semesterMismatch]);
 }

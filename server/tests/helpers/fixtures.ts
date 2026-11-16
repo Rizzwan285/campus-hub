@@ -1,3 +1,5 @@
+import type { Semester } from '../../src/repositories/semesters.repository';
+import type { MeetingDay, TimetableMeeting } from '../../../src/engine/types';
 import type { Harness } from './harness';
 
 export const SLOTS = {
@@ -84,9 +86,9 @@ export async function publishSemester(
   courses: ReturnType<typeof parsedCourse>[],
   options: { activate?: boolean } = {},
 ): Promise<{ id: number; code: string }> {
-  const created = await h.api('POST', '/api/admin/semesters', { token: adminToken, body: { name } });
+  const created = await h.api<Semester>('POST', '/api/admin/semesters', { token: adminToken, body: { name } });
   if (created.status !== 201) throw new Error(`create failed: ${JSON.stringify(created.body)}`);
-  const id = created.body.id as number;
+  const id = created.body.id;
   const imported = await h.api('POST', `/api/admin/semesters/${id}/import-parsed`, {
     token: adminToken, body: parsedImport(courses),
   });
@@ -102,5 +104,5 @@ export async function publishSemester(
 }
 
 export const meeting = (
-  day: string, startTime: string, endTime: string, room = 'A01-212', extra: Record<string, unknown> = {},
-) => ({ type: 'lecture', day, startTime, endTime, room, instructors: [], recurrence: { type: 'weekly' }, ...extra });
+  day: MeetingDay, startTime: string, endTime: string, room = 'A01-212', extra: Partial<TimetableMeeting> = {},
+): TimetableMeeting => ({ type: 'lecture', day, startTime, endTime, room, instructors: [], recurrence: { type: 'weekly' }, ...extra });

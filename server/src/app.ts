@@ -77,7 +77,6 @@ export function createApp() {
   });
 
   // Express identifies error handlers by arity, so `next` must stay.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (err.message.includes('not allowed by CORS')) {
       res.status(403).json({ error: err.message });

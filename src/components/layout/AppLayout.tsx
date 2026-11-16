@@ -128,7 +128,7 @@ export function AppLayout() {
           selectedDate={selectedDate}
           userName={account?.name ?? profile?.name ?? ''}
           onOpenSettings={accountsEnabled ? () => setSettingsOpen(true) : undefined}
-          notifications={accountsEnabled ? <NotificationCenter /> : undefined}
+          notifications={accountsEnabled ? <NotificationCenter key={account?.id} /> : undefined}
         />
         
         {/* Desktop Navigation */}

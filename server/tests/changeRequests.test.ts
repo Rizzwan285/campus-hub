@@ -1,3 +1,7 @@
+import assert from 'node:assert/strict';
+import type { CourseOffering } from '../../src/engine/types';
+import type { ChangeRequest, CourseOverride, Notification, ProposalState } from '../src/repositories/courseChanges.repository';
+import type { PublicProfile } from '../src/repositories/profile.repository';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { contextOf, startHarness, type Harness } from './helpers/harness';
 import { meeting, parsedCourse, publishSemester } from './helpers/fixtures';
@@ -16,19 +20,21 @@ let dev: User;    // picks the courses up afterwards
 let semesterId: number;
 
 const B = [meeting('Monday', '09:00', '09:50'), meeting('Tuesday', '08:00', '08:50'), meeting('Friday', '10:00', '10:50')];
-const strip = (list: any[]) => list.map((m) => `${m.day} ${m.startTime}-${m.endTime} ${m.room}${m.date ? ` on ${m.date}` : ''}`);
+const strip = (list: CourseOverride['meetings']) => list.map((m) => `${m.day} ${m.startTime}-${m.endTime} ${m.room}${m.date ? ` on ${m.date}` : ''}`);
 
 const select = (user: User, codes: string[]) =>
-  h.api('PUT', '/api/auth/courses', { token: user.token, body: { offeringIds: codes, context: contextOf(), semesterId } });
+  h.api<{ newNotifications: number }>('PUT', '/api/auth/courses', { token: user.token, body: { offeringIds: codes, context: contextOf(), semesterId } });
 const official = async (code: string, branch = 'CSE') => {
-  const courses = await h.api('GET', '/api/timetable/courses');
-  return courses.body.find((c: any) => c.id === code && c.branch === branch).meetings as any[];
+  const courses = await h.api<CourseOffering[]>('GET', '/api/timetable/courses');
+  const course = courses.body.find((c) => c.id === code && c.branch === branch);
+  if (!course) throw new Error(`Missing course ${code} in branch ${branch}`);
+  return course.meetings;
 };
-const inbox = async (user: User) => (await h.api('GET', '/api/notifications', { token: user.token })).body as any[];
+const inbox = async (user: User) => (await h.api<Notification[]>('GET', '/api/notifications', { token: user.token })).body;
 const request = (user: User, courseCode: string, meetings: unknown[], note = 'Announced in class.') =>
-  h.api('POST', '/api/course-changes', { token: user.token, body: { courseCode, meetings, note } });
+  h.api<ChangeRequest>('POST', '/api/course-changes', { token: user.token, body: { courseCode, meetings, note } });
 const approve = (id: number, body: Record<string, unknown>) =>
-  h.api('POST', `/api/admin/course-changes/${id}/approve`, { token: admin.token, body });
+  h.api<{ request: ChangeRequest; notified: number; offeringsUpdated: number; alsoClosed: number }>('POST', `/api/admin/course-changes/${id}/approve`, { token: admin.token, body });
 const settle = async () => {
   for (let i = 0; i < 20; i += 1) {
     await deliverDueEmails();
@@ -70,7 +76,7 @@ describe('filing a request', () => {
     id = filed.body.id;
     await settle();
 
-    const [mail] = await h.sql<any>('select * from email_outbox where request_id = $1', [id]);
+    const [mail] = await h.sql('select * from email_outbox where request_id = $1', [id]);
     expect(mail).toMatchObject({ status: 'sent', to_address: 'developer@example.test', attempts: 1 });
     expect(mail.subject).toContain('CS101');
     for (const expected of [
@@ -98,33 +104,35 @@ describe('filing a request', () => {
     Object.assign(config, { EMAIL_PROVIDER: 'resend', EMAIL_API_KEY: 'key', EMAIL_FROM: 'Campus <a@example.test>' });
     const realFetch = globalThis.fetch;
     let providerUp = false;
-    const calls: any[] = [];
-    vi.stubGlobal('fetch', (url: any, init: any) => {
+    const calls: unknown[] = [];
+    const providerFetch: typeof fetch = (url, init) => {
       if (!String(url).includes('api.resend.com')) return realFetch(url, init);
+      if (typeof init?.body !== 'string') throw new Error('Expected a JSON email body');
       calls.push(JSON.parse(init.body));
       return Promise.resolve(new Response(providerUp ? '{"id":"1"}' : 'down', { status: providerUp ? 200 : 503 }));
-    });
+    };
+    vi.stubGlobal('fetch', providerFetch);
     try {
       const filed = await request(bala, 'CS102', [meeting('Monday', '08:00', '08:50', 'N203'), meeting('Friday', '09:00', '09:50', 'N203')], 'Wednesday class cancelled.');
       expect(filed.status).toBe(201);
       // The route starts a delivery in the background; wait for its attempt.
       await vi.waitFor(async () => {
         await deliverDueEmails();
-        const [row] = await h.sql<any>('select attempts from email_outbox where request_id = $1', [filed.body.id]);
+        const [row] = await h.sql('select attempts from email_outbox where request_id = $1', [filed.body.id]);
         expect(row.attempts).toBeGreaterThan(0);
       });
-      const [failed] = await h.sql<any>('select status, attempts, last_error from email_outbox where request_id = $1', [filed.body.id]);
+      const [failed] = await h.sql('select status, attempts, last_error from email_outbox where request_id = $1', [filed.body.id]);
       expect(failed).toMatchObject({ status: 'pending', attempts: 1 });
       expect(failed.last_error).toContain('503');
       // The request itself is safe and reviewable.
-      const waiting = await h.api('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
-      expect(waiting.body.find((r: any) => r.id === filed.body.id)).toMatchObject({ emailStatus: 'pending', changeKind: 'deletion' });
+      const waiting = await h.api<ChangeRequest[]>('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
+      expect(waiting.body.find((r) => r.id === filed.body.id)).toMatchObject({ emailStatus: 'pending', changeKind: 'deletion' });
 
       providerUp = true;
       const retried = await h.api('POST', '/api/admin/emails/retry', { token: admin.token, body: {} });
       expect(retried.body).toMatchObject({ sent: 1 });
       expect(calls.at(-1)).toMatchObject({ to: ['developer@example.test'], from: 'Campus <a@example.test>' });
-      const [sent] = await h.sql<any>('select status from email_outbox where request_id = $1', [filed.body.id]);
+      const [sent] = await h.sql('select status from email_outbox where request_id = $1', [filed.body.id]);
       expect(sent.status).toBe('sent');
     } finally {
       Object.assign(config, original);
@@ -132,8 +140,8 @@ describe('filing a request', () => {
   });
 
   it('cannot be approved by a student, anonymously, or by opening a link', async () => {
-    expect((await h.api('POST', `/api/admin/course-changes/${id}/approve`, { token: asha.token, body: { mode: 'compulsory' } })).status).toBe(403);
-    expect((await h.api('POST', `/api/admin/course-changes/${id}/approve`, { body: { mode: 'compulsory' } })).status).toBe(401);
+    expect((await h.api<{ request: ChangeRequest; notified: number; offeringsUpdated: number; alsoClosed: number }>('POST', `/api/admin/course-changes/${id}/approve`, { token: asha.token, body: { mode: 'compulsory' } })).status).toBe(403);
+    expect((await h.api<{ request: ChangeRequest; notified: number; offeringsUpdated: number; alsoClosed: number }>('POST', `/api/admin/course-changes/${id}/approve`, { body: { mode: 'compulsory' } })).status).toBe(401);
     expect((await h.api('GET', `/api/admin/course-changes/${id}/approve`, { token: admin.token })).status).toBe(404);
     expect(strip(await official('CS101'))).toEqual(strip(B));
   });
@@ -141,14 +149,16 @@ describe('filing a request', () => {
 
 describe('approve — students can choose (optional)', () => {
   let id: number;
-  let balaNote: any;
+  let balaNote: Notification;
 
   it('refuses an approval made against timings that have since moved', async () => {
-    const pending = await h.api('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
-    id = pending.body.find((r: any) => r.courseCode === 'CS101').id;
+    const pending = await h.api<ChangeRequest[]>('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
+    const pendingRequest = pending.body.find((r) => r.courseCode === 'CS101');
+    assert.ok(pendingRequest);
+    id = pendingRequest.id;
     const stale = await approve(id, { mode: 'optional', expectedFingerprint: 'not-the-current-one' });
     expect(stale.status).toBe(409);
-    expect((await h.sql<any>('select status from course_change_requests where id = $1', [id]))[0].status).toBe('pending');
+    expect((await h.sql('select status from course_change_requests where id = $1', [id]))[0].status).toBe('pending');
   });
 
   it('leaves the official timetable alone and offers the change to students who have the course', async () => {
@@ -169,6 +179,7 @@ describe('approve — students can choose (optional)', () => {
       explanation: 'Corrected: it is from next week.', alert: true, alertSeen: false, read: false,
       response: null, courseSelected: true, proposalState: 'open',
     });
+    assert.ok(balaNote.delta);
     expect(strip(balaNote.delta.remove)).toEqual(['Friday 10:00-10:50 A01-212']);
     expect(strip(balaNote.delta.add)).toEqual(['Thursday 14:00-15:00 A01-118']);
     // The reporter's roll number is never shown to classmates.
@@ -192,26 +203,28 @@ describe('approve — students can choose (optional)', () => {
       body: { overrides: [{ courseCode: 'CS103', meetings: [meeting('Saturday', '09:00', '10:00')], baseFingerprint: 'x', savedAt: new Date().toISOString() }] },
     });
     const result = [B[0], B[1], meeting('Thursday', '14:00', '15:00', 'A01-118')];
-    const body = { response: 'accepted', override: { meetings: result, baseFingerprint: meetingsFingerprint(B as any) } };
-    const accepted = await h.api('POST', `/api/notifications/${balaNote.id}/respond`, { token: bala.token, body });
+    const body = { response: 'accepted', override: { meetings: result, baseFingerprint: meetingsFingerprint(B) } };
+    const accepted = await h.api<{ notification: Notification; courseOverrides: CourseOverride[] }>('POST', `/api/notifications/${balaNote.id}/respond`, { token: bala.token, body });
     expect(accepted.status).toBe(200);
     expect(accepted.body.notification).toMatchObject({ response: 'accepted', read: true, alertSeen: true });
-    expect(accepted.body.courseOverrides.map((o: any) => o.courseCode)).toEqual(['CS101', 'CS103']);
+    expect(accepted.body.courseOverrides.map((o) => o.courseCode)).toEqual(['CS101', 'CS103']);
 
-    const again = await h.api('POST', `/api/notifications/${balaNote.id}/respond`, { token: bala.token, body });
+    const again = await h.api<{ notification: Notification; courseOverrides: CourseOverride[] }>('POST', `/api/notifications/${balaNote.id}/respond`, { token: bala.token, body });
     expect(again.status).toBe(200);
     expect(again.body.notification.respondedAt).toBe(accepted.body.notification.respondedAt);
     expect(await h.sql('select 1 from user_course_overrides where user_id = $1', [bala.id])).toHaveLength(2);
 
     // Signing in on another device brings both back; the official list is unchanged.
-    const me = await h.api('GET', '/api/auth/me', { token: bala.token });
-    expect(strip(me.body.profile.courseOverrides.find((o: any) => o.courseCode === 'CS101').meetings)).toContain('Thursday 14:00-15:00 A01-118');
+    const me = await h.api<{ profile: PublicProfile }>('GET', '/api/auth/me', { token: bala.token });
+    const override = me.body.profile.courseOverrides.find((o) => o.courseCode === 'CS101');
+    assert.ok(override);
+    expect(strip(override.meetings)).toContain('Thursday 14:00-15:00 A01-118');
     expect(strip(await official('CS101'))).toEqual(strip(B));
   });
 
   it('declining is remembered, changes nothing, and can be reversed from the inbox later', async () => {
     const [note] = await inbox(chitra);
-    const declined = await h.api('POST', `/api/notifications/${note.id}/respond`, { token: chitra.token, body: { response: 'rejected' } });
+    const declined = await h.api<{ notification: Notification; courseOverrides: CourseOverride[] }>('POST', `/api/notifications/${note.id}/respond`, { token: chitra.token, body: { response: 'rejected' } });
     expect(declined.body.notification).toMatchObject({ response: 'rejected', alertSeen: true });
     expect(await h.sql('select 1 from user_course_overrides where user_id = $1', [chitra.id])).toHaveLength(0);
     expect((await inbox(chitra))[0]).toMatchObject({ response: 'rejected', alertSeen: true });
@@ -222,8 +235,9 @@ describe('approve — students can choose (optional)', () => {
 
   it('gives a student who adds the courses later inbox entries only — no alerts, no auto-apply', async () => {
     // Two more approved changes exist by now: one optional, one compulsory.
-    const pending = await h.api('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
-    const cs102 = pending.body.find((r: any) => r.courseCode === 'CS102');
+    const pending = await h.api<ChangeRequest[]>('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
+    const cs102 = pending.body.find((r) => r.courseCode === 'CS102');
+    assert.ok(cs102);
     expect((await approve(cs102.id, { mode: 'optional' })).status).toBe(200);
     const extra = await request(asha, 'CS103', [
       meeting('Monday', '15:30', '16:45', 'A01-007'), meeting('Friday', '14:00', '15:15', 'A01-007'),
@@ -250,10 +264,10 @@ describe('approve — students can choose (optional)', () => {
   it('stops prompting about a course the student has dropped, and tracks read state', async () => {
     await select(dev, ['CS101', 'CS103']);
     const entries = await inbox(dev);
-    expect(entries.find((n) => n.courseCode === 'CS102').courseSelected).toBe(false);
-    expect(entries.find((n) => n.courseCode === 'CS101').courseSelected).toBe(true);
+    expect(entries.find((n) => n.courseCode === 'CS102')?.courseSelected).toBe(false);
+    expect(entries.find((n) => n.courseCode === 'CS101')?.courseSelected).toBe(true);
 
-    const marked = await h.api('POST', '/api/notifications/mark', { token: dev.token, body: { ids: 'all', read: true } });
+    const marked = await h.api<{ updated: number }>('POST', '/api/notifications/mark', { token: dev.token, body: { ids: 'all', read: true } });
     expect(marked.body.updated).toBe(3);
     expect((await inbox(dev)).every((n) => n.read)).toBe(true);
     // Reading is not answering.
@@ -277,6 +291,7 @@ describe('approve — apply to everyone (compulsory)', () => {
 
     // Everyone with the course is told, as information — nothing to decide.
     const note = (await inbox(bala)).find((n) => n.requestId === filed.body.id);
+    assert.ok(note);
     expect(note).toMatchObject({ kind: 'official_change', approvalMode: 'compulsory', alert: true, reportedBy: 'Chitra R' });
     expect((await h.api('POST', `/api/notifications/${note.id}/respond`, { token: bala.token, body: { response: 'rejected' } })).status).toBe(404);
     expect((await inbox(dev)).find((n) => n.requestId === filed.body.id)).toMatchObject({ kind: 'official_change', alert: true });
@@ -284,7 +299,7 @@ describe('approve — apply to everyone (compulsory)', () => {
 
   it('reaches a student who selects the course afterwards, through the timetable itself', async () => {
     const late = await h.user('112301009', { name: 'Late Joiner' });
-    await h.api('PUT', '/api/auth/courses', { token: late.token, body: { offeringIds: ['CS101'], context: contextOf(), semesterId } });
+    await h.api<{ newNotifications: number }>('PUT', '/api/auth/courses', { token: late.token, body: { offeringIds: ['CS101'], context: contextOf(), semesterId } });
     expect(strip(await official('CS101'))).not.toContain('Tuesday 08:00-08:50 A01-212');
     const entries = await inbox(late);
     expect(entries.filter((n) => n.kind === 'official_change').every((n) => n.alert === false)).toBe(true);
@@ -299,19 +314,20 @@ describe('approve — apply to everyone (compulsory)', () => {
 
   it('keeps an optional proposal open while it still applies, then settles it when made official', async () => {
     // Asha's Friday -> Thursday proposal still fits: Friday is still there.
-    const [open] = await h.sql<any>("select id, proposal_state from course_change_requests where course_code = 'CS101' and approval_mode = 'optional'");
+    const [open] = await h.sql("select id, proposal_state from course_change_requests where course_code = 'CS101' and approval_mode = 'optional'");
     expect(open.proposal_state).toBe('open');
 
     // Bala asks for the very same move; the developer makes it official.
     const same = await request(bala, 'CS101', [B[0], meeting('Thursday', '14:00', '15:00', 'A01-118')], 'Confirmed by the professor.');
     expect((await approve(same.body.id, { mode: 'compulsory' })).status).toBe(200);
-    const [settled] = await h.sql<any>('select proposal_state, proposal_state_note from course_change_requests where id = $1', [open.id]);
+    const [settled] = await h.sql('select proposal_state, proposal_state_note from course_change_requests where id = $1', [open.id]);
     expect(settled.proposal_state).toBe('official');
 
     // Chitra had declined the optional version; she can no longer flip it, and is told why.
     const mine = (await inbox(chitra)).find((n) => n.requestId === open.id);
+    assert.ok(mine);
     expect(mine).toMatchObject({ proposalState: 'official' });
-    const late = await h.api('POST', `/api/notifications/${mine.id}/respond`, {
+    const late = await h.api<{ state: ProposalState }>('POST', `/api/notifications/${mine.id}/respond`, {
       token: chitra.token, body: { response: 'accepted', override: { meetings: [B[0]], baseFingerprint: 'x' } },
     });
     expect(late.status).toBe(409);
@@ -320,17 +336,18 @@ describe('approve — apply to everyone (compulsory)', () => {
   });
 
   it('marks an optional proposal outdated when the class it moves no longer exists', async () => {
-    const [proposal] = await h.sql<any>("select id from course_change_requests where course_code = 'CS102' and approval_mode = 'optional'");
+    const [proposal] = await h.sql("select id from course_change_requests where course_code = 'CS102' and approval_mode = 'optional'");
     // CS102's proposal drops Wednesday. An official change now moves Wednesday instead.
     const moved = await request(asha, 'CS102', [
       meeting('Monday', '08:00', '08:50', 'N203'), meeting('Thursday', '11:00', '11:50', 'N203'), meeting('Friday', '09:00', '09:50', 'N203'),
     ], 'Wednesday moves to Thursday.');
     expect((await approve(moved.body.id, { mode: 'compulsory' })).status).toBe(200);
-    const [after] = await h.sql<any>('select proposal_state from course_change_requests where id = $1', [proposal.id]);
+    const [after] = await h.sql('select proposal_state from course_change_requests where id = $1', [proposal.id]);
     expect(after.proposal_state).toBe('outdated');
 
     const mine = (await inbox(chitra)).find((n) => n.requestId === proposal.id);
-    const refused = await h.api('POST', `/api/notifications/${mine.id}/respond`, {
+    assert.ok(mine);
+    const refused = await h.api<{ state: ProposalState }>('POST', `/api/notifications/${mine.id}/respond`, {
       token: chitra.token, body: { response: 'accepted', override: { meetings: [B[0]], baseFingerprint: 'x' } },
     });
     expect(refused.status).toBe(409);
@@ -345,7 +362,7 @@ describe('approve — apply to everyone (compulsory)', () => {
     const c = await request(chitra, 'CS103', base.slice(1), 'Monday is cancelled.');
     const approved = await approve(a.body.id, { mode: 'compulsory' });
     expect(approved.body.alsoClosed).toBe(2);
-    const rows = await h.sql<any>('select id, status, approval_mode from course_change_requests where id = any($1::bigint[]) order by id', [[b.body.id, c.body.id]]);
+    const rows = await h.sql('select id, status, approval_mode from course_change_requests where id = any($1::bigint[]) order by id', [[b.body.id, c.body.id]]);
     expect(rows.map((r) => `${r.status}:${r.approval_mode}`)).toEqual(['approved:compulsory', 'superseded:null']);
   });
 
@@ -362,7 +379,7 @@ describe('approve — apply to everyone (compulsory)', () => {
     ];
     const approved = await approve(filed.body.id, { mode: 'compulsory', meetings: corrected });
     expect(approved.body.request.corrected).toBe(true);
-    const extra = (await official('CS103')).find((m: any) => m.date);
+    const extra = (await official('CS103')).find((m) => m.date);
     // The weekday comes from the date, not from what was typed.
     expect(extra).toMatchObject({ day: 'Saturday', date: '2026-11-21', room: 'A01-001', recurrence: { type: 'once' } });
     expect((await inbox(bala)).find((n) => n.requestId === filed.body.id)).toMatchObject({ corrected: true, changeKind: 'addition' });
@@ -382,24 +399,25 @@ describe('approve — apply to everyone (compulsory)', () => {
 describe('rejecting', () => {
   it('changes no timetable, records the reason, and tells the requester', async () => {
     const before = await official('CS102');
-    const pending = await h.api('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
-    const target = pending.body.find((r: any) => r.courseCode === 'CS102' && r.requesterRoll === bala.roll);
+    const pending = await h.api<ChangeRequest[]>('GET', '/api/admin/course-changes?status=pending', { token: admin.token });
+    const target = pending.body.find((r) => r.courseCode === 'CS102' && r.requesterRoll === bala.roll);
+    assert.ok(target);
     const rejected = await h.api('POST', `/api/admin/course-changes/${target.id}/reject`, {
       token: admin.token, body: { note: 'The professor says Monday stays.' },
     });
     expect(rejected.status).toBe(200);
     expect(strip(await official('CS102'))).toEqual(strip(before));
 
-    const mine = await h.api('GET', '/api/course-changes/mine', { token: bala.token });
-    expect(mine.body.find((r: any) => r.id === target.id)).toMatchObject({ status: 'rejected', decisionNote: 'The professor says Monday stays.' });
+    const mine = await h.api<ChangeRequest[]>('GET', '/api/course-changes/mine', { token: bala.token });
+    expect(mine.body.find((r) => r.id === target.id)).toMatchObject({ status: 'rejected', decisionNote: 'The professor says Monday stays.' });
     const note = (await inbox(bala)).find((n) => n.requestId === target.id);
     expect(note).toMatchObject({ kind: 'request_decision', requestStatus: 'rejected', decisionNote: 'The professor says Monday stays.', mine: true });
     // Nobody else hears about a rejected request.
     expect((await inbox(chitra)).some((n) => n.requestId === target.id)).toBe(false);
 
-    const history = await h.api('GET', '/api/admin/course-changes?status=decided', { token: admin.token });
-    expect(history.body.find((r: any) => r.id === target.id)).toMatchObject({ status: 'rejected', decidedByRoll: admin.roll });
-    const audit = await h.sql<any>("select action from audit_log where action like 'course.change.%'");
+    const history = await h.api<ChangeRequest[]>('GET', '/api/admin/course-changes?status=decided', { token: admin.token });
+    expect(history.body.find((r) => r.id === target.id)).toMatchObject({ status: 'rejected', decidedByRoll: admin.roll });
+    const audit = await h.sql("select action from audit_log where action like 'course.change.%'");
     expect(new Set(audit.map((row) => row.action))).toEqual(new Set([
       'course.change.approve', 'course.change.approve-optional', 'course.change.reject',
     ]));
@@ -409,11 +427,11 @@ describe('rejecting', () => {
     await request(dev, 'CS101', [meeting('Monday', '09:00', '09:50')], 'Left over.');
     const next = await publishSemester(h, admin.token, 'Jan-May 2027', [parsedCourse({ code: 'CS101' })], { activate: true });
     expect(next.id).toBeGreaterThan(semesterId);
-    const left = await h.sql<any>("select status from course_change_requests where semester_id = $1 and status = 'pending'", [semesterId]);
+    const left = await h.sql("select status from course_change_requests where semester_id = $1 and status = 'pending'", [semesterId]);
     expect(left).toHaveLength(0);
     // The new semester's CS101 starts from its own timings, with no inherited inbox.
     const fresh = await h.user('112301010');
-    await h.api('PUT', '/api/auth/courses', { token: fresh.token, body: { offeringIds: ['CS101'], context: contextOf(), semesterId: next.id } });
+    await h.api<{ newNotifications: number }>('PUT', '/api/auth/courses', { token: fresh.token, body: { offeringIds: ['CS101'], context: contextOf(), semesterId: next.id } });
     expect(await inbox(fresh)).toEqual([]);
     expect(strip(await official('CS101'))).toEqual(strip(B));
   });
