@@ -10,9 +10,13 @@
 const REQUEST_TIMEOUT_MS = 6000;
 
 export class ApiUnavailableError extends Error {
-  constructor(message: string) {
+  /** The HTTP status when the server did answer; undefined when it could not be reached. */
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
     super(message);
     this.name = 'ApiUnavailableError';
+    this.status = status;
   }
 }
 
@@ -147,7 +151,7 @@ export async function fetchJson<T>(path: string, options: { fresh?: boolean } = 
     });
 
     if (!response.ok) {
-      throw new ApiUnavailableError(`GET ${path} responded ${response.status}`);
+      throw new ApiUnavailableError(`GET ${path} responded ${response.status}`, response.status);
     }
 
     return (await response.json()) as T;
@@ -156,6 +160,39 @@ export async function fetchJson<T>(path: string, options: { fresh?: boolean } = 
     throw new ApiUnavailableError(
       `GET ${path} failed: ${error instanceof Error ? error.message : String(error)}`,
     );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Uploads a file as the raw request body (authenticated). Used by the semester
+ * importer; `apiFetch` only speaks JSON.
+ */
+export async function apiUpload<T>(path: string, file: Blob, timeoutMs = 60_000): Promise<T> {
+  const apiUrl = getApiUrl();
+  if (!apiUrl) throw new ApiUnavailableError('VITE_API_URL is not configured');
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const headers: Record<string, string> = { Accept: 'application/json', 'Content-Type': 'application/octet-stream' };
+  const token = readStoredToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  try {
+    const response = await fetch(`${apiUrl}${path}`, { method: 'PUT', headers, body: file, signal: controller.signal });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new ApiError(
+        response.status,
+        typeof payload?.error === 'string' ? payload.error : `Upload failed (${response.status})`,
+        payload,
+      );
+    }
+    return payload as T;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiUnavailableError(`PUT ${path} failed: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
     clearTimeout(timer);
   }

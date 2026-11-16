@@ -4,17 +4,19 @@ import { issueToken, verifyPassword } from '../auth/tokens';
 import { requireSession } from '../middleware/auth';
 import * as profiles from '../repositories/profile.repository';
 import * as changes from '../repositories/courseChanges.repository';
+import { getActiveSemesterId } from '../repositories/semesters.repository';
 import { meetingListSchema } from './schemas';
 
 export const authRouter = Router();
 
 /** The account as the client sees it: profile, course picks and personal timings. */
 async function publicProfile(row: profiles.ProfileRow): Promise<profiles.PublicProfile> {
+  const semesterId = await getActiveSemesterId();
   const [selected, overrides] = await Promise.all([
-    profiles.getSelectedCourseIds(row.id),
+    profiles.getSelectedCourseIds(row.id, semesterId),
     changes.getOverrides(row.id),
   ]);
-  return profiles.toPublicProfile(row, selected, overrides);
+  return profiles.toPublicProfile(row, selected, overrides, semesterId);
 }
 
 const ROLL_RE = /^[A-Za-z0-9]{4,20}$/;
@@ -197,6 +199,8 @@ authRouter.patch('/profile', requireSession, async (req, res, next) => {
 const coursesBody = z.object({
   offeringIds: z.array(z.string().max(80)).max(40),
   context: z.string().max(200),
+  /** The semester the client believes it is in; a stale one is refused. */
+  semesterId: z.number().int().positive().nullable().optional(),
 });
 
 /** PUT /api/auth/courses — syncs the user's selection across devices. */
@@ -208,8 +212,12 @@ authRouter.put('/courses', requireSession, async (req, res, next) => {
       return;
     }
 
-    const stored = await profiles.setSelectedCourses(req.session!.sub, parsed.data.offeringIds, parsed.data.context);
-    res.json({ selectedCourseIds: stored });
+    const stored = await profiles.setSelectedCourses(
+      req.session!.sub, parsed.data.offeringIds, parsed.data.context, parsed.data.semesterId,
+    );
+    // Approved changes to a course just added go to the inbox, never a popup.
+    const notified = await changes.notifyForAddedCourses(req.session!.sub, stored.semesterId, stored.added);
+    res.json({ selectedCourseIds: stored.selected, semesterId: stored.semesterId, newNotifications: notified });
   } catch (error) {
     if (error instanceof profiles.ProfileError) {
       res.status(error.status).json({ error: error.message });

@@ -12,9 +12,11 @@ interface HeaderProps {
   userName?: string;
   /** Present once accounts are enabled; opens the profile sheet. */
   onOpenSettings?: () => void;
+  /** The notifications bell, when accounts are enabled. */
+  notifications?: React.ReactNode;
 }
 
-export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpenSettings }: HeaderProps) {
+export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpenSettings, notifications }: HeaderProps) {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeInKolkata());
   // index.html has already applied the saved (or default dark) theme.
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
@@ -109,6 +111,8 @@ export function Header({ onRefresh, onDateChange, selectedDate, userName, onOpen
             Next Day
             <ChevronRight className="h-3.5 w-3.5 ml-1" />
           </Button>
+
+          {notifications}
 
           {onOpenSettings ? (
             <Button

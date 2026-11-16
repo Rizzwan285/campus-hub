@@ -173,7 +173,7 @@ export function CourseTimingsEditor({ open, onOpenChange, courseCode }: CourseTi
     try {
       const request = await submitSuggestion(code, edited, note);
       if (isAdmin) {
-        await approveSuggestion(request.id, 'Applied directly by the developer.');
+        await approveSuggestion(request.id, 'Applied directly by the developer.', { mode: 'compulsory' });
         // They are the official timings now, here as for everyone else.
         void refreshCourses();
         toast.success(`${code} now has these timings for everyone taking it.`);
@@ -396,7 +396,9 @@ function SuggestionStatus({
   const decided = request.decidedAt ? shortDate(request.decidedAt) : '';
   const approved = request.status === 'approved';
   const text = approved
-    ? `Your suggestion was approved on ${decided}, so it now applies to everyone taking the course.`
+    ? request.approvalMode === 'optional'
+      ? `Your suggestion was approved on ${decided} as an optional update: everyone taking the course can choose to use it.`
+      : `Your suggestion was approved on ${decided}, so it now applies to everyone taking the course.`
     : request.status === 'rejected'
       ? `Your suggestion from ${shortDate(request.createdAt)} was not approved.`
       : `Your suggestion was closed on ${decided} because the timings changed in the meantime.`;

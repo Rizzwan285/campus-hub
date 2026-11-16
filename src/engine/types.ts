@@ -1,5 +1,6 @@
 export interface RecurrenceRule {
-  type: 'weekly' | 'biweekly_odd' | 'biweekly_even' | 'custom';
+  /** `once` is a single class on `TimetableMeeting.date`, e.g. an extra lecture. */
+  type: 'weekly' | 'biweekly_odd' | 'biweekly_even' | 'custom' | 'once';
 }
 
 export type MeetingDay =
@@ -15,6 +16,12 @@ export interface TimetableMeeting {
   room: string;
   instructors: string[];
   recurrence: RecurrenceRule;
+  /** The slot this class came from; absent for a class outside the slot system. */
+  slot?: string;
+  /** Batches the class is for, e.g. "B1-B6". Absent means everyone. */
+  batches?: string;
+  /** YYYY-MM-DD, only with `recurrence.type === 'once'`. */
+  date?: string;
 }
 
 export interface CourseOffering {
@@ -31,6 +38,8 @@ export interface CourseOffering {
   source?: 'seed' | 'admin';
   /** Set by the store when the student's own timings replace the official ones. */
   isPersonal?: boolean;
+  program?: string;
+  branch?: string;
 }
 
 export interface Holiday {

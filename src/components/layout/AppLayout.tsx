@@ -14,6 +14,7 @@ import { isApiConfigured } from '@/services/api';
 import { Onboarding } from '@/components/features/Onboarding';
 import { Login } from '@/components/features/Login';
 import { AccountSettings } from '@/components/features/AccountSettings';
+import { NotificationCenter } from '@/components/features/notifications/NotificationCenter';
 
 export interface AppContextType {
   currentTime: Date;
@@ -127,6 +128,7 @@ export function AppLayout() {
           selectedDate={selectedDate}
           userName={account?.name ?? profile?.name ?? ''}
           onOpenSettings={accountsEnabled ? () => setSettingsOpen(true) : undefined}
+          notifications={accountsEnabled ? <NotificationCenter /> : undefined}
         />
         
         {/* Desktop Navigation */}

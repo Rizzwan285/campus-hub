@@ -1,12 +1,15 @@
 import { createApp } from './app';
 import { config } from './config';
 import { pool } from './db';
+import { startEmailWorker } from './services/email.service';
 
 const app = createApp();
 
 const server = app.listen(config.PORT, () => {
   console.log(`Campus Hub API listening on http://localhost:${config.PORT}`);
   console.log(`Allowed origins: ${config.allowedOrigins.join(', ')}`);
+  // Sends queued change-request emails, and retries any that failed.
+  startEmailWorker();
 });
 
 async function shutdown(signal: string) {

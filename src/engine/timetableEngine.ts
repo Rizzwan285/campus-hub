@@ -129,8 +129,9 @@ export const TimetableEngine = {
 
     selectedCourses.forEach(course => {
       course.meetings.forEach((meeting, index) => {
+        const once = meeting.recurrence?.type === 'once';
         // Evaluate Recurrence
-        if (!this.evaluateRecurrence(meeting.recurrence, options.targetWeek)) return;
+        if (!once && !this.evaluateRecurrence(meeting.recurrence, options.targetWeek)) return;
 
         // Calculate specific date for this meeting
         const targetDayIndex = DAY_MAP[meeting.day];
@@ -139,8 +140,13 @@ export const TimetableEngine = {
         const meetingDate = new Date(anchor);
         meetingDate.setDate(anchor.getDate() + targetDayIndex);
 
+        // A one-time class exists on its own date only, in whichever week that
+        // date falls. It was scheduled for that day on purpose, so a holiday
+        // does not cancel it the way it cancels a weekly class.
+        if (once && calendarDateKey(meetingDate) !== meeting.date) return;
+
         // Check Holiday
-        const holiday = this.isHoliday(meetingDate, holidays);
+        const holiday = once ? null : this.isHoliday(meetingDate, holidays);
         if (holiday) {
           if (!holidaysEncountered.some(h => h.date === holiday.date)) {
             holidaysEncountered.push(holiday);

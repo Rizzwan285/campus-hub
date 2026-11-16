@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { requireSession } from '../middleware/auth';
 import * as changes from '../repositories/courseChanges.repository';
+import * as profiles from '../repositories/profile.repository';
+import { deliverDueEmails } from '../services/email.service';
 import { meetingListSchema } from './schemas';
 
 /**
@@ -53,14 +55,16 @@ courseChangesRouter.post('/', async (req, res, next) => {
       res.status(404).json({ error: `${courseCode} is not in the timetable.` });
       return;
     }
-    if (changes.sameMeetings(meetings, official.meetings)) {
+    if (changes.sameMeetingLists(meetings, official.meetings)) {
       res.status(400).json({ error: 'Those are already the official timings, so there is nothing to suggest.' });
       return;
     }
 
+    const requester = await profiles.findByRoll(req.session!.roll);
     const saved = await changes.submitRequest({
       userId: req.session!.sub,
       roll: req.session!.roll,
+      requesterName: requester?.name ?? null,
       courseCode,
       courseName: official.courseName,
       note: note || null,
@@ -74,6 +78,9 @@ courseChangesRouter.post('/', async (req, res, next) => {
       return;
     }
 
+    // The request is stored and its email queued; sending happens out of
+    // band, so a slow mail provider never holds up the student.
+    void deliverDueEmails();
     res.status(201).json(saved);
   } catch (error) {
     next(error);

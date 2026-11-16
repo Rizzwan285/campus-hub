@@ -17,6 +17,20 @@ const schema = z.object({
   SESSION_DAYS: z.coerce.number().int().positive().default(30),
   /** Roll number that owns the developer account. */
   ADMIN_ROLL_NUMBER: z.string().default('142301026'),
+
+  /** Interpreter for the semester importer (scripts/pipeline). Standard library only. */
+  PYTHON_BIN: z.string().default('python3'),
+
+  // ---- email to the developer about new timetable change requests ----
+  /** `resend` or `brevo` send over HTTPS; `log` prints instead; `none` disables. */
+  EMAIL_PROVIDER: z.enum(['resend', 'brevo', 'log', 'none']).default('none'),
+  EMAIL_API_KEY: z.string().optional(),
+  /** A sender the provider has verified, e.g. "Campus Companion <alerts@example.com>". */
+  EMAIL_FROM: z.string().optional(),
+  /** Where change-request emails go. */
+  ADMIN_NOTIFY_EMAIL: z.string().optional(),
+  /** Public URL of the web app, for the link back to /admin. No trailing slash. */
+  APP_URL: z.string().optional(),
 });
 
 const parsed = schema.safeParse(process.env);

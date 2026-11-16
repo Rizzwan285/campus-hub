@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox,
+  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox, GraduationCap,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { useMessData } from '@/hooks/useApiData';
 import { getWeekCycle } from '@/utils/dateUtils';
 import { CourseChangeReview } from '@/components/features/CourseChangeReview';
 import { SpecialServicesEditor } from '@/components/features/SpecialServicesEditor';
+import { SemestersAdmin } from '@/components/features/admin/SemestersAdmin';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
@@ -1076,7 +1077,19 @@ function PendingBadge() {
 
 export default function Admin() {
   const account = useAuthStore((state) => state.account);
+  const restore = useAuthStore((state) => state.restore);
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  // The email about a new request links here as /admin?request=<id>. The link
+  // only opens this page; deciding still takes a signed-in click below.
+  const focusRequestId = Number(params.get('request')) || null;
+  const [tab, setTab] = useState(params.get('tab') ?? 'requests');
+
+  // This page sits outside AppLayout, which is what normally revalidates the
+  // stored session, so a direct visit (from that email) has to do it itself.
+  useEffect(() => {
+    void restore();
+  }, [restore]);
 
   if (account?.role !== 'admin') {
     return (
@@ -1086,6 +1099,7 @@ export default function Admin() {
           <h1 className="text-lg font-semibold">Developer access only</h1>
           <p className="text-sm text-muted-foreground">
             Sign in with an administrator account to use these tools.
+            {focusRequestId ? ' Then open the link from the email again.' : ''}
           </p>
           <Button variant="outline" onClick={() => navigate('/')} className="rounded-xl">
             <ArrowLeft className="h-4 w-4" /> Back to app
@@ -1096,7 +1110,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-3xl">
+    <div className={`container mx-auto px-4 py-6 ${tab === 'semesters' ? 'max-w-6xl' : 'max-w-3xl'}`}>
       <div className="flex items-center gap-3 mb-6">
         <Button variant="outline" size="icon" onClick={() => navigate('/')} className="rounded-xl">
           <ArrowLeft className="h-4 w-4" />
@@ -1111,9 +1125,10 @@ export default function Admin() {
         </div>
       </div>
 
-      <Tabs defaultValue="requests">
-        <TabsList className="grid grid-cols-3 h-auto mb-5">
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList className="grid grid-cols-3 sm:grid-cols-5 h-auto mb-5">
           <TabsTrigger value="requests"><Inbox className="h-4 w-4 mr-1" />Requests<PendingBadge /></TabsTrigger>
+          <TabsTrigger value="semesters"><GraduationCap className="h-4 w-4 mr-1" />Semesters</TabsTrigger>
           <TabsTrigger value="courses"><CalendarDays className="h-4 w-4 mr-1" />Slots</TabsTrigger>
           <TabsTrigger value="menu"><UtensilsCrossed className="h-4 w-4 mr-1" />Menu</TabsTrigger>
           <TabsTrigger value="timings"><Clock className="h-4 w-4 mr-1" />Timings</TabsTrigger>
@@ -1124,7 +1139,8 @@ export default function Admin() {
           <TabsTrigger value="audit"><History className="h-4 w-4 mr-1" />Log</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="requests"><Card className="p-5"><CourseChangeReview /></Card></TabsContent>
+        <TabsContent value="requests"><Card className="p-5"><CourseChangeReview focusRequestId={focusRequestId} /></Card></TabsContent>
+        <TabsContent value="semesters"><SemestersAdmin /></TabsContent>
         <TabsContent value="courses"><Card className="p-5"><CourseSlotEditor /></Card></TabsContent>
         <TabsContent value="menu" className="space-y-4">
           <Card className="p-5"><WeekCycleAlignment /></Card>

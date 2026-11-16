@@ -1,7 +1,7 @@
 import { academicContext, firstYearBatch } from '../lib/academicProfile';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { TimetableLoader } from '../services/timetableLoader';
+import { TimetableLoader, type SemesterInfo, type TimetableMeta, type TimetableSource } from '../services/timetableLoader';
 import { isApiConfigured } from '../services/api';
 import { TimetableEngine } from '../engine/timetableEngine';
 import {
@@ -9,8 +9,18 @@ import {
   meetingsFingerprint,
   overrideStatus,
   sameMeetings,
+  applyDelta,
   type CourseOverride,
+  type DeltaOutcome,
+  type MeetingDelta,
 } from '../engine/courseTimings';
+import {
+  DEFAULT_SEMESTER_CONFIG,
+  batchAllowed,
+  firstYearExclusions,
+  venueFor,
+  type SemesterConfig,
+} from '../engine/courseSchedule';
 import { useUserStore } from './useUserStore';
 import {
   CourseOffering,
@@ -20,44 +30,23 @@ import {
   TimetableMeeting
 } from '../engine/types';
 
-function getVenueForMeeting(courseCode: string, meetingType: string, batchNo: number): string | null {
-  if (courseCode === 'PH1030' || courseCode === 'MA1011A') {
-    if (batchNo <= 6) return 'C06-105';
-    if (batchNo <= 12) return 'C06-106';
-    if (batchNo <= 18) return 'C06-107';
-    return 'C06-104';
-  }
-  if (courseCode === 'ES1010') {
-    if (batchNo <= 11) return 'N203';
-    if (batchNo <= 18) return 'N305';
-    return 'C06-104';
-  }
-  if (courseCode === 'ME1130') {
-    if (meetingType === 'lab') return 'A01-112 (Drawing Hall)';
-    if (batchNo <= 5) return 'C06-105';
-    if (batchNo <= 10) return 'C06-106';
-    if (batchNo <= 15) return 'C06-107';
-    if (batchNo <= 20) return 'C06-104';
-    return 'N305';
-  }
-  if (courseCode === 'ID1050A') {
-    return meetingType === 'lab' ? 'Nila CS-Lab' : 'A01-007';
-  }
-  if (courseCode === 'ME1150') return 'D-03 Workshop';
-  if (courseCode === 'EE1110') return 'C06-105 + C06 Electronics Lab';
-  if (courseCode === 'PH1130') return 'A01 Physics Lab';
-  if (courseCode === 'CY1140') return 'A01 Chemistry Lab';
-  if (courseCode === 'GN1003') return 'N-203/204 & Nila CS Lab';
-  return null;
-}
-
 /**
  * Whether loaded courses are the live official timetable. They are, unless an
  * API is configured but did not answer and the bundled copy stood in — only
  * the API sends `offeringId`.
  */
-function isAuthoritative(courses: CourseOffering[]): boolean {
-  return !isApiConfigured() || courses.some((course) => course.offeringId !== undefined);
+function isAuthoritative(courses: CourseOffering[], meta?: TimetableMeta): boolean {
+  if (!isApiConfigured()) return true;
+  // The loader knows where the data came from. A saved snapshot carries
+  // `offeringId` too, but it is as capable of predating an approval as the
+  // bundle is, so only a live answer counts.
+  if (meta) return meta.source === 'api';
+  return courses.some((course) => course.offeringId !== undefined);
+}
+
+/** The loader's account of the last load; absent when the loader is mocked in tests. */
+function loaderMeta(): TimetableMeta | undefined {
+  return (TimetableLoader as { getMeta?: () => TimetableMeta }).getMeta?.();
 }
 
 /**
@@ -102,6 +91,12 @@ interface TimetableState {
   selectedCourseIds: string[];
   selectionContext: string | null;
   previewDate: string; // ISO string to be serializable
+  /**
+   * The semester the selection and timings above belong to. When the server
+   * reports a different current semester they are set aside: last semester's
+   * courses and corrections are not this semester's.
+   */
+  semesterCode: string | null;
   /** The student's own timings, keyed by course code. */
   courseOverrides: Record<string, CourseOverride>;
   /**
@@ -116,6 +111,15 @@ interface TimetableState {
   loadedHolidays: Holiday[];
   /** False while bundled fallback data stands in for an unreachable API. */
   coursesAuthoritative: boolean;
+  /** The semester of the loaded timetable, and whether it came live, saved or built in. */
+  semester: SemesterInfo | null;
+  timetableSource: TimetableSource;
+  /** When a saved snapshot standing in for the API was saved. */
+  snapshotSavedAt: string | null;
+  /** The only data available is from a semester that is over; no classes are shown. */
+  timetableOutdated: boolean;
+  /** This semester's first-year and venue rules. */
+  semesterConfig: SemesterConfig;
   
   // Resolved Output
   resolvedEvents: CalendarEvent[];
@@ -148,12 +152,50 @@ interface TimetableState {
   setCourseOverrides: (overrides: CourseOverride[]) => void;
   /** The account now holds exactly what is stored locally. */
   markCourseOverridesSynced: () => void;
+  /**
+   * What an approved optional change would do to this student's timetable:
+   * only the classes it names, on top of whatever they see now. Saves
+   * nothing - the caller records the answer first, then saves the result with
+   * saveCourseOverride. Reports `outdated` rather than guessing when a class
+   * the change moves is no longer there.
+   */
+  previewProposal: (courseCode: string, delta: MeetingDelta) => DeltaOutcome & { baseFingerprint?: string };
 }
 
 export const useTimetableStore = create<TimetableState>()(
   persist(
     (set, get) => {
       let initialization = 0;
+
+      const metaState = (meta?: TimetableMeta) =>
+        meta
+          ? {
+              semester: meta.semester,
+              timetableSource: meta.source,
+              snapshotSavedAt: meta.savedAt,
+              timetableOutdated: meta.outdated,
+              semesterConfig: meta.config ?? DEFAULT_SEMESTER_CONFIG,
+            }
+          : {};
+
+      /**
+       * Notices a new current semester. The selection and the student's own
+       * timings were for the semester before, so they are set aside here; the
+       * account holds each semester's separately and the old ones stay there.
+       * Only a live answer from the server can declare a semester current.
+       */
+      const adoptSemester = (meta?: TimetableMeta): boolean => {
+        const code = meta?.source === 'api' ? meta.semester?.code : undefined;
+        if (!code || code === get().semesterCode) return false;
+        const changed = get().semesterCode !== null;
+        set({
+          semesterCode: code,
+          ...(changed
+            ? { selectedCourseIds: [], courseOverrides: {}, courseOverridesUnsynced: false }
+            : {}),
+        });
+        return changed;
+      };
       // Internal pure recomputation logic (avoids redundant hook dependencies)
       const _recompute = () => {
         const {
@@ -161,10 +203,11 @@ export const useTimetableStore = create<TimetableState>()(
           courseOverrides, coursesAuthoritative,
         } = get();
 
-        if (!loadedCourses.length) {
+        if (!loadedCourses.length || get().timetableOutdated) {
           set({ resolvedEvents: [], collisions: [], holidaysEncountered: [] });
           return;
         }
+        const config = get().semesterConfig;
 
         const selectedSet = new Set(selectedCourseIds);
         // A student's own timings stand in for the official ones — until the
@@ -227,7 +270,9 @@ export const useTimetableStore = create<TimetableState>()(
                   }
                   
                   // If no batch restriction is mentioned, it's for everyone.
-                  return !hasRestriction || allowed;
+                  // Semesters imported through /admin mark batches in their
+                  // own field; older data only in the room text.
+                  return (!hasRestriction || allowed) && batchAllowed(m.batches, batchNo);
                 })
                 .map(m => {
                   let finalRoom = m.room;
@@ -260,7 +305,7 @@ export const useTimetableStore = create<TimetableState>()(
                     }
                   }
 
-                  const customRoom = getVenueForMeeting(course.courseCode, m.type, batchNo);
+                  const customRoom = venueFor(config, course.courseCode, m.type, batchNo);
                   // A room the student typed into their own timings stays as typed.
                   const typedByStudent =
                     course.isPersonal && !officialRooms.get(course.courseCode)?.has(m.room);
@@ -306,6 +351,12 @@ export const useTimetableStore = create<TimetableState>()(
         loadedCourses: [],
         loadedHolidays: [],
         coursesAuthoritative: false,
+        semesterCode: null,
+        semester: null,
+        timetableSource: 'bundled',
+        snapshotSavedAt: null,
+        timetableOutdated: false,
+        semesterConfig: DEFAULT_SEMESTER_CONFIG,
 
         resolvedEvents: [],
         collisions: [],
@@ -331,6 +382,9 @@ export const useTimetableStore = create<TimetableState>()(
 
             if (request !== initialization) return;
             const allCourses = mergeOfferings(allCoursesRaw);
+            const meta = loaderMeta();
+            const config = meta?.config ?? DEFAULT_SEMESTER_CONFIG;
+            adoptSemester(meta);
 
             const userState = get();
             let newSelectedIds = userState.selectedCourseIds;
@@ -341,24 +395,16 @@ export const useTimetableStore = create<TimetableState>()(
             // First-year cores belong to one batch; other years choose their own courses.
             if (program === 'UG' && profile?.yearOfStudy === '1') {
               const batchNo = firstYearBatch(profile.batchNo);
-              const excludedCodes: string[] = ['BT2010']; // Life science not in this semester
-              
-              if (batchNo && batchNo >= 1 && batchNo <= 12) {
-                excludedCodes.push('CY1140', 'EE1110'); // B1-12 gets Physics/Mech, exclude Chem/Elec
-              } else if (batchNo && batchNo >= 13 && batchNo <= 24) {
-                excludedCodes.push('PH1130', 'ME1150'); // B13-24 gets Chem/Elec, exclude Physics/Mech
-              }
+              // Which cores a batch skips is the semester's rule, not the app's:
+              // e.g. B1-12 take Physics/Mech labs, B13-24 Chemistry/Electrical.
+              const excludedCodes = firstYearExclusions(config, batchNo);
 
               const commonCoreIds = commonData
                 .filter(c => c.category?.toLowerCase().includes('core') && !excludedCodes.includes(c.courseCode))
                 .map(c => c.courseCode);
                 
-              const extraIds = [];
-              if (branch === 'DS') {
-                // Since we load all courses now, find DS1010 safely
-                const ds1010 = allCourses.find(c => c.courseCode === 'DS1010');
-                if (ds1010) extraIds.push(ds1010.courseCode);
-              }
+              const extraIds = (config.firstYear?.extraByBranch?.[branch] ?? [])
+                .filter(code => allCourses.some(c => c.courseCode === code));
               
               // Preserve electives on a reload, but never retain excluded cohort cores.
               const previouslySelectedElectives = allCourses
@@ -371,7 +417,8 @@ export const useTimetableStore = create<TimetableState>()(
             set({
               loadedCourses: allCourses,
               loadedHolidays: holidays,
-              coursesAuthoritative: isAuthoritative(allCoursesRaw),
+              coursesAuthoritative: isAuthoritative(allCoursesRaw, meta),
+              ...metaState(meta),
               selectedCourseIds: newSelectedIds,
               isLoading: false
             });
@@ -408,8 +455,18 @@ export const useTimetableStore = create<TimetableState>()(
             return false;
           }
 
-          set({ loadedCourses: mergeOfferings(fresh), coursesAuthoritative: isAuthoritative(fresh) });
+          const meta = loaderMeta();
+          const semesterChanged = adoptSemester(meta);
+          set({
+            loadedCourses: mergeOfferings(fresh),
+            coursesAuthoritative: isAuthoritative(fresh, meta),
+            ...metaState(meta),
+          });
           _recompute();
+          // A new semester needs the full start-up again: a first year's core
+          // courses are picked for them from the new catalogue.
+          const { program, branch } = get();
+          if (semesterChanged && program && branch) void get().initializeTimetable(program, branch);
           return true;
         },
 
@@ -484,7 +541,23 @@ export const useTimetableStore = create<TimetableState>()(
           _recompute();
         },
 
-        markCourseOverridesSynced: () => set({ courseOverridesUnsynced: false })
+        markCourseOverridesSynced: () => set({ courseOverridesUnsynced: false }),
+
+        previewProposal: (courseCode: string, delta: MeetingDelta) => {
+          const official = get().loadedCourses.find(c => c.courseCode === courseCode);
+          if (!official) return { status: 'outdated', missing: delta.remove };
+
+          const own = get().courseOverrides[courseCode];
+          const authoritative = get().coursesAuthoritative;
+          const current =
+            own && overrideStatus(own, official.meetings, authoritative) === 'active'
+              ? own.meetings
+              : official.meetings;
+
+          const outcome = applyDelta(current, delta);
+          if (outcome.status !== 'applied') return outcome;
+          return { ...outcome, baseFingerprint: baseFingerprintFor(official, authoritative) };
+        }
       };
     },
     {
@@ -496,6 +569,7 @@ export const useTimetableStore = create<TimetableState>()(
         selectedCourseIds: state.selectedCourseIds,
         selectionContext: state.selectionContext,
         previewDate: state.previewDate,
+        semesterCode: state.semesterCode,
         courseOverrides: state.courseOverrides,
         courseOverridesUnsynced: state.courseOverridesUnsynced
       })

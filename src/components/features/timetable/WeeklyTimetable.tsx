@@ -22,7 +22,12 @@ export function WeeklyTimetable() {
     courseOverrides,
     coursesAuthoritative,
     keepCourseOverride,
-    removeCourseOverride
+    removeCourseOverride,
+    semester,
+    timetableSource,
+    timetableOutdated,
+    snapshotSavedAt,
+    refreshCourses
   } = useTimetableStore();
 
   const profile = useUserStore(state => state.profile);
@@ -63,8 +68,37 @@ export function WeeklyTimetable() {
     );
   }
 
+  if (timetableOutdated) {
+    // The only timetable this device holds is for a semester that has ended.
+    // Showing it would send a student to last semester's classes.
+    return (
+      <Card className="w-full p-8 flex flex-col items-center text-center gap-3 bg-card">
+        <AlertCircle className="h-10 w-10 text-amber-500" />
+        <h2 className="text-lg font-semibold">This semester&rsquo;s timetable could not be loaded</h2>
+        <p className="text-sm text-muted-foreground max-w-md">
+          The server is not answering, and the copy on this device is for {semester?.name ?? 'an earlier semester'},
+          which is over. Nothing is shown rather than last semester&rsquo;s classes.
+        </p>
+        <Button onClick={() => void refreshCourses()} className="rounded-xl">Try again</Button>
+      </Card>
+    );
+  }
+
   return (
     <div className="w-full space-y-4">
+      {timetableSource === 'cache' && (
+        <div className="rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+          <span>
+            Showing the saved copy of {semester?.name ?? 'your timetable'}
+            {snapshotSavedAt
+              ? ` from ${new Date(snapshotSavedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}`
+              : ''}
+            {' '}— the server is not answering, so changes since then are missing.
+          </span>
+          <Button size="sm" variant="outline" onClick={() => void refreshCourses()} className="h-7 rounded-lg">Retry</Button>
+        </div>
+      )}
+
       {collisions.length > 0 && <CollisionBanner collisions={collisions} />}
 
       {superseded.map(course => (
@@ -96,6 +130,7 @@ export function WeeklyTimetable() {
             </h2>
             <p className="text-sm text-muted-foreground">
               Week of {new Date(previewDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {semester?.name ? ` · ${semester.name}` : ''}
             </p>
           </div>
           <div className="flex gap-2">
