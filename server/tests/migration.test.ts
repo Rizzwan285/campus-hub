@@ -157,3 +157,38 @@ describe('migration 012/013 on the existing database', () => {
     expect(after).toEqual(before); // same ids, same meetings, same provenance
   });
 });
+
+describe('migration 015: the 2027 holidays', () => {
+  let h: Harness;
+
+  beforeAll(async () => {
+    h = await startHarness({ migrations: (file) => file < '015' });
+    // What an admin may already have done through /admin before 015 runs.
+    await h.sql(`update academic_days set name = 'Christmas (edited)', source = 'admin', customized_at = now() where date = '2026-12-25'`);
+    await h.sql(`insert into academic_days (date, name, kind, source, customized_at) values ('2027-02-13', 'Saturday instructional', 'instructional', 'admin', now())`);
+    await migrate(h.db, (file) => file.startsWith('015'));
+    invalidate();
+  });
+  afterAll(async () => h.close());
+
+  it('adds every 2027 holiday as an admin-owned row and leaves 2026 and other days alone', async () => {
+    const rows = await h.sql<{ date: string; name: string; source: string }>(
+      `select to_char(date, 'YYYY-MM-DD') as date, name, source from academic_days where kind = 'holiday' order by date`);
+    const year2027 = rows.filter((row) => row.date.startsWith('2027'));
+    expect(year2027).toHaveLength(16);
+    expect(year2027.every((row) => row.source === 'admin')).toBe(true);
+    expect(rows.filter((row) => row.date.startsWith('2026'))).toHaveLength(17);
+    expect(rows.find((row) => row.date === '2026-12-25')?.name).toBe('Christmas (edited)');
+    expect(await h.sql(`select kind from academic_days where date = '2027-02-13'`)).toEqual([{ kind: 'instructional' }]);
+  });
+
+  it('serves both years, with both 15 August holidays and the moon-sighting marks', async () => {
+    const days = await h.api<{ holidays: Array<{ date: string; occasion: string }> }>('GET', '/api/academic-days');
+    const august = days.body.holidays.filter((day) => day.date === '2027-08-15');
+    expect(august).toEqual([{ date: '2027-08-15', occasion: "Independence Day & Prophet Mohammad's Birthday (Id-E-Milad)*" }]);
+    expect(days.body.holidays.some((day) => day.date === '2026-01-26')).toBe(true);
+    expect(days.body.holidays.filter((day) => day.occasion.endsWith('*') && day.date.startsWith('2027'))).toHaveLength(4);
+    const engine = await h.api<Array<{ date: string; name: string }>>('GET', '/api/holidays');
+    expect(engine.body.some((day) => day.date === '2027-05-20' && day.name === 'Buddha Purnima')).toBe(true);
+  });
+});

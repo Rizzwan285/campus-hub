@@ -1,63 +1,118 @@
-import { CalendarDays, PartyPopper, ArrowRight } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { CalendarDays, ChevronsDown, PartyPopper } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAcademicDays } from '@/hooks/useApiData';
-import {
-  formatDaysAway,
-  groupHolidays,
-  type HolidayEntry,
-} from '@/lib/semesterHolidays';
+import { formatDaysAway, holidayWindow, type HolidayEntry } from '@/lib/holidayList';
 
 interface HolidaysCardProps {
-  /** The day being viewed, so a previewed date lists holidays from its term. */
+  /** The campus date being viewed: today, or the day previewed in the header. */
   date: Date;
 }
 
-const weekdayOf = (entry: HolidayEntry) =>
-  entry.at.toLocaleDateString('en-IN', { weekday: 'short' });
+/** The list is exactly this many rows tall; the rest is a scroll away. */
+const VISIBLE_ROWS = 5;
 
-const dateOf = (entry: HolidayEntry) =>
-  entry.at.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+const keyOf = (entry: HolidayEntry) => `${entry.date}|${entry.occasion}`;
+const dayMonth = (entry: HolidayEntry) => entry.at.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+const weekday = (entry: HolidayEntry) => entry.at.toLocaleDateString('en-IN', { weekday: 'long' });
 
 function HolidayRow({ entry, isNext }: { entry: HolidayEntry; isNext: boolean }) {
   return (
-    <div
-      className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+    <li
+      className={`flex items-center gap-3 p-2.5 rounded-lg border ${
         isNext
           ? 'bg-primary/10 border-primary/40'
           : entry.past
             ? 'bg-muted/30 border-transparent opacity-60'
-            : 'bg-muted/50 border-transparent hover:bg-muted'
+            : 'bg-muted/50 border-transparent'
       }`}
     >
-      <div
-        className={`w-14 shrink-0 text-center rounded-md py-1 ${
-          isNext ? 'bg-primary/15 text-primary' : 'bg-background/60'
-        }`}
-      >
-        <p className="text-xs font-semibold leading-tight">{dateOf(entry)}</p>
-        <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-          {weekdayOf(entry)}
-        </p>
+      {/* The list runs across a new year, so every row carries its year. */}
+      <div className={`w-14 shrink-0 text-center rounded-md py-1 ${isNext ? 'bg-primary/15 text-primary' : 'bg-background/60'}`}>
+        <p className="text-xs font-semibold leading-tight">{dayMonth(entry)}</p>
+        <p className="text-[11px] font-medium text-muted-foreground tabular-nums">{entry.year}</p>
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className={`text-sm font-medium ${entry.past ? 'line-through' : ''}`}>
-          {entry.occasion}
+        <p className={`text-sm font-medium break-words ${entry.past ? 'line-through' : ''}`}>{entry.occasion}</p>
+        <p className="text-xs text-muted-foreground">
+          {weekday(entry)}
+          {entry.past ? ' · past' : entry.onWeekend ? ' · weekend' : ''}
         </p>
-        {/* A holiday on a weekend costs no teaching day — worth saying so. */}
-        {entry.onWeekend && !entry.past && (
-          <p className="text-xs text-muted-foreground">Falls on a {weekdayOf(entry) === 'Sun' ? 'Sunday' : 'Saturday'}</p>
-        )}
       </div>
 
       {!entry.past && (
-        <Badge
-          variant={isNext ? 'default' : 'secondary'}
-          className="shrink-0 text-[10px] font-medium"
-        >
+        <Badge variant={isNext ? 'default' : 'secondary'} className="shrink-0 text-[10px] font-medium">
           {formatDaysAway(entry.daysAway)}
         </Badge>
+      )}
+    </li>
+  );
+}
+
+/**
+ * The holidays in a box exactly VISIBLE_ROWS rows tall that scrolls by touch,
+ * wheel or keyboard. Rows can wrap to two lines on a phone, so the height is
+ * measured from the rows themselves rather than assumed. Scroll chaining is
+ * left on, so reaching either end hands the gesture back to the page.
+ */
+function HolidayScroller({ rows, nextIndex }: { rows: HolidayEntry[]; nextIndex: number }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const [maxHeight, setMaxHeight] = useState<number>();
+  const overflows = rows.length > VISIBLE_ROWS;
+
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    const list = listRef.current;
+    if (!scroller || !list) return;
+    const measure = () => {
+      if (list.children.length <= VISIBLE_ROWS) {
+        setMaxHeight(undefined); // Fewer rows: the box shrinks to fit, no blank rows.
+        return;
+      }
+      // offsetTop counts from inside the top border and includes the top padding.
+      const last = list.children[VISIBLE_ROWS - 1] as HTMLElement;
+      const style = getComputedStyle(scroller);
+      const px = (value: string) => parseFloat(value) || 0;
+      const frame = px(style.paddingBottom) + px(style.borderTopWidth) + px(style.borderBottomWidth);
+      setMaxHeight(Math.ceil(last.offsetTop + last.offsetHeight + frame));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [rows.length]);
+
+  // Opens on the two past holidays, the next one and the two after it.
+  const firstKey = rows[0] ? keyOf(rows[0]) : '';
+  useEffect(() => {
+    if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
+  }, [firstKey]);
+
+  return (
+    <div>
+      <div
+        ref={scrollerRef}
+        role="region"
+        aria-label={overflows ? `Holidays, ${rows.length} listed; scroll for more` : 'Holidays'}
+        tabIndex={overflows ? 0 : undefined}
+        style={{ maxHeight }}
+        className="relative overflow-y-auto rounded-xl border border-border/50 p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      >
+        <ol ref={listRef} className="space-y-1.5">
+          {rows.map((entry, index) => (
+            <HolidayRow key={keyOf(entry)} entry={entry} isNext={index === nextIndex} />
+          ))}
+        </ol>
+      </div>
+      {overflows && (
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2">
+          <ChevronsDown className="h-3.5 w-3.5" aria-hidden="true" />
+          Scroll the list for {rows.length - VISIBLE_ROWS} more
+        </p>
       )}
     </div>
   );
@@ -65,75 +120,52 @@ function HolidayRow({ entry, isNext }: { entry: HolidayEntry; isNext: boolean })
 
 export function HolidaysCard({ date }: HolidaysCardProps) {
   const { holidays } = useAcademicDays();
-  const { semester, thisSemester, next, afterSemester } = groupHolidays(holidays, date);
+  const { rows, next, nextIndex } = holidayWindow(holidays, date);
+  const years = [...new Set(rows.map((entry) => entry.year))];
+  const tentativeShown = rows.some((entry) => entry.tentative && !entry.past);
 
   return (
-    <Card className="p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 rounded-2xl">
+    <Card id="holidays" className="scroll-mt-6 p-5 sm:p-6 bg-card border-border/50 shadow-[var(--shadow-card)] rounded-2xl">
       <div className="flex items-center gap-3 mb-4">
         <div className="p-2 bg-primary/8 rounded-xl">
-          <CalendarDays className="h-6 w-6 text-primary" />
+          <CalendarDays className="h-6 w-6 text-primary" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold">Institute Holidays</h2>
-          <p className="text-sm text-muted-foreground">This semester · {semester.label}</p>
-        </div>
-      </div>
-
-      {next && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
-          <PartyPopper className="h-5 w-5 text-primary shrink-0" />
-          <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">Next holiday</p>
-            <p className="font-semibold truncate">{next.occasion}</p>
-            <p className="text-xs text-muted-foreground">
-              {next.at.toLocaleDateString('en-IN', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })}{' '}
-              · {formatDaysAway(next.daysAway)}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {thisSemester.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-6 text-center">
-          No institute holidays listed for {semester.label}.
-        </p>
-      ) : (
-        <div className="space-y-2">
-          {thisSemester.map((entry) => (
-            <HolidayRow key={entry.date} entry={entry} isNext={entry.date === next?.date} />
-          ))}
-        </div>
-      )}
-
-      <div className="mt-5 pt-4 border-t border-border/50">
-        <div className="flex items-center gap-2 mb-2">
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold">Next holidays after this semester</h3>
-        </div>
-        {afterSemester.length > 0 ? (
-          <div className="space-y-2">
-            {afterSemester.map((entry) => (
-              <HolidayRow key={entry.date} entry={entry} isNext={entry.date === next?.date} />
-            ))}
-          </div>
-        ) : (
-          // Says why it is empty rather than hiding: the institute publishes the
-          // next year's gazetted list late, and a missing section reads as a bug.
+          <h2 className="text-xl font-semibold">Institute holidays</h2>
           <p className="text-sm text-muted-foreground">
-            They appear here as soon as the institute publishes the calendar for
-            the next semester.
+            Gazetted holidays{years.length ? ` · ${years[0]}${years.length > 1 ? `–${years[years.length - 1]}` : ''}` : ''}
           </p>
-        )}
+        </div>
       </div>
 
-      <p className="text-xs text-muted-foreground mt-4 pt-3 border-t border-border/40">
-        Gazetted institute holidays. Mess, bus and buggy schedules follow the
-        Saturday / holiday timings on these days, and classes are not held.
-      </p>
+      {next ? (
+        <>
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
+            <PartyPopper className="h-5 w-5 text-primary shrink-0" aria-hidden="true" />
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Next holiday</p>
+              <p className="font-semibold break-words">{next.occasion}</p>
+              <p className="text-xs text-muted-foreground">
+                {next.at.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                {' · '}
+                {formatDaysAway(next.daysAway)}
+              </p>
+            </div>
+          </div>
+          <HolidayScroller rows={rows} nextIndex={nextIndex} />
+        </>
+      ) : (
+        <p className="text-sm text-muted-foreground py-4">
+          No upcoming holidays are listed yet. They appear here once the institute publishes the next holiday list.
+        </p>
+      )}
+
+      <div className="text-xs text-muted-foreground mt-4 pt-3 border-t border-border/40 space-y-1">
+        {tentativeShown && <p>* The date depends on the sighting of the moon and may change.</p>}
+        <p>
+          Mess, bus and buggy schedules follow the Saturday / holiday timings on these days, and classes are not held.
+        </p>
+      </div>
     </Card>
   );
 }

@@ -52,19 +52,22 @@ export function ImportantLinksCard() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a
-            href={docUrl('Academic_Calender2026.pdf')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors sm:col-span-2"
-          >
-            <FileText className="h-5 w-5 text-primary shrink-0" />
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm">Academic Calendar (2026)</h3>
-              <p className="text-xs text-muted-foreground">PDF Document</p>
-            </div>
-            <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
-          </a>
+          {['2027', '2026'].map((year) => (
+            <a
+              key={year}
+              href={docUrl(`Academic_Calender${year}.pdf`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors"
+            >
+              <FileText className="h-5 w-5 text-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-sm">Academic Calendar ({year})</h3>
+                <p className="text-xs text-muted-foreground">PDF Document</p>
+              </div>
+              <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
+            </a>
+          ))}
           {campusLinks.map(({ title, description, href }) => (
             <a
               key={href}

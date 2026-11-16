@@ -1,7 +1,7 @@
 import { toZonedTime } from 'date-fns-tz';
 import { calendarDateKey } from '../lib/calendarDate';
 import { holidays2025, specialDays2025 } from '@/data/busData';
-import holidays2026 from '@/data/timetable/holidays.json';
+import instituteHolidays from '@/data/timetable/holidays.json';
 
 export const TIMEZONE = 'Asia/Kolkata';
 
@@ -15,7 +15,7 @@ export interface AcademicDaysData {
  * the starting point for anything that lists holidays (see useAcademicDays()).
  */
 export const bundledAcademicDays: AcademicDaysData = {
-  holidays: [...holidays2025, ...holidays2026.map(({ date, name }) => ({ date, occasion: name }))],
+  holidays: [...holidays2025, ...instituteHolidays.map(({ date, name }) => ({ date, occasion: name }))],
   specialDays: specialDays2025,
 };
 
