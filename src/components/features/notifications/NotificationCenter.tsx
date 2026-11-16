@@ -206,10 +206,12 @@ export function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<InboxFilter>('all');
   const [alertIds, setAlertIds] = useState<number[]>([]);
+  // Suppress immediately, even while the server is saving (or offline).
+  const [dismissedIds, setDismissedIds] = useState<number[]>([]);
   const { respond, busy } = useRespond();
 
   const { data } = useQuery({
-    queryKey: QUERY_KEY,
+    queryKey: [...QUERY_KEY, account?.id],
     queryFn: listNotifications,
     enabled: account !== null,
     // Catches an approval made while the app is open; a missed one is simply
@@ -230,9 +232,9 @@ export function NotificationCenter() {
   // until it closes, so answering one does not make the rest jump around.
   useEffect(() => {
     if (alertIds.length > 0 || open) return;
-    const waiting = alertsToShow(notifications);
+    const waiting = alertsToShow(notifications).filter(n => !dismissedIds.includes(n.id));
     if (waiting.length > 0) setAlertIds(waiting.map((notification) => notification.id));
-  }, [notifications, alertIds.length, open]);
+  }, [notifications, alertIds.length, open, dismissedIds]);
 
   const alerts = notifications.filter((notification) => alertIds.includes(notification.id));
   const unread = unreadCount(notifications);
@@ -240,6 +242,7 @@ export function NotificationCenter() {
 
   const closeAlert = () => {
     const ids = alertIds;
+    setDismissedIds(previous => [...new Set([...previous, ...ids])]);
     setAlertIds([]);
     if (ids.length === 0) return;
     void markNotifications(ids, { alertSeen: true, read: true })

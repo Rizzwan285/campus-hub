@@ -228,6 +228,7 @@ authRouter.put('/courses', requireSession, async (req, res, next) => {
 });
 
 const overridesBody = z.object({
+  semesterId: z.number().int().positive().nullable().optional(),
   overrides: z
     .array(
       z.object({
@@ -255,9 +256,13 @@ authRouter.put('/course-overrides', requireSession, async (req, res, next) => {
       return;
     }
 
-    const stored = await changes.replaceOverrides(req.session!.sub, parsed.data.overrides);
+    const stored = await changes.replaceOverrides(req.session!.sub, parsed.data.overrides, parsed.data.semesterId);
     res.json({ courseOverrides: stored });
   } catch (error) {
+    if (error instanceof changes.OverrideContextError) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 });

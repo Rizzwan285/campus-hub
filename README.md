@@ -653,3 +653,11 @@ discuss what you'd like to change. Two house rules that are easy to trip over:
 - **Bus times are ordered strings, not times.** They carry no AM/PM marker; it
   is inferred from a departure's position in the list, so sorting or
   deduplicating a direction silently reinterprets every time after the edit.
+
+## Semester management and notifications
+
+The semester-management implementation adds institute-file imports, visual review,
+versioned publication/activation, upcoming catalogue browsing and optional or
+compulsory timetable updates with a student inbox. See the
+[workflow and rollout instructions](server/README.md#semester-management-and-timetable-notifications)
+for migrations 012/013, Python packaging, email setup and validation.

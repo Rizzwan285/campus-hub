@@ -35,25 +35,31 @@ export interface Harness {
   url: string;
   /** Runs SQL straight on the test database. */
   sql: <T = Record<string, unknown>>(text: string, params?: unknown[]) => Promise<T[]>;
-  api: (
+  api: <T = unknown>(
     method: string,
     route: string,
     options?: { token?: string | null; body?: unknown; raw?: Buffer; headers?: Record<string, string> },
-  ) => Promise<{ status: number; body: any }>;
+  ) => Promise<{ status: number; body: T }>;
   /** Creates a student (or admin) and returns their id and session token. */
   user: (roll: string, profile?: Partial<{ name: string; role: string; program: string; branch: string; year: string; batch: string }>) =>
     Promise<{ id: string; roll: string; token: string }>;
   close: () => Promise<void>;
 }
 
-export async function startHarness(): Promise<Harness> {
-  const db = new PGlite();
+/** Applies migrations in order; `only` picks which (by file name). */
+export async function migrate(db: PGlite, only: (file: string) => boolean = () => true): Promise<void> {
   for (const file of fs.readdirSync(MIGRATIONS).filter((name) => name.endsWith('.sql')).sort()) {
+    if (!only(file)) continue;
     // gen_random_uuid() is built in; the extension itself is not shipped.
     const sql = fs.readFileSync(path.join(MIGRATIONS, file), 'utf8')
       .replace(/create extension if not exists "pgcrypto";/i, '');
     await db.exec(sql);
   }
+}
+
+export async function startHarness(options: { migrations?: (file: string) => boolean } = {}): Promise<Harness> {
+  const db = new PGlite();
+  await migrate(db, options.migrations);
 
   const turnstile = new Turnstile();
   const run = async (text: string, params?: unknown[]) => {
@@ -97,10 +103,10 @@ export async function startHarness(): Promise<Harness> {
     db,
     url,
     sql,
-    async api(method, route, options = {}) {
+    async api<T = unknown>(method: string, route: string, options: Parameters<Harness['api']>[2] = {}) {
       const headers: Record<string, string> = { ...(options.headers ?? {}) };
       if (options.token) headers.Authorization = `Bearer ${options.token}`;
-      let body: BodyInit | undefined;
+      let body: string | Buffer | undefined;
       if (options.raw) {
         headers['Content-Type'] = 'application/octet-stream';
         body = options.raw;
@@ -116,7 +122,7 @@ export async function startHarness(): Promise<Harness> {
       } catch {
         parsed = text;
       }
-      return { status: response.status, body: parsed };
+      return { status: response.status, body: parsed as T };
     },
     async user(roll, profile = {}) {
       const rows = await sql<{ id: string }>(

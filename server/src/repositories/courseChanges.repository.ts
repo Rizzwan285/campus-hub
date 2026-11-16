@@ -120,14 +120,20 @@ export async function getOverrides(userId: string): Promise<CourseOverride[]> {
   }));
 }
 
+export class OverrideContextError extends Error {}
+
 /** Replaces the user's whole set of corrections for the current semester. */
 export async function replaceOverrides(
   userId: string,
   overrides: CourseOverride[],
+  clientSemesterId?: number | null,
 ): Promise<CourseOverride[]> {
   // One insert cannot touch the same row twice, so a repeated code keeps its last entry.
   const byCode = new Map(overrides.map((override) => [override.courseCode, override]));
   const semesterId = await getActiveSemesterId();
+  if (clientSemesterId != null && clientSemesterId !== semesterId) {
+    throw new OverrideContextError('The current semester changed. Reload before saving personal timings.');
+  }
 
   const client = await pool.connect();
   try {
