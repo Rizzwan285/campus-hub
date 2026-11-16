@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "set-admin": "tsx scripts/set-admin.ts",
     "seed:reset": "tsx scripts/seed.ts --reset",
+    "email:preview": "tsx scripts/email-preview.ts",
     "test": "vitest run"
   },
   "dependencies": {

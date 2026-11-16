@@ -1,8 +1,9 @@
+import crypto from 'crypto';
 import type { PoolClient } from 'pg';
 import { config } from '../config';
 import { pool, query } from '../db';
-import type { ChangeKind, MeetingDelta } from '../../../src/engine/courseTimings';
-import type { TimetableMeeting } from '../../../src/engine/types';
+import { APPS_SCRIPT_TIMEOUT_MS, AppsScriptError, redactSecret, sendViaAppsScript } from './appsScript';
+import { renderChangeRequestEmail, renderTestEmail, type ChangeRequestEmailInput, type RenderedEmail } from './emailTemplate';
 
 /**
  * Emails to the developer, through an outbox.
@@ -13,8 +14,11 @@ import type { TimetableMeeting } from '../../../src/engine/types';
  * never lose - or even slow - the request itself. Undelivered rows are retried
  * with a growing delay, and the admin panel can retry them by hand.
  *
- * Sending is plain HTTPS to the provider's API (Resend or Brevo). SMTP is
+ * Sending is plain HTTPS: to Resend's or Brevo's API, or to a Google Apps
+ * Script web app that relays through Gmail (see appsScript.ts). SMTP is
  * deliberately not used: free hosting tiers block outbound SMTP ports.
+ *
+ * What the emails say lives in emailTemplate.ts; every provider sends that.
  */
 
 const MAX_ATTEMPTS = 8;
@@ -24,9 +28,14 @@ export function emailConfigured(): boolean {
   if (config.EMAIL_PROVIDER === 'none') return false;
   if (!config.ADMIN_NOTIFY_EMAIL) return false;
   if (config.EMAIL_PROVIDER === 'log') return true;
+  if (config.EMAIL_PROVIDER === 'apps_script') return Boolean(config.APPS_SCRIPT_URL && config.APPS_SCRIPT_SECRET);
   return Boolean(config.EMAIL_API_KEY && config.EMAIL_FROM);
 }
 
+/**
+ * For the admin panel: what is set up and what is missing, by variable name.
+ * Never includes a secret, an API key or the Apps Script URL.
+ */
 export function emailStatus() {
   const missing: string[] = [];
   if (config.EMAIL_PROVIDER === 'none') missing.push('EMAIL_PROVIDER');
@@ -35,99 +44,27 @@ export function emailStatus() {
     if (!config.EMAIL_API_KEY) missing.push('EMAIL_API_KEY');
     if (!config.EMAIL_FROM) missing.push('EMAIL_FROM');
   }
+  if (config.EMAIL_PROVIDER === 'apps_script') {
+    if (!config.APPS_SCRIPT_URL) missing.push('APPS_SCRIPT_URL');
+    if (!config.APPS_SCRIPT_SECRET) missing.push('APPS_SCRIPT_SECRET');
+  }
   if (!config.APP_URL) missing.push('APP_URL');
-  return { provider: config.EMAIL_PROVIDER, configured: emailConfigured(), missing };
+  return {
+    provider: config.EMAIL_PROVIDER,
+    configured: emailConfigured(),
+    missing,
+    recipient: config.ADMIN_NOTIFY_EMAIL ?? null,
+    /** The Apps Script relay ignores the API's recipient and uses its own. */
+    recipientNote: config.EMAIL_PROVIDER === 'apps_script'
+      ? "Apps Script sends to its own ADMIN_EMAIL script property. Keep it the same as ADMIN_NOTIFY_EMAIL."
+      : null,
+    appUrl: config.APP_URL ?? null,
+  };
 }
 
 // ---------------------------------------------------------------- composing
 
-const escapeHtml = (text: string) =>
-  text.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]!));
-
-function describeMeeting(meeting: TimetableMeeting): string {
-  const when = meeting.recurrence?.type === 'once' && meeting.date
-    ? `${meeting.day} ${meeting.date} (one time)`
-    : meeting.recurrence?.type && meeting.recurrence.type !== 'weekly'
-      ? `${meeting.day} (${meeting.recurrence.type.replace('biweekly_', 'alternate weeks, ')})`
-      : meeting.day;
-  const room = meeting.room?.trim() ? `, ${meeting.room.trim()}` : '';
-  const batches = meeting.batches ? ` [${meeting.batches}]` : '';
-  return `${meeting.type} · ${when} ${meeting.startTime}–${meeting.endTime}${room}${batches}`;
-}
-
-const KIND_LABEL: Record<ChangeKind, string> = {
-  addition: 'Addition (a class is added)',
-  deletion: 'Deletion (a class is removed)',
-  modification: 'Modification (a class moves or changes venue)',
-};
-
-export interface RequestEmailInput {
-  requestId: number;
-  courseCode: string;
-  courseName: string | null;
-  semesterName: string | null;
-  requesterRoll: string;
-  requesterName: string | null;
-  note: string | null;
-  kind: ChangeKind;
-  delta: MeetingDelta;
-}
-
-export function composeRequestEmail(input: RequestEmailInput) {
-  const link = config.APP_URL ? `${config.APP_URL.replace(/\/$/, '')}/admin?request=${input.requestId}` : null;
-  const course = input.courseName ? `${input.courseCode} — ${input.courseName}` : input.courseCode;
-  const student = input.requesterName ? `${input.requesterName} (${input.requesterRoll})` : input.requesterRoll;
-  const removed = input.delta.remove.map(describeMeeting);
-  const added = input.delta.add.map(describeMeeting);
-
-  const subject = `Timetable change request: ${input.courseCode} (${input.kind})`;
-  const lines = [
-    `Student:  ${student}`,
-    `Course:   ${course}`,
-    ...(input.semesterName ? [`Semester: ${input.semesterName}`] : []),
-    `Change:   ${KIND_LABEL[input.kind]}`,
-    '',
-    'Current (to be replaced):',
-    ...(removed.length ? removed.map((line) => `  - ${line}`) : ['  (nothing is removed)']),
-    '',
-    'Proposed:',
-    ...(added.length ? added.map((line) => `  + ${line}`) : ['  (nothing is added)']),
-    '',
-    'Student\'s explanation:',
-    `  ${input.note?.trim() || '(none given)'}`,
-    '',
-    link
-      ? `Review it (sign-in required): ${link}`
-      : 'Review it in /admin → Requests. (Set APP_URL on the API to get a direct link here.)',
-    '',
-    'Nothing changes for any student until you decide. Opening the link does not approve anything.',
-  ];
-
-  const list = (items: string[], empty: string, color: string) =>
-    items.length
-      ? `<ul style="margin:4px 0 12px;padding-left:20px">${items
-          .map((item) => `<li style="color:${color}">${escapeHtml(item)}</li>`)
-          .join('')}</ul>`
-      : `<p style="margin:4px 0 12px;color:#666">${empty}</p>`;
-
-  const html = `<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.5;color:#111">
-<h2 style="font-size:16px;margin:0 0 12px">Timetable change request #${input.requestId}</h2>
-<table style="border-collapse:collapse;margin-bottom:12px">
-<tr><td style="padding:2px 12px 2px 0;color:#666">Student</td><td>${escapeHtml(student)}</td></tr>
-<tr><td style="padding:2px 12px 2px 0;color:#666">Course</td><td>${escapeHtml(course)}</td></tr>
-${input.semesterName ? `<tr><td style="padding:2px 12px 2px 0;color:#666">Semester</td><td>${escapeHtml(input.semesterName)}</td></tr>` : ''}
-<tr><td style="padding:2px 12px 2px 0;color:#666">Change</td><td>${escapeHtml(KIND_LABEL[input.kind])}</td></tr>
-</table>
-<strong>Current (to be replaced)</strong>${list(removed, 'Nothing is removed.', '#b42318')}
-<strong>Proposed</strong>${list(added, 'Nothing is added.', '#067647')}
-<strong>Student's explanation</strong>
-<p style="margin:4px 0 16px;white-space:pre-wrap">${escapeHtml(input.note?.trim() || '(none given)')}</p>
-${link ? `<p><a href="${escapeHtml(link)}" style="display:inline-block;padding:8px 14px;background:#2563eb;color:#fff;border-radius:8px;text-decoration:none">Review in the admin panel</a></p>` : '<p>Review it in /admin → Requests.</p>'}
-<p style="color:#666;font-size:12px">Sign-in is required. Opening the link does not approve anything; nothing changes for any student until you decide.</p>
-</div>`;
-
-  return { subject, text: lines.join('\n'), html };
-}
+export type RequestEmailInput = ChangeRequestEmailInput;
 
 /** Queues the email for a new or updated request. Call inside the request's transaction. */
 export async function queueRequestEmail(
@@ -135,7 +72,7 @@ export async function queueRequestEmail(
   input: RequestEmailInput & { contentKey: string },
 ): Promise<void> {
   if (!config.ADMIN_NOTIFY_EMAIL) return; // Nowhere to send; the request is still saved.
-  const message = composeRequestEmail(input);
+  const message = renderChangeRequestEmail(input, config.APP_URL);
   await client.query(
     `insert into email_outbox (kind, dedupe_key, request_id, to_address, subject, body_text, body_html)
      values ('change_request', $1, $2, $3, $4, $5, $6)
@@ -149,12 +86,30 @@ export async function queueRequestEmail(
 
 // ---------------------------------------------------------------- sending
 
-async function send(row: { to_address: string; subject: string; body_text: string; body_html: string | null; dedupe_key: string }) {
+interface OutboxRow {
+  id: number;
+  to_address: string;
+  subject: string;
+  body_text: string;
+  body_html: string | null;
+  dedupe_key: string;
+  attempts: number;
+}
+
+async function send(row: OutboxRow) {
   if (config.EMAIL_PROVIDER === 'log') {
     console.log(`[email:log] to ${row.to_address}: ${row.subject}\n${row.body_text}`);
     return;
   }
   if (!emailConfigured()) throw new Error('Email is not configured (see EMAIL_* in server/.env.example).');
+
+  if (config.EMAIL_PROVIDER === 'apps_script') {
+    // The script chooses the recipient (its ADMIN_EMAIL property); to_address
+    // records where ADMIN_NOTIFY_EMAIL said it should go.
+    const email: RenderedEmail = { subject: row.subject, text: row.body_text, html: row.body_html ?? '' };
+    await sendViaAppsScript(email, { url: config.APPS_SCRIPT_URL!, secret: config.APPS_SCRIPT_SECRET! });
+    return;
+  }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
@@ -207,6 +162,72 @@ function parseSender(from: string): { name?: string; email: string } {
   return match ? { name: match[1] || undefined, email: match[2] } : { email: from.trim() };
 }
 
+/** Error text safe to store in the outbox, print to the log and show in /admin. */
+function safeErrorMessage(error: unknown): string {
+  const message = error instanceof AppsScriptError || error instanceof Error ? error.message : String(error);
+  return redactSecret(redactSecret(message, config.APPS_SCRIPT_SECRET), config.EMAIL_API_KEY).slice(0, 500);
+}
+
+type Attempt = 'sent' | 'failed' | 'none';
+
+/**
+ * Claims one due row (or the given one) under a lock, sends it and records the
+ * outcome. A second API instance skips a claimed row instead of sending it twice.
+ */
+async function attemptOne(id?: number): Promise<Attempt> {
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+    const claimed = await client.query<OutboxRow>(
+      `select id, to_address, subject, body_text, body_html, dedupe_key, attempts
+         from email_outbox
+        where status = 'pending' and ($1::bigint is null and next_attempt_at <= now() or id = $1)
+        order by next_attempt_at
+        limit 1
+        for update skip locked`,
+      [id ?? null],
+    );
+    const row = claimed.rows[0];
+    if (!row) {
+      await client.query('rollback');
+      return 'none';
+    }
+
+    let outcome: Attempt;
+    try {
+      await send(row);
+      await client.query(
+        `update email_outbox set status = 'sent', sent_at = now(), attempts = attempts + 1, last_error = null
+          where id = $1`,
+        [row.id],
+      );
+      outcome = 'sent';
+    } catch (error) {
+      const attempts = row.attempts + 1;
+      const message = safeErrorMessage(error);
+      // 5, 20, 45, 80 ... minutes; then stop and wait for a manual retry.
+      await client.query(
+        `update email_outbox
+            set attempts = $2::int, last_error = $3,
+                status = case when $2::int >= $4::int then 'failed' else 'pending' end,
+                next_attempt_at = now() + make_interval(mins => $5::int)
+          where id = $1`,
+        [row.id, attempts, message, MAX_ATTEMPTS, attempts * attempts * 5],
+      );
+      outcome = 'failed';
+      // Only the id and the scrubbed reason: never the message or request body.
+      console.error(`[email] delivery ${row.id} failed (attempt ${attempts}): ${message}`);
+    }
+    await client.query('commit');
+    return outcome;
+  } catch (error) {
+    await client.query('rollback').catch(() => undefined);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 let delivering = false;
 
 /**
@@ -221,64 +242,91 @@ export async function deliverDueEmails(limit = 10): Promise<{ sent: number; fail
   let failed = 0;
   try {
     for (let i = 0; i < limit; i += 1) {
-      const client = await pool.connect();
-      try {
-        await client.query('begin');
-        const claimed = await client.query<{
-          id: number; to_address: string; subject: string; body_text: string; body_html: string | null;
-          dedupe_key: string; attempts: number;
-        }>(
-          `select id, to_address, subject, body_text, body_html, dedupe_key, attempts
-             from email_outbox
-            where status = 'pending' and next_attempt_at <= now()
-            order by next_attempt_at
-            limit 1
-            for update skip locked`,
-        );
-        const row = claimed.rows[0];
-        if (!row) {
-          await client.query('rollback');
-          break;
-        }
-
-        try {
-          await send(row);
-          await client.query(
-            `update email_outbox set status = 'sent', sent_at = now(), attempts = attempts + 1, last_error = null
-              where id = $1`,
-            [row.id],
-          );
-          sent += 1;
-        } catch (error) {
-          const attempts = row.attempts + 1;
-          const message = error instanceof Error ? error.message : String(error);
-          // 5, 20, 45, 80 ... minutes; then stop and wait for a manual retry.
-          await client.query(
-            `update email_outbox
-                set attempts = $2::int, last_error = $3,
-                    status = case when $2::int >= $4::int then 'failed' else 'pending' end,
-                    next_attempt_at = now() + make_interval(mins => $5::int)
-              where id = $1`,
-            [row.id, attempts, message.slice(0, 500), MAX_ATTEMPTS, attempts * attempts * 5],
-          );
-          failed += 1;
-          console.error(`[email] delivery ${row.id} failed (attempt ${attempts}): ${message}`);
-        }
-        await client.query('commit');
-      } catch (error) {
-        await client.query('rollback').catch(() => undefined);
-        throw error;
-      } finally {
-        client.release();
-      }
+      const outcome = await attemptOne();
+      if (outcome === 'none') break;
+      if (outcome === 'sent') sent += 1;
+      else failed += 1;
     }
   } catch (error) {
     // The outbox table may not exist yet (migration 013 pending). Not fatal.
-    if ((error as { code?: string }).code !== '42P01') console.error('[email] outbox run failed:', error);
+    if ((error as { code?: string }).code !== '42P01') console.error('[email] outbox run failed:', safeErrorMessage(error));
   } finally {
     delivering = false;
   }
   return { sent, failed };
+}
+
+// ---------------------------------------------------------------- test email
+
+export interface TestEmailResult {
+  /** `not_configured` means nothing was queued. */
+  status: 'sent' | 'pending' | 'failed' | 'not_configured';
+  id: number | null;
+  error: string | null;
+  /** A plain sentence for the admin panel. */
+  message: string;
+}
+
+const campusTime = (date: Date) =>
+  `${date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })} IST`;
+
+/**
+ * "Send test email" in /admin: queues a test message in the outbox and sends
+ * it straight away through the configured provider, exactly like a request
+ * email. A failed one stays queued and is retried like any other; an older
+ * undelivered test message is cancelled so fixing a setting does not release
+ * a pile of them at once.
+ */
+export async function sendTestEmail(): Promise<TestEmailResult> {
+  if (!emailConfigured()) {
+    const { missing } = emailStatus();
+    return {
+      status: 'not_configured', id: null, error: null,
+      message: `Email is not set up, so nothing was sent. Set ${missing.join(', ') || 'the EMAIL_* variables'} on the API.`,
+    };
+  }
+
+  const rendered = renderTestEmail({ provider: config.EMAIL_PROVIDER, sentAt: campusTime(new Date()) }, config.APP_URL);
+  await query(`update email_outbox set status = 'cancelled' where kind = 'test' and status in ('pending', 'failed')`);
+  const [row] = await query<{ id: number }>(
+    `insert into email_outbox (kind, dedupe_key, to_address, subject, body_text, body_html)
+     values ('test', $1, $2, $3, $4, $5) returning id`,
+    [`test:${crypto.randomUUID()}`, config.ADMIN_NOTIFY_EMAIL, rendered.subject, rendered.text, rendered.html],
+  );
+
+  const readBack = async () => (await query<{ status: string; attempts: number; last_error: string | null }>(
+    'select status, attempts, last_error from email_outbox where id = $1',
+    [row.id],
+  ))[0];
+
+  let after = (await attemptOne(row.id)) === 'none' ? null : await readBack();
+  // The background worker picked it up first: wait for that attempt to finish.
+  for (const started = Date.now(); !after || (after.status === 'pending' && after.attempts === 0);) {
+    if (Date.now() - started > APPS_SCRIPT_TIMEOUT_MS + 5_000) break;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    after = await readBack();
+  }
+  after ??= await readBack();
+
+  const where = config.EMAIL_PROVIDER === 'apps_script'
+    ? "the script's ADMIN_EMAIL address"
+    : config.ADMIN_NOTIFY_EMAIL;
+  if (after.status === 'sent') {
+    return {
+      status: 'sent', id: row.id, error: null,
+      message: config.EMAIL_PROVIDER === 'log'
+        ? 'Logged, not sent: EMAIL_PROVIDER is "log", so the email was printed to the API log.'
+        : `Sent. Check the inbox of ${where} (and Spam, the first time).`,
+    };
+  }
+  return {
+    status: after.status === 'failed' ? 'failed' : 'pending',
+    id: row.id,
+    error: after.last_error,
+    message: after.last_error
+      ? `Not sent. ${after.last_error}`
+      : 'Not sent yet: another delivery was in progress. It stays in the queue and goes out shortly.',
+  };
 }
 
 export interface OutboxEntry {

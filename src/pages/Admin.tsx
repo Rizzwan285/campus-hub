@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Loader2, Save, ArrowLeft, Clock, UtensilsCrossed, CalendarDays, History,
-  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox, GraduationCap, Contact,
+  FileDiff, Repeat, Bus, Route, Trash2, IndianRupee, Inbox, GraduationCap, Contact, LogOut,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { CourseChangeReview } from '@/components/features/CourseChangeReview';
 import { SpecialServicesEditor } from '@/components/features/SpecialServicesEditor';
 import { SemestersAdmin } from '@/components/features/admin/SemestersAdmin';
 import { ContactsAdmin } from '@/components/features/admin/ContactsAdmin';
+import { Login } from '@/components/features/Login';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
@@ -1078,7 +1079,10 @@ function PendingBadge() {
 
 export default function Admin() {
   const account = useAuthStore((state) => state.account);
+  const token = useAuthStore((state) => state.token);
+  const isRestoring = useAuthStore((state) => state.isRestoring);
   const restore = useAuthStore((state) => state.restore);
+  const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   const [params] = useSearchParams();
   // The email about a new request links here as /admin?request=<id>. The link
@@ -1092,19 +1096,44 @@ export default function Admin() {
     void restore();
   }, [restore]);
 
-  if (account?.role !== 'admin') {
+  if (!account && token && isRestoring) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Signing in here keeps this URL, so a request opened from the email is
+  // still the one shown afterwards. Nothing is decided until a click below.
+  if (!account) {
+    return (
+      <Login
+        notice={focusRequestId
+          ? `Sign in with the developer account to review request #${focusRequestId}. Nothing is approved until you choose.`
+          : 'Sign in with the developer account to open the developer tools.'}
+      />
+    );
+  }
+
+  if (account.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <Card className="p-6 max-w-sm text-center space-y-3">
           <ShieldCheck className="h-8 w-8 text-muted-foreground mx-auto" />
           <h1 className="text-lg font-semibold">Developer access only</h1>
           <p className="text-sm text-muted-foreground">
-            Sign in with an administrator account to use these tools.
-            {focusRequestId ? ' Then open the link from the email again.' : ''}
+            You are signed in as {account.rollNumber}, which is a student account. Sign out and sign in with the
+            developer account to use these tools.
           </p>
-          <Button variant="outline" onClick={() => navigate('/')} className="rounded-xl">
-            <ArrowLeft className="h-4 w-4" /> Back to app
-          </Button>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button onClick={logout} className="rounded-xl">
+              <LogOut className="h-4 w-4" /> Sign out
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/')} className="rounded-xl">
+              <ArrowLeft className="h-4 w-4" /> Back to app
+            </Button>
+          </div>
         </Card>
       </div>
     );

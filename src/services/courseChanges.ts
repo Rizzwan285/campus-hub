@@ -60,6 +60,11 @@ export interface EmailStatus {
   provider: string;
   configured: boolean;
   missing: string[];
+  /** ADMIN_NOTIFY_EMAIL on the API. */
+  recipient?: string | null;
+  /** Set when the provider, not the API, decides where email goes (Apps Script). */
+  recipientNote?: string | null;
+  appUrl?: string | null;
   outbox: Array<{
     id: number; requestId: number | null; subject: string; status: string; attempts: number;
     lastError: string | null; createdAt: string; sentAt: string | null;
@@ -70,10 +75,24 @@ export function getEmailStatus() {
   return apiFetch<EmailStatus>('/api/admin/emails');
 }
 
+// Apps Script can take up to 30 seconds per email, so these wait longer than
+// the usual 12 seconds before giving up on the answer.
 export function retryEmails(id?: number) {
   return apiFetch<{ queued: number; sent: number; failed: number }>('/api/admin/emails/retry', {
-    method: 'POST', body: id ? { id } : {},
+    method: 'POST', body: id ? { id } : {}, timeoutMs: 90_000,
   });
+}
+
+export interface TestEmailResult {
+  status: 'sent' | 'pending' | 'failed' | 'not_configured';
+  id: number | null;
+  error: string | null;
+  message: string;
+}
+
+/** Sends a test email through the outbox and the configured provider. */
+export function sendTestEmail() {
+  return apiFetch<TestEmailResult>('/api/admin/emails/test', { method: 'POST', body: {}, timeoutMs: 60_000 });
 }
 
 export function closeOptionalChange(id: number, note: string) {

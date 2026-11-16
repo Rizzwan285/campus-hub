@@ -13,7 +13,7 @@ import * as profiles from '../repositories/profile.repository';
 import * as changes from '../repositories/courseChanges.repository';
 import { syncDraftFromLive } from '../repositories/semesters.repository';
 import { pool } from '../db';
-import { deliverDueEmails, emailStatus, listOutbox, retryEmails } from '../services/email.service';
+import { deliverDueEmails, emailStatus, listOutbox, retryEmails, sendTestEmail } from '../services/email.service';
 import { contactBody, contactCategoryBody, contactOrderBody, meetingListSchema, plainError } from './schemas';
 import { semestersRouter } from './semesters.routes';
 
@@ -1032,6 +1032,19 @@ adminRouter.post('/emails/retry', async (req, res, next) => {
     const queued = await retryEmails(body.data.id);
     const result = await deliverDueEmails();
     res.json({ queued, ...result });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/admin/emails/test — queues a test email and sends it now through
+ * the configured provider, the same path a request email takes. Answers with
+ * the outcome in plain words; a failure stays queued and is retried.
+ */
+adminRouter.post('/emails/test', async (_req, res, next) => {
+  try {
+    res.json(await sendTestEmail());
   } catch (error) {
     next(error);
   }

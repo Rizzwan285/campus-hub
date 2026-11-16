@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ApiError } from '@/services/api';
 import {
-  approveSuggestion, closeOptionalChange, getEmailStatus, listForReview, rejectSuggestion, retryEmails,
-  type ApprovalMode, type ReviewItem, type SuggestionStatus,
+  approveSuggestion, closeOptionalChange, getEmailStatus, listForReview, rejectSuggestion, retryEmails, sendTestEmail,
+  type ApprovalMode, type ReviewItem, type SuggestionStatus, type TestEmailResult,
 } from '@/services/courseChanges';
 import { deltaBetween, changeKind, meetingsFingerprint, sameMeetings } from '@/engine/courseTimings';
 import { DeltaView, MeetingDiff } from '@/components/features/timetable/MeetingDiff';
@@ -101,25 +101,49 @@ export function CourseChangeReview({ focusRequestId }: { focusRequestId?: number
   );
 }
 
-/** Whether request emails are being delivered, with a way to retry the ones that failed. */
+/**
+ * Whether request emails are being delivered, with a way to retry the ones
+ * that failed and to send a test email through the same path.
+ */
 function EmailStatusLine() {
   const queryClient = useQueryClient();
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<'retry' | 'test' | null>(null);
+  const [testResult, setTestResult] = useState<TestEmailResult | { status: 'error'; message: string } | null>(null);
   const { data } = useQuery({ queryKey: ['admin-emails'], queryFn: getEmailStatus, staleTime: 30_000, retry: false });
   if (!data) return null;
 
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['admin-emails'] });
+    void queryClient.invalidateQueries({ queryKey: ['admin-course-changes'] });
+  };
   const stuck = data.outbox.filter((entry) => entry.status === 'failed' || (entry.status === 'pending' && entry.attempts > 0));
   const retry = async () => {
-    setBusy(true);
+    setBusy('retry');
     try {
       const result = await retryEmails();
       toast.success(result.sent > 0 ? `${plural(result.sent, 'email')} sent.` : 'Still not delivered; see the error below.');
     } catch {
-      toast.error('Retry failed. Is the API reachable?');
+      toast.error('No answer yet. Delivery may still be running; check again in a minute.');
     } finally {
-      setBusy(false);
-      void queryClient.invalidateQueries({ queryKey: ['admin-emails'] });
-      void queryClient.invalidateQueries({ queryKey: ['admin-course-changes'] });
+      setBusy(null);
+      refresh();
+    }
+  };
+  const test = async () => {
+    setBusy('test');
+    setTestResult(null);
+    try {
+      setTestResult(await sendTestEmail());
+    } catch (error) {
+      setTestResult({
+        status: 'error',
+        message: error instanceof ApiError
+          ? `The API refused it: ${error.message}`
+          : 'No answer from the API within a minute. The email may still be sending; check the list below shortly.',
+      });
+    } finally {
+      setBusy(null);
+      refresh();
     }
   };
 
@@ -132,24 +156,44 @@ function EmailStatusLine() {
       </p>
     );
   }
-  if (stuck.length === 0) {
-    return (
-      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Mail className="h-3.5 w-3.5" /> You are emailed about each new request ({data.provider}).
-      </p>
-    );
-  }
+
   return (
-    <div className="text-xs rounded-lg px-3 py-2 bg-amber-500/10 border border-amber-500/30 space-y-1.5">
-      <p className="flex items-start gap-2">
-        <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
-        {plural(stuck.length, 'notification email')} could not be delivered. The requests themselves are safe
-        and listed below.
-      </p>
-      {stuck[0].lastError && <p className="font-mono text-[11px] text-muted-foreground break-words">{stuck[0].lastError}</p>}
-      <Button size="sm" variant="outline" onClick={() => void retry()} disabled={busy} className="h-7 rounded-lg">
-        {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Retry delivery
-      </Button>
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Mail className="h-3.5 w-3.5 shrink-0" /> You are emailed about each new request ({data.provider}).
+        </p>
+        <Button size="sm" variant="outline" onClick={() => void test()} disabled={busy !== null} className="h-7 rounded-lg">
+          {busy === 'test' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+          {busy === 'test' ? 'Sending…' : 'Send test email'}
+        </Button>
+      </div>
+      {data.recipientNote && <p className="text-[11px] text-muted-foreground">{data.recipientNote}</p>}
+      {testResult && (
+        <p
+          role="status"
+          className={`text-xs rounded-lg px-3 py-2 border break-words ${
+            testResult.status === 'sent'
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-200'
+          }`}
+        >
+          {testResult.message}
+        </p>
+      )}
+      {stuck.length > 0 && (
+        <div className="text-xs rounded-lg px-3 py-2 bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+          <p className="flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
+            {plural(stuck.length, 'notification email')} could not be delivered. The requests themselves are safe
+            and listed below.
+          </p>
+          {stuck[0].lastError && <p className="text-[11px] text-muted-foreground break-words">{stuck[0].lastError}</p>}
+          <Button size="sm" variant="outline" onClick={() => void retry()} disabled={busy !== null} className="h-7 rounded-lg">
+            {busy === 'retry' && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Retry delivery
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

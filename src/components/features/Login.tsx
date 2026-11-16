@@ -4,7 +4,12 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/useAuthStore';
 import { apiFetch, ApiError, isApiConfigured } from '@/services/api';
 
-export function Login() {
+interface LoginProps {
+  /** A line above the form saying why sign-in is needed here (e.g. on /admin). */
+  notice?: string;
+}
+
+export function Login({ notice }: LoginProps = {}) {
   const login = useAuthStore((state) => state.login);
 
   const [rollNumber, setRollNumber] = useState('');
@@ -77,6 +82,11 @@ export function Login() {
             <p className="text-sm text-muted-foreground mt-1.5">
               Sign in with your roll number to sync your timetable and mess across devices.
             </p>
+            {notice && (
+              <p className="text-sm mt-4 rounded-lg px-3 py-2 bg-primary/10 border border-primary/20 text-foreground">
+                {notice}
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-4">

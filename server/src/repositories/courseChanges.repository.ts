@@ -333,6 +333,8 @@ export async function submitRequest(input: {
       requesterName: input.requesterName,
       note: input.note,
       kind,
+      currentMeetings: asEngine(input.baseMeetings),
+      proposedMeetings: asEngine(input.proposedMeetings),
       delta,
       // A resubmission with different content is worth a second email; an
       // identical one is not.

@@ -293,17 +293,59 @@ Additional variables:
 | Variable | Purpose |
 |---|---|
 | `PYTHON_BIN` | Python interpreter; defaults to `python3`, standard library only |
-| `EMAIL_PROVIDER` | `none` (default), `log` (local testing), `resend`, or `brevo` |
-| `EMAIL_API_KEY` | Provider credential; API-only secret |
-| `EMAIL_FROM` | Provider-verified sender |
-| `ADMIN_NOTIFY_EMAIL` | Developer recipient; without it, no email is queued |
-| `APP_URL` | Public frontend origin, used for authenticated request links |
+| `EMAIL_PROVIDER` | `none` (default), `log` (local testing), `apps_script`, `resend`, or `brevo` |
+| `ADMIN_NOTIFY_EMAIL` | Whether request emails are queued at all; without it, no email is queued. With `apps_script`, set it to the script's `ADMIN_EMAIL` |
+| `APP_URL` | The website (frontend) URL, for the authenticated `/admin?request=<id>` button. A trailing slash is removed |
+| `APPS_SCRIPT_URL` | `apps_script` only: the web app's deployment URL ending in `/exec` (https required) |
+| `APPS_SCRIPT_SECRET` | `apps_script` only: equals the script's `SHARED_SECRET` property. Secret: never logged, shown or committed |
+| `EMAIL_API_KEY` | `resend`/`brevo` credential; API-only secret |
+| `EMAIL_FROM` | `resend`/`brevo` provider-verified sender |
 
 Email requests and outbox entries are saved transactionally. Delivery retries
-run in the API process; the admin Requests panel exposes status and retry.
-`log` does not deliver externally. Configuring a recipient later does not
-retroactively queue requests submitted without one. Email links never approve
-anything on GET. No real provider delivery was verified during local testing.
+run in the API process (every five minutes, growing back-off, eight attempts);
+the admin Requests panel shows status, the last failure reason, **Retry
+delivery** and **Send test email**, which queues a test message and sends it
+through the same outbox and provider. `log` does not deliver externally.
+Configuring a recipient later does not retroactively queue requests submitted
+without one. Email links never approve anything on GET: they open `/admin`,
+which asks for the developer sign-in when needed and keeps the request link.
+
+### Email content
+
+Every provider sends what `src/services/emailTemplate.ts` renders: subject,
+plain text, HTML, the student and request details (current and proposed
+timings with the changes marked) and the admin button. Student input is
+HTML-escaped. Preview it without sending anything:
+
+```bash
+npm --prefix server run email:preview          # writes server/email-preview/*.html and *.txt
+APP_URL=https://example.org/ npm --prefix server run email:preview
+```
+
+### Apps Script provider
+
+`apps_script` posts JSON `{token, subject, text, html}` to `APPS_SCRIPT_URL`
+and reads the script's `{success, message}` reply. Points that matter:
+
+- **The script picks the recipient** (its `ADMIN_EMAIL` property); the API's
+  `ADMIN_NOTIFY_EMAIL` only switches emails on and is recorded in the outbox.
+  Keep the two the same.
+- Success is decided from the reply body: Apps Script answers HTTP 200 even when
+  it failed. A web page (sign-in or error) instead of the JSON reply is a failure.
+- `/exec` answers a 302 to a one-time Google URL holding the reply. The API
+  follows it with a GET without a body, so the secret is sent once.
+- 30-second timeout. Wrong secret, the Gmail quota (about 100 recipients a day),
+  a missing script property, timeouts and network errors are recorded as plain
+  reasons and retried with the normal back-off. Eight attempts take about
+  12 hours; a quota failure may need **Retry delivery** after Google's reset.
+- **No idempotency key.** The script has no way to recognise a repeat, so if a
+  reply is lost after the script already sent (a timeout), the retry sends a
+  second copy.
+- The secret travels in the request body (Apps Script cannot read headers).
+  Request bodies are never logged, and error messages are scrubbed of it.
+
+No real provider delivery was verified during local testing; the tests mock
+all HTTP.
 
 If hosted Python is unavailable, run
 `python3 scripts/pipeline/import_semester.py --dir <files-directory> --semester
