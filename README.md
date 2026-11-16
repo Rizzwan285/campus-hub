@@ -25,6 +25,10 @@ live content editing through `/admin`.
 - **Timing corrections** — When a professor moves, adds or cancels a class, fix it in your own timetable at once, or suggest the change for everyone taking the course
 - **Sign-in** — Roll number only, no password; profile, course picks and your own timings sync across devices
 - **Contacts** — Auto drivers, medical and restaurant numbers on the Campus page; tap a number to call, open a restaurant's map, and still see them offline
+- **Academics page** — Academic calendars (2026 and 2027), the institute's guidelines and forms page, library timings with the Web OPAC, and the Moodle, Fedena and dashboard portals
+- **Campus page** — Amul Cafe, contacts, gym slots, hostel rules and feedback, grouped by what you came to do
+- **Leave and holidays** — The leave form for your mess, and the 2026–2027 institute holidays in a short scrollable list with the next one highlighted
+- **Email alerts** — The developer gets an email (Gmail via Google Apps Script, Resend or Brevo) for every timetable change request, with a button to review it in `/admin`
 - **Developer tools** — Edit mess menus, timings, bus schedules, contacts and course slots live at `/admin`, and approve or reject students' timing suggestions, no redeploy
 - **Dark Mode** — Toggle between light and dark themes
 - **Real-time Clock** — Live time display with next-bus countdown

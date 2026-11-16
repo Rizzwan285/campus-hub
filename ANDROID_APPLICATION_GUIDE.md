@@ -325,7 +325,7 @@ Use the App plugin and an application-level navigation policy. Back should dismi
 
 Installing a custom `backButton` listener replaces default handling, so implement the full intended behavior and remove listeners on teardown. Test both buttons and gestures, including predictive Back on current Android versions. [Capacitor App API](https://capacitorjs.com/docs/apis/app).
 
-Start with the existing BrowserRouter and verify cold-start/reload paths `/timetable`, `/campus`, `/leave` and `/gym`. Avoid changing route strategy without a demonstrated need. Audit the obsolete GitHub Pages query rewrite in `src/main.tsx` if it interferes with incoming URLs.
+Start with the existing BrowserRouter and verify cold-start/reload paths `/timetable`, `/academics`, `/campus` and `/leave`, and the redirects in `src/routes.ts` (`/gym` → `/campus#gym`). Avoid changing route strategy without a demonstrated need. Audit the obsolete GitHub Pages query rewrite in `src/main.tsx` if it interferes with incoming URLs.
 
 External deep links are optional for the first version. If added, configure Android App Links, domain association and a strict allowed-route parser. Handle both a cold launch and `appUrlOpen` while running. Arbitrary incoming URLs must not navigate the privileged app WebView to external sites. [Capacitor deep-link guide](https://capacitorjs.com/docs/guides/deep-links).
 

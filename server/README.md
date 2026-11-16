@@ -100,6 +100,9 @@ Write (require `X-Admin-Key`):
 | GET | `/api/admin/course-changes/count` |
 | POST | `/api/admin/course-changes/:id/approve` — optional `note`, and `meetings` to correct the suggestion first |
 | POST | `/api/admin/course-changes/:id/reject` — optional `note` |
+| GET | `/api/admin/emails` — email setup (variable names only, never values) and recent deliveries |
+| POST | `/api/admin/emails/retry` — optional `id`; re-queues undelivered emails and sends now |
+| POST | `/api/admin/emails/test` — queues a test email and sends it through the configured provider; answers with the outcome in words |
 
 Signed-in students (session token):
 
@@ -242,6 +245,17 @@ no seed is needed. Deploy the API with `src/lib/contactPhone.ts` beside the
 other shared modules (the root `server/Dockerfile` copies it). Until 014 is
 applied, `/api/contacts` fails and the app shows its bundled copy. Edit the
 list from **/admin → Contacts**.
+
+## 2027 holidays
+
+Migration **015** adds the 16 dates (17 holidays) of the institute's 2027
+list as admin-owned `academic_days` rows, so `npm run migrate` alone is
+enough and a reseed keeps them. 2026 rows are not touched. `academic_days` has
+one row per date, so 15 August 2027 is one row naming both Independence Day
+and Id-E-Milad. Until 015 runs, the API serves only the 2026 holidays and the
+app follows the API, so 2027 dates do not get holiday bus, mess or class
+handling yet. The bundled fallback (`src/data/timetable/holidays.json`) holds
+the same rows.
 
 ## Semester management and timetable notifications
 
