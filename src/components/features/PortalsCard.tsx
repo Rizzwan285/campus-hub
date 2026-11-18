@@ -10,7 +10,7 @@ const PORTALS = [
 /** The institute's own sites students sign in to. */
 export function PortalsCard() {
   return (
-    <FeatureCard id="institute-portals" accent="violet">
+    <FeatureCard id="institute-portals">
       <FeatureCardHeader icon={Globe} title="Institute portals" subtitle="Courses, records and the dashboard" />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {PORTALS.map((portal) => (

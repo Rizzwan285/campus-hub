@@ -1,4 +1,4 @@
-import { BookOpen, Clock, MapPin, Search } from 'lucide-react';
+import { BookOpen, MapPin, Search } from 'lucide-react';
 import { ExternalLinkRow, FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeUntil } from '@/utils/dateUtils';
@@ -20,7 +20,7 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
   const { open, changesAt } = getLibraryStatus(currentTime);
 
   return (
-    <FeatureCard id="library-timings" accent="teal">
+    <FeatureCard id="library-timings">
       <FeatureCardHeader
         icon={BookOpen}
         title="Library Timings"
@@ -43,18 +43,21 @@ export function LibraryTimingsCard({ currentTime }: LibraryTimingsCardProps) {
         }
       />
 
-      <div className="p-4 rounded-xl bg-gradient-to-br from-teal-500/15 to-transparent border border-teal-500/30 mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Clock className="h-4 w-4 text-teal-600 dark:text-teal-300 shrink-0" aria-hidden="true" />
-          <p className="font-semibold">{LIBRARY_TIMINGS_LABEL}</p>
+      {/* Set like a timetable entry: the hours, and how long is left. */}
+      <div className="flex items-start justify-between gap-4 p-4 rounded-xl border border-border/60 bg-muted/30 mb-4">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Hours</p>
+          <p className="mt-1 font-semibold tabular-nums">{LIBRARY_TIMINGS_LABEL}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{LIBRARY_DAYS_LABEL}</p>
         </div>
-        <p className="text-xs text-muted-foreground">{LIBRARY_DAYS_LABEL}</p>
-        <p className="text-sm mt-2">
-          {open ? 'Closes in ' : 'Opens in '}
-          <span className="font-semibold text-teal-700 dark:text-teal-300">
+        <div className="shrink-0 text-right pl-4 border-l border-border/60">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {open ? 'Closes in' : 'Opens in'}
+          </p>
+          <p className="mt-1 text-xl font-semibold leading-tight tabular-nums text-primary">
             {formatTimeUntil(changesAt, currentTime)}
-          </span>
-        </p>
+          </p>
+        </div>
       </div>
 
       <div className="space-y-2">

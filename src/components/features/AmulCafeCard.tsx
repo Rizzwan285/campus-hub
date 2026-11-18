@@ -7,7 +7,7 @@ import { telHref } from '@/lib/contactPhone';
 
 export function AmulCafeCard() {
   return (
-    <FeatureCard id="amul-cafe" accent="amber">
+    <FeatureCard id="amul-cafe">
       <FeatureCardHeader icon={Coffee} title={amulCafe.name} subtitle="Menu & campus delivery" />
 
       <p className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
@@ -15,16 +15,16 @@ export function AmulCafeCard() {
         {amulCafe.location}
       </p>
 
-      <div className="p-4 rounded-xl bg-gradient-to-br from-amber-500/15 to-transparent border border-amber-500/30 space-y-2">
+      <div className="p-4 rounded-xl border border-border/60 bg-muted/30 space-y-2">
         <div className="flex items-start gap-2">
-          <Truck className="h-4 w-4 text-amber-600 dark:text-amber-300 shrink-0 mt-0.5" aria-hidden="true" />
+          <Truck className="h-4 w-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
           <div>
             <p className="text-sm font-semibold">Delivery: {amulCafe.deliveryHours}</p>
             <p className="text-xs text-muted-foreground mt-1">Delivery across campus · ₹{amulCafe.deliveryCharge} extra for packing &amp; delivery</p>
           </div>
         </div>
         <p className="flex items-start gap-2 text-sm">
-          <Clock className="h-4 w-4 text-amber-600 dark:text-amber-300 shrink-0 mt-0.5" aria-hidden="true" />
+          <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
           Cafe open until {amulCafe.closingTime}
         </p>
         <p className="text-xs text-muted-foreground">Doorstep delivery ends at 6:00 PM, before the cafe closes.</p>

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { CalendarDays, ChevronsDown, PartyPopper } from 'lucide-react';
+import { CalendarDays, ChevronsDown } from 'lucide-react';
 import { FeatureCard, FeatureCardHeader } from './FeatureCard';
 import { Badge } from '@/components/ui/badge';
 import { useAcademicDays } from '@/hooks/useApiData';
@@ -21,17 +21,17 @@ const weekday = (entry: HolidayEntry) => entry.at.toLocaleDateString('en-IN', { 
 function CalendarTile({ entry, isNext }: { entry: HolidayEntry; isNext: boolean }) {
   return (
     <div
-      className={`w-12 shrink-0 overflow-hidden rounded-lg border text-center shadow-sm bg-background ${
-        isNext ? 'border-orange-500/50' : 'border-border/60'
+      className={`w-12 shrink-0 overflow-hidden rounded-lg border text-center bg-background ${
+        isNext ? 'border-primary/60' : 'border-border/60'
       }`}
     >
       <p
         className={`text-[10px] font-bold uppercase tracking-wider leading-4 ${
           isNext
-            ? 'bg-gradient-to-r from-orange-400 to-rose-500 text-white'
+            ? 'bg-primary text-primary-foreground'
             : entry.past
               ? 'bg-muted text-muted-foreground'
-              : 'bg-orange-500/15 text-orange-700 dark:text-orange-300'
+              : 'bg-primary/10 text-primary'
         }`}
       >
         {month(entry)}
@@ -47,7 +47,7 @@ function HolidayRow({ entry, isNext }: { entry: HolidayEntry; isNext: boolean })
     <li
       className={`flex items-center gap-3 p-2 rounded-xl border ${
         isNext
-          ? 'bg-gradient-to-r from-orange-500/15 to-rose-500/5 border-orange-500/40'
+          ? 'bg-primary/5 border-primary/40'
           : entry.past
             ? 'bg-muted/20 border-transparent opacity-60'
             : 'bg-muted/40 border-transparent'
@@ -66,7 +66,7 @@ function HolidayRow({ entry, isNext }: { entry: HolidayEntry; isNext: boolean })
       {!entry.past && (
         <Badge
           variant="secondary"
-          className={`shrink-0 text-[10px] font-medium ${isNext ? 'bg-gradient-to-r from-orange-400 to-rose-500 text-white border-transparent hover:from-orange-400' : ''}`}
+          className={`shrink-0 text-[10px] font-medium ${isNext ? 'bg-primary text-primary-foreground border-transparent hover:bg-primary' : ''}`}
         >
           {formatDaysAway(entry.daysAway)}
         </Badge>
@@ -149,7 +149,7 @@ export function HolidaysCard({ date }: HolidaysCardProps) {
   const tentativeShown = rows.some((entry) => entry.tentative && !entry.past);
 
   return (
-    <FeatureCard id="holiday-list" accent="orange">
+    <FeatureCard id="holiday-list">
       <FeatureCardHeader
         icon={CalendarDays}
         title="Institute holidays"
@@ -158,28 +158,25 @@ export function HolidaysCard({ date }: HolidaysCardProps) {
 
       {next ? (
         <>
-          <div className="relative overflow-hidden flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br from-orange-500/20 via-rose-500/10 to-transparent border border-orange-500/30 mb-4">
-            <div className="grid place-items-center h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-orange-400 to-rose-500 text-white shadow-md">
-              <PartyPopper className="h-5 w-5" aria-hidden="true" />
-            </div>
+          <div className="flex items-center gap-4 p-4 rounded-xl border border-primary/30 bg-primary/5 mb-4">
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-orange-700 dark:text-orange-300">Next holiday</p>
-              <p className="font-semibold break-words leading-snug">{next.occasion}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Next holiday</p>
+              <p className="font-semibold break-words leading-snug mt-0.5">{next.occasion}</p>
               <p className="text-xs text-muted-foreground">
                 {next.at.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             </div>
             {/* The countdown is the point of the banner, so it gets the big type. */}
-            <div className="shrink-0 text-right">
+            <div className="shrink-0 text-right pl-4 border-l border-primary/20">
               {next.daysAway > 1 ? (
                 <>
-                  <p className="text-3xl font-bold leading-none tabular-nums bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent">
+                  <p className="text-4xl font-semibold leading-none tabular-nums text-primary">
                     {next.daysAway}
                   </p>
                   <p className="text-[11px] font-medium text-muted-foreground mt-1">days to go</p>
                 </>
               ) : (
-                <p className="text-lg font-bold bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent">
+                <p className="text-lg font-semibold text-primary">
                   {formatDaysAway(next.daysAway)}
                 </p>
               )}

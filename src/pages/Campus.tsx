@@ -1,16 +1,16 @@
-import { Building2, Dumbbell, Home as HomeIcon, UtensilsCrossed } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import { AmulCafeCard } from '@/components/features/AmulCafeCard';
 import { ContactsCard } from '@/components/features/ContactsCard';
 import { FeedbackCard } from '@/components/features/FeedbackCard';
 import { GymTimingsCard } from '@/components/features/GymTimingsCard';
 import { HostelCard } from '@/components/features/HostelCard';
-import { PageHero, PageSection, PageSections, type PageHeroSection } from '@/components/layout/PageSection';
+import { PageHero, PageSection, PageSections, type PageIndexEntry } from '@/components/layout/PageSection';
 
 const SECTIONS = {
-  food: { id: 'food-and-contacts', label: 'Food & contacts', icon: UtensilsCrossed, accent: 'amber' },
-  gym: { id: 'gym', label: 'Gym', icon: Dumbbell, accent: 'rose' },
-  hostel: { id: 'hostel', label: 'Hostel & feedback', icon: HomeIcon, accent: 'emerald' },
-} satisfies Record<string, PageHeroSection>;
+  food: { id: 'food-and-contacts', number: 1, label: 'Food & contacts' },
+  gym: { id: 'gym', number: 2, label: 'Gym' },
+  hostel: { id: 'hostel', number: 3, label: 'Hostel & feedback' },
+} satisfies Record<string, PageIndexEntry>;
 
 /** Living on campus: food and phone numbers, the gym, hostel rules, feedback. */
 const Campus = () => {
@@ -19,7 +19,6 @@ const Campus = () => {
     <PageSections>
       <PageHero
         icon={Building2}
-        accent="amber"
         title="Campus"
         description="Food, phone numbers, the gym and hostel life."
         sections={Object.values(SECTIONS)}

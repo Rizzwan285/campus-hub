@@ -19,12 +19,12 @@ export function LeaveFormCard({ onChangeMess }: LeaveFormCardProps) {
   const userMess = profile?.mess?.toLowerCase() === 'nila' ? 'nila' : 'kedaram';
 
   return (
-    <FeatureCard accent="sky">
+    <FeatureCard>
       <FeatureCardHeader icon={ClipboardList} title="Leave Form" subtitle="Overnight and long leaves" />
 
-      <div className="rounded-xl p-4 bg-gradient-to-br from-sky-500/15 to-transparent border border-sky-500/30">
+      <div className="rounded-xl p-4 border border-border/60 bg-muted/30">
         <div className="flex items-start gap-3">
-          <Info className="h-5 w-5 text-sky-600 dark:text-sky-300 mt-0.5 shrink-0" aria-hidden="true" />
+          <Info className="h-5 w-5 text-primary mt-0.5 shrink-0" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <h4 className="font-medium text-foreground mb-1">Overnight / Long Leave Form</h4>
             <p className="text-sm text-muted-foreground mb-4">
