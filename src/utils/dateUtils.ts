@@ -202,6 +202,15 @@ export function formatTimeUntil(at: Date, currentTime: Date): string {
   return diffHours > 0 ? `${diffHours}h ${remainingMins}m` : `${diffMins}m`;
 }
 
+/**
+ * How long ago an already-resolved departure was due, for one that may still
+ * be on its way: "just now" inside its first minute, then "4 min ago".
+ */
+export function formatTimeSince(at: Date, currentTime: Date): string {
+  const diffMins = Math.floor((currentTime.getTime() - at.getTime()) / 60000);
+  return diffMins < 1 ? 'just now' : `${diffMins} min ago`;
+}
+
 export function formatTime(date: Date): string {
   return date.toLocaleTimeString('en-IN', { 
     hour: '2-digit', 

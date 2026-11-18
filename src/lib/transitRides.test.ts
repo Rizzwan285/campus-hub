@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeRides, toRides } from './transitRides';
+import { LATE_GRACE_MINUTES, latestDue, mergeRides, rideStatus, toRides } from './transitRides';
 import { resolveDepartures } from '@/utils/dateUtils';
 import { workingDaysBus, saturdayHolidayBus } from '@/data/busData';
 import { workingDaysBuggy, sundayBuggy } from '@/data/buggyData';
@@ -66,5 +66,39 @@ describe('mergeRides', () => {
     const buggy = toRides(resolveDepartures(sundayBuggy.nilaToSahyadri, reference), 'buggy');
 
     expect(mergeRides(bus, buggy)).toEqual(bus);
+  });
+});
+
+describe('rideStatus', () => {
+  const ride = { time: '5:45', at: new Date('2026-10-22T17:45:00') };
+  const minutesAfter = (minutes: number) => new Date(ride.at.getTime() + minutes * 60000);
+
+  it('is upcoming until its time', () => {
+    expect(rideStatus(ride, minutesAfter(-1))).toBe('upcoming');
+    expect(rideStatus(ride, new Date(ride.at.getTime() - 1))).toBe('upcoming');
+  });
+
+  it('is due from its time until the grace period is over', () => {
+    expect(rideStatus(ride, ride.at)).toBe('due');
+    expect(rideStatus(ride, minutesAfter(1))).toBe('due');
+    expect(rideStatus(ride, minutesAfter(LATE_GRACE_MINUTES - 0.01))).toBe('due');
+  });
+
+  it('has departed after that', () => {
+    expect(rideStatus(ride, minutesAfter(LATE_GRACE_MINUTES))).toBe('departed');
+    expect(rideStatus(ride, minutesAfter(120))).toBe('departed');
+  });
+});
+
+describe('latestDue', () => {
+  const rides = toRides(resolveDepartures(workingDaysBus.sahyadriToNila, reference), 'bus');
+
+  it('is the most recent ride inside the grace period', () => {
+    // 8:55 and 9:00 are both due at 9:01; the 9:00 is the one to mention.
+    expect(latestDue(rides, new Date('2026-10-22T09:01:00'))?.time).toBe('9:00');
+  });
+
+  it('is nothing when every recent ride is well past', () => {
+    expect(latestDue(rides, new Date('2026-10-22T09:15:00'))).toBeUndefined();
   });
 });

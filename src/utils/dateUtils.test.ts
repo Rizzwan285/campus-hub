@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWeekCycle, resolveDepartures, getNextDeparture, formatTimeUntil } from './dateUtils';
+import { getWeekCycle, resolveDepartures, getNextDeparture, formatTimeUntil, formatTimeSince } from './dateUtils';
 
 describe('getWeekCycle', () => {
   // 2026-08-20 is a Thursday the mess serves as an even-week day.
@@ -137,5 +137,20 @@ describe('getNextDeparture and formatTimeUntil', () => {
     for (let i = 1; i < resolved.length; i += 1) {
       expect(resolved[i].at.getTime()).toBeGreaterThan(resolved[i - 1].at.getTime());
     }
+  });
+});
+
+describe('formatTimeSince', () => {
+  const due = new Date('2026-10-22T17:45:00');
+  const later = (seconds: number) => new Date(due.getTime() + seconds * 1000);
+
+  it('says "just now" for the first minute', () => {
+    expect(formatTimeSince(due, due)).toBe('just now');
+    expect(formatTimeSince(due, later(59))).toBe('just now');
+  });
+
+  it('counts whole minutes after that', () => {
+    expect(formatTimeSince(due, later(60))).toBe('1 min ago');
+    expect(formatTimeSince(due, later(9 * 60 + 30))).toBe('9 min ago');
   });
 });

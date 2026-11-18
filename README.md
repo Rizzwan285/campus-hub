@@ -17,7 +17,7 @@ live content editing through `/admin`.
 ## Features
 
 - **Mess Menu** — 4-week rotating menu with daily breakfast, lunch, snacks, and dinner
-- **Bus Schedule** — Weekday, Friday, Saturday/holiday and Sunday timetables for campus, town, and Wise Park routes
+- **Bus Schedule** — Weekday, Friday, Saturday/holiday and Sunday timetables for campus, town, and Wise Park routes. Show just the next bus, the remaining ones or the whole day; a bus that was due in the last 10 minutes stays on screen, since it may be running late
 - **Exam shuttles** — Temporary extra buses appear on the bus card only on the dates they run, and drop off by themselves afterwards
 - **Mess Timings** — Separate timings for weekdays and weekends
 - **Date Preview** — Browse any date's menu and bus schedule

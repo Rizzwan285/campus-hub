@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info, Star } from 'lucide-react';
+import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info, Star, Hourglass } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getDayType } from '@/utils/dateUtils';
-import { resolveDepartures, formatTimeUntil } from '@/utils/dateUtils';
-import { mergeRides, specialRides, toRides, type Ride } from '@/lib/transitRides';
+import { resolveDepartures, formatTimeUntil, formatTimeSince } from '@/utils/dateUtils';
+import { mergeRides, rideStatus, specialRides, toRides, type Ride, type RideMode } from '@/lib/transitRides';
+import { BUS_VIEWS, liveBoard, readBusView, saveBusView, type BusView } from '@/lib/busView';
 import {
   formatServiceExceptions,
   formatServiceWindow,
@@ -33,11 +34,73 @@ interface BusScheduleCardProps {
 
 type Direction = 'nilaToSahyadri' | 'sahyadriToNila';
 
+// Each kind of ride keeps one colour everywhere it appears.
+const MODE_ACCENT: Record<RideMode, { text: string; ring: string }> = {
+  bus: { text: 'text-primary', ring: 'ring-primary' },
+  special: { text: 'text-violet-600 dark:text-violet-400', ring: 'ring-violet-500' },
+  buggy: { text: 'text-emerald-600 dark:text-emerald-400', ring: 'ring-emerald-500' },
+};
+
+/** Next / Remaining / All day. Shared by both directions, so it sits above them. */
+function BusViewToggle({ value, onChange }: { value: BusView; onChange: (view: BusView) => void }) {
+  return (
+    <div className="flex justify-center mb-2">
+      <div role="group" aria-label="Which buses to show" className="inline-flex items-center gap-1 rounded-full bg-muted p-1">
+        {BUS_VIEWS.map((option) => {
+          const active = option.value === value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(option.value)}
+              className={`h-8 rounded-full px-3.5 text-xs sm:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                active ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A ride whose time has just passed. Buses often come a minute or two late,
+ * so the card says so instead of quietly moving on to the next one.
+ */
+function LateRideNotice({ ride, now }: { ride: Ride; now: Date }) {
+  const kind = ride.mode === 'buggy' ? 'buggy' : 'bus';
+  const service = ride.mode === 'special' && ride.label ? ` (${ride.label})` : '';
+
+  return (
+    <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs">
+      <Hourglass className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+      <p className="text-muted-foreground">
+        <span className="font-semibold text-foreground">
+          The {ride.time} {kind}
+          {service} was due {formatTimeSince(ride.at, now)}.
+        </span>{' '}
+        {ride.mode === 'buggy' ? 'Buggy timings vary' : 'Buses often run a few minutes late'}, so it may still be on
+        its way.
+      </p>
+    </div>
+  );
+}
+
 export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardProps) {
   const { workingDaysBus, fridayBus, saturdayHolidayBus, sundayBus } = useBusSchedules();
   const specialServices = useSpecialServices();
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
   const [showBuggies, setShowBuggies] = useState(false);
+  // Remembered on this device: people tend to always want the same one.
+  const [view, setView] = useState<BusView>(readBusView);
+  const changeView = (next: BusView) => {
+    setView(next);
+    saveBusView(next);
+  };
   const dayType = getDayType(displayDate);
 
   // Preview dates show every departure; today keeps the live countdown.
@@ -70,24 +133,18 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
   const activeSpecials = servicesRunningOn(specialServices, displayDate);
 
   /**
-   * Every schedule for one direction, resolved to real instants and tagged with
-   * its position in its own list.
+   * The whole day for one direction, resolved to real instants and tagged with
+   * each ride's position in its own list.
    *
-   * The whole day is resolved first and filtered afterwards: `resolveDepartures`
-   * infers am/pm by walking the list, so handing it a tail would reinterpret
-   * every time in it.
+   * Never a tail of the day: `resolveDepartures` infers am/pm by walking the
+   * list, so handing it a tail would reinterpret every time in it. Which rides
+   * to show is decided afterwards, by `liveBoard`.
    */
-  const ridesFor = (direction: Direction) => {
-    const busRides = toRides(resolveDepartures(schedule[direction], filterTime), 'bus');
-    const buggyRides = toRides(resolveDepartures(buggySchedule[direction], filterTime), 'buggy');
-    const stillToCome = (ride: Ride) => isPreviewMode || ride.at > filterTime;
-
-    return {
-      bus: busRides.filter(stillToCome),
-      special: specialRides(activeSpecials, direction, filterTime).filter(stillToCome),
-      buggy: buggyRides.filter(stillToCome),
-    };
-  };
+  const ridesFor = (direction: Direction) => ({
+    bus: toRides(resolveDepartures(schedule[direction], filterTime), 'bus'),
+    special: specialRides(activeSpecials, direction, filterTime),
+    buggy: toRides(resolveDepartures(buggySchedule[direction], filterTime), 'buggy'),
+  });
 
   const scheduleLabel = dayType === 'sunday' ? 'Sunday' : dayType === 'saturday' ? 'Saturday/Holiday' : dayType === 'friday' ? 'Friday' : 'Working Days (Mon–Thu)';
 
@@ -113,11 +170,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
   const NextRideHero = ({ ride, direction }: { ride: Ride; direction: Direction }) => {
     const isBuggy = ride.mode === 'buggy';
     const isSpecial = ride.mode === 'special';
-    const accent = isBuggy
-      ? 'text-emerald-600 dark:text-emerald-400'
-      : isSpecial
-        ? 'text-violet-600 dark:text-violet-400'
-        : 'text-primary';
+    const accent = MODE_ACCENT[ride.mode].text;
 
     return (
       <div
@@ -167,38 +220,51 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
 
   const DepartureList = ({ direction }: { direction: Direction }) => {
     const { bus, special, buggy } = ridesFor(direction);
-    const hasNilaParkingBus = schedule[direction].some((t) => t.includes('*'));
 
     // An extra bus is still a bus: it competes with the regular ones for
     // "next bus" instead of getting a hero of its own.
     const buses = mergeRides(bus, special);
+    const buggies = showBuggies ? buggy : [];
 
-    // Live view leads with the next of each kind, so those two are lifted out
-    // of the grid below by identity rather than by position.
-    const heroes = isPreviewMode
-      ? []
-      : [buses[0], showBuggies ? buggy[0] : undefined].filter((ride): ride is Ride => Boolean(ride));
+    // Nothing on another date has gone yet, so it simply lists the whole day.
+    const { late, next, grid } = isPreviewMode
+      ? { late: [], next: [], grid: mergeRides(buses, buggies) }
+      : liveBoard(buses, buggies, view, currentTime);
 
-    const listed = showBuggies ? mergeRides(bus, special, buggy) : buses;
-    const grid = listed.filter((ride) => !heroes.includes(ride));
-
-    if (listed.length === 0) {
-      return (
-        <p className="text-center text-muted-foreground py-8">
-          No more {showBuggies ? 'buses or buggies' : 'buses'} today. Check another date or see full schedule.
-        </p>
-      );
-    }
+    const rides = showBuggies ? 'buses or buggies' : 'buses';
+    // Only when one of those buses is actually on screen.
+    const hasNilaParkingBus = [...late, ...next, ...grid].some((ride) => ride.time.includes('*'));
 
     return (
       <div className="space-y-3">
-        {heroes.map((ride) => (
+        {late.map((ride) => (
+          <LateRideNotice key={`late-${ride.mode}`} ride={ride} now={currentTime} />
+        ))}
+
+        {next.map((ride) => (
           <NextRideHero key={ride.mode === 'buggy' ? 'buggy' : 'bus'} ride={ride} direction={direction} />
         ))}
 
-        {isPreviewMode && (
+        {!isPreviewMode && next.length === 0 && (
+          <p className="text-center text-muted-foreground py-6">
+            No more {rides} today.
+            {view !== 'all' && ' Choose All day to see every time, or check another date.'}
+          </p>
+        )}
+
+        {isPreviewMode && grid.length === 0 && (
+          <p className="text-center text-muted-foreground py-8">No {rides} on this day.</p>
+        )}
+
+        {isPreviewMode && grid.length > 0 && (
           <p className="text-sm text-center text-muted-foreground mb-2">
             All scheduled {showBuggies ? 'buses and buggies' : 'buses'} for this day
+          </p>
+        )}
+
+        {!isPreviewMode && view === 'all' && grid.length > 0 && (
+          <p className="text-xs text-center text-muted-foreground">
+            All of today&apos;s times · the ones that have passed are faded
           </p>
         )}
 
@@ -212,45 +278,71 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           </div>
         )}
 
-        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
-          {grid.map((ride) => (
-            <div
-              key={`${ride.mode}-${ride.index}`}
-              title={ride.mode === 'special' ? ride.label : undefined}
-              className={`p-3 text-center rounded-lg transition-colors relative ${
-                ride.mode === 'buggy'
-                  ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
-                  : ride.mode === 'special'
-                    ? 'bg-violet-500/10 border border-violet-500/40 hover:bg-violet-500/20'
-                    : 'bg-muted hover:bg-muted/80'
-              }`}
-            >
-              {ride.mode === 'buggy' ? (
-                <CarFront className="h-3 w-3 mx-auto mb-1 text-emerald-500" />
-              ) : ride.mode === 'special' ? (
-                <Star className="h-3 w-3 mx-auto mb-1 text-violet-500" />
-              ) : (
-                <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
-              )}
-              <p
-                className={`text-xs sm:text-sm font-medium ${
-                  ride.mode === 'buggy'
-                    ? 'text-emerald-700 dark:text-emerald-300'
-                    : ride.mode === 'special'
-                      ? 'text-violet-700 dark:text-violet-300'
-                      : ''
-                }`}
-              >
-                {ride.time}
-              </p>
-              {ride.mode === 'bus' && isMultipleBus(ride.time, ride.index, direction) && (
-                <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
-                  x2
-                </Badge>
-              )}
-            </div>
-          ))}
-        </div>
+        {grid.length > 0 && (
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4">
+            {grid.map((ride) => {
+              const status = isPreviewMode ? 'upcoming' : rideStatus(ride, currentTime);
+              const isNext = next.includes(ride);
+
+              return (
+                <div
+                  key={`${ride.mode}-${ride.index}`}
+                  title={ride.mode === 'special' ? ride.label : undefined}
+                  className={`p-3 text-center rounded-lg transition-colors relative flex flex-col items-center justify-center ${
+                    ride.mode === 'buggy'
+                      ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
+                      : ride.mode === 'special'
+                        ? 'bg-violet-500/10 border border-violet-500/40 hover:bg-violet-500/20'
+                        : 'bg-muted hover:bg-muted/80'
+                  } ${
+                    isNext
+                      ? `ring-2 ${MODE_ACCENT[ride.mode].ring}`
+                      : status === 'due'
+                        ? 'ring-2 ring-amber-500/70'
+                        : status === 'departed'
+                          ? 'opacity-50'
+                          : ''
+                  }`}
+                >
+                  {ride.mode === 'buggy' ? (
+                    <CarFront className="h-3 w-3 mx-auto mb-1 text-emerald-500" />
+                  ) : ride.mode === 'special' ? (
+                    <Star className="h-3 w-3 mx-auto mb-1 text-violet-500" />
+                  ) : (
+                    <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
+                  )}
+                  <p
+                    className={`text-xs sm:text-sm font-medium ${
+                      ride.mode === 'buggy'
+                        ? 'text-emerald-700 dark:text-emerald-300'
+                        : ride.mode === 'special'
+                          ? 'text-violet-700 dark:text-violet-300'
+                          : ''
+                    }`}
+                  >
+                    {ride.time}
+                  </p>
+                  {isNext && (
+                    <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-wide leading-tight ${MODE_ACCENT[ride.mode].text}`}>
+                      Next
+                    </p>
+                  )}
+                  {status === 'due' && (
+                    <p className="mt-0.5 text-[10px] font-medium leading-tight text-amber-700 dark:text-amber-300">
+                      {formatTimeSince(ride.at, currentTime)}
+                    </p>
+                  )}
+                  {status === 'departed' && <span className="sr-only">(time has passed)</span>}
+                  {ride.mode === 'bus' && isMultipleBus(ride.time, ride.index, direction) && (
+                    <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 px-1.5 text-[10px]">
+                      x2
+                    </Badge>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {hasNilaParkingBus && (
           <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5 font-medium">
@@ -385,6 +477,9 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
           <TabsTrigger value="nila-sahyadri">Nila → Sahyadri</TabsTrigger>
           <TabsTrigger value="sahyadri-nila">Sahyadri → Nila</TabsTrigger>
         </TabsList>
+
+        {/* Another date always lists its whole day, so there is nothing to choose. */}
+        {!isPreviewMode && <BusViewToggle value={view} onChange={changeView} />}
 
         <TabsContent value="nila-sahyadri">
           <DepartureList direction="nilaToSahyadri" />
