@@ -11,7 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { getDayType } from '@/utils/dateUtils';
 import { resolveDepartures, formatTimeUntil, formatTimeSince } from '@/utils/dateUtils';
 import { mergeRides, rideStatus, specialRides, toRides, type Ride, type RideMode } from '@/lib/transitRides';
-import { BUS_VIEWS, liveBoard, readBusView, saveBusView, type BusView } from '@/lib/busView';
+import { BUS_VIEWS, DEFAULT_BUS_VIEW, liveBoard, type BusView } from '@/lib/busView';
 import {
   formatServiceExceptions,
   formatServiceWindow,
@@ -41,7 +41,7 @@ const MODE_ACCENT: Record<RideMode, { text: string; ring: string }> = {
   buggy: { text: 'text-emerald-600 dark:text-emerald-400', ring: 'ring-emerald-500' },
 };
 
-/** Next / Remaining / All day. Shared by both directions, so it sits above them. */
+/** Next / All day. Shared by both directions, so it sits above them. */
 function BusViewToggle({ value, onChange }: { value: BusView; onChange: (view: BusView) => void }) {
   return (
     <div className="flex justify-center mb-2">
@@ -95,12 +95,8 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
   const specialServices = useSpecialServices();
   const [showExtraRoutes, setShowExtraRoutes] = useState(false);
   const [showBuggies, setShowBuggies] = useState(false);
-  // Remembered on this device: people tend to always want the same one.
-  const [view, setView] = useState<BusView>(readBusView);
-  const changeView = (next: BusView) => {
-    setView(next);
-    saveBusView(next);
-  };
+  // Opens on Next every time; All day is a look, not a setting.
+  const [view, setView] = useState<BusView>(DEFAULT_BUS_VIEW);
   const dayType = getDayType(displayDate);
 
   // Preview dates show every departure; today keeps the live countdown.
@@ -460,7 +456,7 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </TabsList>
 
         {/* Another date always lists its whole day, so there is nothing to choose. */}
-        {!isPreviewMode && <BusViewToggle value={view} onChange={changeView} />}
+        {!isPreviewMode && <BusViewToggle value={view} onChange={setView} />}
 
         <TabsContent value="nila-sahyadri">
           <DepartureList direction="nilaToSahyadri" />

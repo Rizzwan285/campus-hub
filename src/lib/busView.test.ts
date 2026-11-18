@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_BUS_VIEW, liveBoard, readBusView, saveBusView } from './busView';
+import { describe, expect, it } from 'vitest';
+import { BUS_VIEWS, DEFAULT_BUS_VIEW, liveBoard } from './busView';
 import { mergeRides, specialRides, toRides, type Ride } from './transitRides';
 import { resolveDepartures } from '@/utils/dateUtils';
 import { workingDaysBus } from '@/data/busData';
@@ -19,7 +19,7 @@ describe('liveBoard at 5:46 pm, a minute after the 5:45 bus was due', () => {
   const now = at(17, 46);
 
   it('still points out the 5:45, whichever view is chosen', () => {
-    for (const view of ['next', 'remaining', 'all'] as const) {
+    for (const view of ['next', 'all'] as const) {
       expect(times(liveBoard(nilaBuses, [], view, now).late)).toEqual(['5:45']);
     }
   });
@@ -28,12 +28,8 @@ describe('liveBoard at 5:46 pm, a minute after the 5:45 bus was due', () => {
     expect(times(liveBoard(nilaBuses, [], 'next', now).next)).toEqual(['6:00']);
   });
 
-  it('Next lists nothing beyond it', () => {
-    expect(liveBoard(nilaBuses, [], 'next', now).grid).toEqual([]);
-  });
-
-  it('Remaining lists what comes after the next bus', () => {
-    const { grid } = liveBoard(nilaBuses, [], 'remaining', now);
+  it('Next lists every bus after it, not just the one', () => {
+    const { grid } = liveBoard(nilaBuses, [], 'next', now);
 
     expect(times(grid)[0]).toBe('6:30');
     expect(times(grid)[grid.length - 1]).toBe('12:00');
@@ -86,8 +82,8 @@ describe('liveBoard with buggies shown', () => {
     expect(times(liveBoard(sahyadriBuses, sahyadriBuggies, 'next', now).next)).toEqual(['2:15', '3:00 PM']);
   });
 
-  it('Remaining leaves both of them out of the list below', () => {
-    const { grid } = liveBoard(sahyadriBuses, sahyadriBuggies, 'remaining', now);
+  it('Next leaves both of them out of the list below', () => {
+    const { grid } = liveBoard(sahyadriBuses, sahyadriBuggies, 'next', now);
 
     expect(times(grid)[0]).toBe('2:45');
     expect(times(grid)).not.toContain('2:15');
@@ -113,7 +109,7 @@ describe('liveBoard around the last bus', () => {
   });
 
   it('leaves only the late notice once it is due', () => {
-    const board = liveBoard(sahyadriBuses, [], 'remaining', justAfterMidnight(11));
+    const board = liveBoard(sahyadriBuses, [], 'next', justAfterMidnight(11));
 
     expect(board.next).toEqual([]);
     expect(board.grid).toEqual([]);
@@ -129,46 +125,12 @@ describe('liveBoard around the last bus', () => {
   });
 });
 
-function memoryStorage(): Storage {
-  const store = new Map<string, string>();
-  return {
-    get length() { return store.size; },
-    clear: () => store.clear(),
-    getItem: (key) => store.get(key) ?? null,
-    key: (index) => [...store.keys()][index] ?? null,
-    removeItem: (key) => { store.delete(key); },
-    setItem: (key, value) => { store.set(key, String(value)); },
-  };
-}
-
-describe('the remembered view', () => {
-  beforeEach(() => vi.stubGlobal('localStorage', memoryStorage()));
-  afterEach(() => vi.unstubAllGlobals());
-
-  it('starts on the whole day', () => {
-    expect(DEFAULT_BUS_VIEW).toBe('all');
-    expect(readBusView()).toBe('all');
+describe('the view switch', () => {
+  it('offers only Next and All day', () => {
+    expect(BUS_VIEWS.map((option) => option.label)).toEqual(['Next', 'All day']);
   });
 
-  it('comes back as it was last chosen', () => {
-    saveBusView('next');
-    expect(readBusView()).toBe('next');
-    saveBusView('remaining');
-    expect(readBusView()).toBe('remaining');
-  });
-
-  it('ignores a saved value it does not know', () => {
-    localStorage.setItem('campus-bus-view', 'everything');
-    expect(readBusView()).toBe('all');
-  });
-
-  it('works without storage, as in a private window', () => {
-    const blocked = memoryStorage();
-    blocked.getItem = () => { throw new Error('denied'); };
-    blocked.setItem = () => { throw new Error('denied'); };
-    vi.stubGlobal('localStorage', blocked);
-
-    expect(() => saveBusView('next')).not.toThrow();
-    expect(readBusView()).toBe('all');
+  it('opens on Next', () => {
+    expect(DEFAULT_BUS_VIEW).toBe('next');
   });
 });
