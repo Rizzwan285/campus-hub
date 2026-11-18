@@ -440,25 +440,6 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         </div>
       </div>
 
-      {activeSpecials.map((service) => {
-        const exceptions = formatServiceExceptions(service);
-        return (
-          <div
-            key={service.id}
-            className="flex items-start gap-2 p-3 mb-4 rounded-lg bg-violet-500/10 border border-violet-500/30 text-xs"
-          >
-            <Star className="h-4 w-4 text-violet-500 shrink-0 mt-0.5" />
-            <p className="text-muted-foreground">
-              <span className="font-semibold text-foreground">{service.title}</span>
-              {service.note ? ` · ${service.note}` : ''}
-              <br />
-              Extra buses on this day are highlighted below. Runs {formatServiceWindow(service)}
-              {exceptions ? `, except ${exceptions}` : ''}.
-            </p>
-          </div>
-        );
-      })}
-
       {showBuggies && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
@@ -575,13 +556,32 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         )
       )}
 
-      {showBuggies && (
-        <div className="mt-6 pt-3 border-t border-border/40 flex items-start gap-2 text-xs text-muted-foreground">
-          <Info className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-          <p>
-            <span className="font-semibold text-foreground">Buggy disclaimer: </span>
-            {BUGGY_DISCLAIMER} Buggy timings are effective from {buggyEffectiveFrom}.
-          </p>
+      {(showBuggies || activeSpecials.length > 0) && (
+        <div className="mt-6 pt-3 border-t border-border/40 space-y-2">
+          {showBuggies && (
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
+              <Info className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+              <p>
+                <span className="font-semibold text-foreground">Buggy disclaimer: </span>
+                {BUGGY_DISCLAIMER} Buggy timings are effective from {buggyEffectiveFrom}.
+              </p>
+            </div>
+          )}
+
+          {/* A key for the star times, kept to one small line: on a phone
+              nothing else says what they are. */}
+          {activeSpecials.map((service) => {
+            const exceptions = formatServiceExceptions(service);
+            return (
+              <p key={service.id} className="flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
+                <Star className="h-3 w-3 mt-px shrink-0 text-violet-500" />
+                <span>
+                  {service.title}: extra buses {formatServiceWindow(service)}
+                  {exceptions ? `, except ${exceptions}` : ''}.
+                </span>
+              </p>
+            );
+          })}
         </div>
       )}
     </Card>
