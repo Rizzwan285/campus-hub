@@ -75,7 +75,7 @@ function multipleTimes(spec: { times: string[]; positions: number[] }): string[]
  * Shown on the bus card so students can tell at a glance whether the app is
  * behind a freshly circulated timetable.
  */
-export const busEffectiveFrom = "7 August 2026";
+export const busEffectiveFrom = "3 October 2026";
 
 const CONSTRUCTION_NOTE = "service roads only — construction may cause detours";
 
@@ -99,17 +99,21 @@ const MORNING_TOWN_ROUTES: BusRoute[] = [
   { description: "Palakkad (8:00 AM) → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Kalmandapam → Chandranagar → Pudussery → Nila Gate → Sahyadri (8:30 AM)" },
 ];
 
-// Routes 3 and 4 also run on Saturdays, so they are shared.
-const ROUTES_3_AND_4: BusRoute[] = [
-  { description: "Nila Gate (7:40 AM) → Palakkad (8:25 AM) → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Kalmandapam → Chandranagar → Pudussery → Nila Gate → Sahyadri (8:55 AM)" },
-  { description: "Nila Gate (7:55 AM) → Kalleppulley (8:25 AM) → Koppam → Sekharipuram → Mattumantha → Malampuzha → Nila Gate → Sahyadri (8:55 AM)" },
-];
+// Weekdays only since the 3 October circular, which dropped it on Saturdays.
+const ROUTE_3: BusRoute = {
+  description: "Nila Gate (7:40 AM) → Palakkad (8:25 AM) → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Kalmandapam → Chandranagar → Pudussery → Nila Gate → Sahyadri (8:55 AM)"
+};
 
-// Route 5 runs to town Monday–Thursday but only as far as Kinnar stop on
-// Friday and Saturday, so the two variants differ by their trailing note.
-const route5 = (extent: string): BusRoute => ({
-  description: `Sahyadri (5:35 PM) → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad → Stadium Bus Stand → Chandranagar → Pudussery → Nila (${extent})`
-});
+// Also runs on Saturdays.
+const ROUTE_4: BusRoute = {
+  description: "Nila Gate (7:55 AM) → Kalleppulley (8:25 AM) → Koppam → Sekharipuram → Mattumantha → Malampuzha → Nila Gate → Sahyadri (8:55 AM)"
+};
+
+// Two buses, every day it runs (Mon–Sat). The 3 October circular ends it at
+// Palakkad: its return leg and the Fri/Sat short turn at Kinnar stop are gone.
+const ROUTE_5: BusRoute = {
+  description: "Sahyadri (5:35 PM) → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad (2 buses)"
+};
 
 const wiseParkEvening: BusRoute = {
   description: `Sahyadri (6:15 PM) → Nila Gate → Wise Park Junction (6:45 PM) → Nila Manogata (7:00 PM) (${CONSTRUCTION_NOTE})`
@@ -134,8 +138,9 @@ export const workingDaysBus: BusSchedule = {
   sahyadriToNila: WORKING_S2N.times,
   palakkadTown: [
     ...MORNING_TOWN_ROUTES,
-    ...ROUTES_3_AND_4,
-    route5("Mon–Thu: runs up to town"),
+    ROUTE_3,
+    ROUTE_4,
+    ROUTE_5,
     ROUTE_6,
     ROUTE_8_ALL_DAYS
   ],
@@ -153,15 +158,15 @@ export const workingDaysBus: BusSchedule = {
   }
 };
 
-// Fridays — same shuttle times as Mon–Thu, but route 7 runs and route 5 is
-// short-turned at Kinnar stop.
+// Fridays — same shuttle times and routes as Mon–Thu, plus route 7.
 export const fridayBus: BusSchedule = {
   nilaToSahyadri: [...workingDaysBus.nilaToSahyadri],
   sahyadriToNila: [...workingDaysBus.sahyadriToNila],
   palakkadTown: [
     ...MORNING_TOWN_ROUTES,
-    ...ROUTES_3_AND_4,
-    route5("Fri & Sat: runs up to Kinnar stop"),
+    ROUTE_3,
+    ROUTE_4,
+    ROUTE_5,
     ROUTE_6,
     ROUTE_7_FRI_SAT,
     ROUTE_8_ALL_DAYS
@@ -187,12 +192,12 @@ const SATURDAY_S2N = departures([
 export const saturdayHolidayBus: BusSchedule = {
   nilaToSahyadri: SATURDAY_N2S.times,
   sahyadriToNila: SATURDAY_S2N.times,
-  // The circular lists routes 3, 4, 5, 7 and 8 from the working-day schedule,
+  // The circular lists routes 4, 5, 7 and 8 from the working-day schedule,
   // plus route 9 below. Kept in departure order.
   palakkadTown: [
-    ...ROUTES_3_AND_4,
+    ROUTE_4,
     { description: "Sahyadri (1:00 PM) → Nila Gate → Pudussery → Kadamkode → Manapullykavu → Maidaan (Govt. Hospital) → Stadium Bus Stand → Palakkad (1:30 PM) → Stadium Bus Stand (1:30 PM) → Chandranagar → Pudussery → Nila → Saraswati (2:00 PM)" },
-    route5("Fri & Sat: runs up to Kinnar stop"),
+    ROUTE_5,
     ROUTE_7_FRI_SAT,
     ROUTE_8_ALL_DAYS
   ],

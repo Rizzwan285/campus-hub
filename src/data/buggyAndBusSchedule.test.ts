@@ -7,8 +7,10 @@ import {
 } from './buggyData';
 import {
   workingDaysBus,
+  fridayBus,
   saturdayHolidayBus,
   sundayBus,
+  busEffectiveFrom,
 } from './busData';
 
 describe('Buggy Schedule Data', () => {
@@ -90,5 +92,41 @@ describe('Bus Timings Verification & Additions', () => {
     const s2nSatMidnightIndex = saturdayHolidayBus.sahyadriToNila.indexOf('12:10*');
     expect(saturdayHolidayBus.multipleBusPositions?.sahyadriToNila).not.toContain(s2nSatIndex);
     expect(saturdayHolidayBus.multipleBusPositions?.sahyadriToNila).not.toContain(s2nSatMidnightIndex);
+  });
+});
+
+describe('Town routes from the 3 October 2026 circular', () => {
+  const routes = (schedule: { palakkadTown?: Array<{ description: string }> }) =>
+    (schedule.palakkadTown ?? []).map((route) => route.description);
+  const route3 = (description: string) => description.startsWith('Nila Gate (7:40 AM)');
+  const route5 = (description: string) => description.startsWith('Sahyadri (5:35 PM) → Nila Gate');
+
+  it('is the circular the card says it is', () => {
+    expect(busEffectiveFrom).toBe('3 October 2026');
+  });
+
+  it('runs route 3 on weekdays and Fridays only', () => {
+    expect(routes(workingDaysBus).some(route3)).toBe(true);
+    expect(routes(fridayBus).some(route3)).toBe(true);
+    expect(routes(saturdayHolidayBus).some(route3)).toBe(false);
+  });
+
+  it('ends route 5 at Palakkad with two buses, the same every day it runs', () => {
+    for (const schedule of [workingDaysBus, fridayBus, saturdayHolidayBus]) {
+      const [description] = routes(schedule).filter(route5);
+      expect(description).toMatch(/→ Palakkad \(2 buses\)$/);
+      expect(description).not.toMatch(/Kinnar|runs up to town/);
+    }
+  });
+
+  it('keeps the Saturday routes in departure order: 4, 9, 5, 7, 8', () => {
+    const starts = routes(saturdayHolidayBus).map((description) => description.split(' → ')[0]);
+    expect(starts).toEqual([
+      'Nila Gate (7:55 AM)',
+      'Sahyadri (1:00 PM)',
+      'Sahyadri (5:35 PM)',
+      'Sahyadri (6:15 PM)',
+      'Stadium Bus Stand (9:30 PM)',
+    ]);
   });
 });
