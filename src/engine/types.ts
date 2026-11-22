@@ -75,6 +75,12 @@ export interface EngineOptions {
 
 export interface ResolveResult {
   events: CalendarEvent[];
+  /**
+   * This week's classes that fall on a holiday. Kept apart from `events`, so
+   * Home's "Today's Classes" says the day is a holiday instead of listing
+   * them, while the weekly timetable still shows the whole week.
+   */
+  cancelledEvents: CalendarEvent[];
   collisions: Collision[];
   holidaysEncountered: Holiday[];
 }

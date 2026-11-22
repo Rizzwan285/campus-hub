@@ -3,6 +3,7 @@ import { GraduationCap, BookOpen, AlertCircle, Clock, Play, CheckCircle2, Pencil
 import { Card } from '@/components/ui/card';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { CalendarEvent } from '@/engine/types';
+import { calendarDateKey } from '@/lib/calendarDate';
 import metadata from '@/data/timetable/metadata.json';
 
 interface ClassTimetableCardProps {
@@ -23,10 +24,12 @@ export function ClassTimetableCard({ date }: ClassTimetableCardProps) {
     event.startTime.toLocaleDateString('en-US', { weekday: 'long' }) === dayName
   ).sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 
-  const isoDate = date.toISOString().split('T')[0];
+  // Wall dates, not UTC: toISOString() put 00:00-05:30 IST on the day before,
+  // so a holiday showed as an ordinary day with no classes until 5:30.
+  const isoDate = calendarDateKey(date);
   const holiday = holidaysEncountered.find(h => h.date === isoDate);
   const hasClasses = dayEvents.length > 0;
-  const isToday = now.toISOString().split('T')[0] === isoDate;
+  const isToday = calendarDateKey(now) === isoDate;
 
   // Determine current/next class logic only if the card is showing "today"
   let currentEvent: CalendarEvent | null = null;

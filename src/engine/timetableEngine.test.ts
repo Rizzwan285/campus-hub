@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { TimetableEngine } from './timetableEngine';
 import { CourseOffering, Holiday, RecurrenceRule } from './types';
+import { calendarDateKey } from '../lib/calendarDate';
 
 describe('TimetableEngine', () => {
   const mockCourses: CourseOffering[] = [
@@ -72,8 +73,13 @@ describe('TimetableEngine', () => {
     
     const result = TimetableEngine.resolveWeek([mockCourses[0]], mockHolidays, { targetWeek });
     
-    // Should hit the holiday
+    // Should hit the holiday: the class is not held, but it is kept for the
+    // weekly timetable, which shows the whole week.
     expect(result.events).toHaveLength(0);
+    expect(result.cancelledEvents).toHaveLength(1);
+    expect(result.cancelledEvents[0].courseCode).toBe('CS5634');
+    expect(calendarDateKey(result.cancelledEvents[0].startTime)).toBe('2026-01-26');
+    expect(result.cancelledEvents[0].startTime.getHours()).toBe(10);
     expect(result.holidaysEncountered).toHaveLength(1);
     expect(result.holidaysEncountered[0].name).toBe('Republic Day');
     
@@ -82,6 +88,7 @@ describe('TimetableEngine', () => {
     const result2 = TimetableEngine.resolveWeek([mockCourses[0]], mockHolidays, { targetWeek: targetWeekNoHoliday });
     
     expect(result2.events).toHaveLength(1);
+    expect(result2.cancelledEvents).toHaveLength(0);
     expect(result2.events[0].courseCode).toBe('CS5634');
     expect(result2.events[0].startTime.getHours()).toBe(10);
     expect(result2.events[0].endTime.getMinutes()).toBe(50);

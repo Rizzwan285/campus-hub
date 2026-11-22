@@ -14,6 +14,7 @@ import { TimetableDownload } from './TimetableDownload';
 export function WeeklyTimetable() {
   const {
     resolvedEvents,
+    cancelledEvents,
     collisions,
     isLoading,
     error,
@@ -161,7 +162,12 @@ export function WeeklyTimetable() {
             </p>
           </div>
         ) : (
-          <WeeklyGrid events={resolvedEvents} onEventClick={event => openEditor(event.courseCode)} />
+          // The whole week, holidays included: this page is the student's
+          // timetable. Home's "Today's Classes" is where a holiday shows.
+          <WeeklyGrid
+            events={[...resolvedEvents, ...cancelledEvents]}
+            onEventClick={event => openEditor(event.courseCode)}
+          />
         )}
       </Card>
 

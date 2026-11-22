@@ -117,6 +117,7 @@ export const TimetableEngine = {
     options: EngineOptions
   ): ResolveResult {
     const events: CalendarEvent[] = [];
+    const cancelledEvents: CalendarEvent[] = [];
     const holidaysEncountered: Holiday[] = [];
     
     // 1. Detect collisions
@@ -145,15 +146,6 @@ export const TimetableEngine = {
         // does not cancel it the way it cancels a weekly class.
         if (once && calendarDateKey(meetingDate) !== meeting.date) return;
 
-        // Check Holiday
-        const holiday = once ? null : this.isHoliday(meetingDate, holidays);
-        if (holiday) {
-          if (!holidaysEncountered.some(h => h.date === holiday.date)) {
-            holidaysEncountered.push(holiday);
-          }
-          return; // Skip this event because it's a holiday
-        }
-
         // Parse Start and End Times
         const [startHH, startMM] = meeting.startTime.split(':').map(Number);
         const [endHH, endMM] = meeting.endTime.split(':').map(Number);
@@ -164,7 +156,7 @@ export const TimetableEngine = {
         const endTime = new Date(meetingDate);
         endTime.setHours(endHH, endMM, 0, 0);
 
-        events.push({
+        const event: CalendarEvent = {
           id: `${course.id}_${meeting.day}_${meeting.startTime}_${index}`,
           courseId: course.id,
           courseCode: course.courseCode,
@@ -174,12 +166,26 @@ export const TimetableEngine = {
           endTime,
           room: meeting.room || 'TBA',
           isPersonal: course.isPersonal
-        });
+        };
+
+        // A holiday cancels a recurring class that day. It is set aside, not
+        // dropped: the weekly timetable still shows it.
+        const holiday = once ? null : this.isHoliday(meetingDate, holidays);
+        if (holiday) {
+          if (!holidaysEncountered.some(h => h.date === holiday.date)) {
+            holidaysEncountered.push(holiday);
+          }
+          cancelledEvents.push(event);
+          return;
+        }
+
+        events.push(event);
       });
     });
 
     return {
       events,
+      cancelledEvents,
       collisions,
       holidaysEncountered
     };

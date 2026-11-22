@@ -29,6 +29,7 @@ describe('useTimetableStore', () => {
       loadedCourses: [],
       loadedHolidays: [],
       resolvedEvents: [],
+      cancelledEvents: [],
       collisions: [],
       holidaysEncountered: [],
       isLoading: false,
@@ -127,6 +128,35 @@ describe('useTimetableStore', () => {
     const stateAfter = useTimetableStore.getState();
     expect(stateAfter.selectedCourseIds).toEqual(['CS101']);
     expect(stateAfter.resolvedEvents).toHaveLength(1);
+  });
+
+  it("keeps a holiday's classes for the weekly timetable but not for today's classes", () => {
+    // 24 Nov 2026 (Guru Nanak's Birthday) is a Tuesday. A student checking on
+    // Monday 23 Nov saw no Tuesday classes at all in their weekly timetable.
+    const course: CourseOffering = {
+      id: 'UG_CSE_CS2010',
+      courseCode: 'CS2010',
+      courseName: 'Data Structures',
+      credits: '3',
+      category: 'core',
+      meetings: [
+        { type: 'lecture', day: 'Monday', startTime: '09:00', endTime: '09:50', room: 'A1', instructors: [], recurrence: { type: 'weekly' } },
+        { type: 'lecture', day: 'Tuesday', startTime: '10:00', endTime: '10:50', room: 'A1', instructors: [], recurrence: { type: 'weekly' } },
+      ],
+    };
+    useTimetableStore.setState({
+      loadedCourses: [course],
+      loadedHolidays: [{ date: '2026-11-24', name: "Guru Nanak's Birthday" }],
+      previewDate: new Date(2026, 10, 23, 11).toISOString(),
+    });
+
+    useTimetableStore.getState().updateSelectedCourses(['CS2010']);
+
+    const state = useTimetableStore.getState();
+    expect(state.resolvedEvents.map(event => event.startTime.getDay())).toEqual([1]);
+    expect(state.cancelledEvents.map(event => event.startTime.getDay())).toEqual([2]);
+    expect(state.cancelledEvents[0].startTime.getDate()).toBe(24);
+    expect(state.holidaysEncountered).toEqual([{ date: '2026-11-24', name: "Guru Nanak's Birthday" }]);
   });
 });
 

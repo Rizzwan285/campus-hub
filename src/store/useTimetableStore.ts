@@ -130,6 +130,8 @@ interface TimetableState {
    */
   activeCourses: CourseOffering[];
   resolvedEvents: CalendarEvent[];
+  /** This week's classes a holiday cancels; see `ResolveResult.cancelledEvents`. */
+  cancelledEvents: CalendarEvent[];
   collisions: Collision[];
   holidaysEncountered: Holiday[];
   
@@ -211,7 +213,7 @@ export const useTimetableStore = create<TimetableState>()(
         } = get();
 
         if (!loadedCourses.length || get().timetableOutdated) {
-          set({ activeCourses: [], resolvedEvents: [], collisions: [], holidaysEncountered: [] });
+          set({ activeCourses: [], resolvedEvents: [], cancelledEvents: [], collisions: [], holidaysEncountered: [] });
           return;
         }
         const config = get().semesterConfig;
@@ -252,7 +254,7 @@ export const useTimetableStore = create<TimetableState>()(
         if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
           const batchNo = firstYearBatch(profile.batchNo);
           if (!batchNo) {
-            set({ activeCourses: [], resolvedEvents: [], collisions: [], holidaysEncountered: [] });
+            set({ activeCourses: [], resolvedEvents: [], cancelledEvents: [], collisions: [], holidaysEncountered: [] });
             return;
           }
           if (batchNo) {
@@ -337,12 +339,13 @@ export const useTimetableStore = create<TimetableState>()(
           set({
             activeCourses,
             resolvedEvents: result.events,
+            cancelledEvents: result.cancelledEvents,
             collisions: result.collisions,
             holidaysEncountered: result.holidaysEncountered,
             error: null
           });
         } catch (err) {
-          set({ error: 'Failed to compute timetable events.', activeCourses: [], resolvedEvents: [], collisions: [] });
+          set({ error: 'Failed to compute timetable events.', activeCourses: [], resolvedEvents: [], cancelledEvents: [], collisions: [] });
           console.error(err);
         }
       };
@@ -368,6 +371,7 @@ export const useTimetableStore = create<TimetableState>()(
 
         activeCourses: [],
         resolvedEvents: [],
+        cancelledEvents: [],
         collisions: [],
         holidaysEncountered: [],
         
@@ -380,7 +384,7 @@ export const useTimetableStore = create<TimetableState>()(
           const context = profile ? academicContext(profile) : null;
           const changed = get().selectionContext !== null && get().selectionContext !== context;
           set({ isLoading: true, error: null, program, branch, selectionContext: context,
-            ...(changed ? { selectedCourseIds: [], resolvedEvents: [], collisions: [] } : {}) });
+            ...(changed ? { selectedCourseIds: [], resolvedEvents: [], cancelledEvents: [], collisions: [] } : {}) });
 
           try {
             const [allCoursesRaw, commonData, holidays] = await Promise.all([
