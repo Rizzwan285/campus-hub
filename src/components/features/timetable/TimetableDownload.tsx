@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { useUserStore } from '@/store/useUserStore';
 import { buildTimetableExport } from '@/lib/timetableExport';
+import { TimetableLoader } from '@/services/timetableLoader';
+import type { SlotDefinitions } from '@/engine/courseSchedule';
 
 type Format = 'pdf' | 'xlsx';
 
@@ -13,14 +15,14 @@ const FORMATS: Array<{ format: Format; title: string; detail: string; icon: type
   {
     format: 'pdf',
     title: 'PDF',
-    detail: 'Your week on one page, with course details on the next. Best for printing or keeping on your phone.',
+    detail: 'Your week on one page, laid out like the slot system, with course details and slots on the next. Best for printing or keeping on your phone.',
     icon: FileText,
     mime: 'application/pdf',
   },
   {
     format: 'xlsx',
     title: 'Excel',
-    detail: 'The same week as a coloured grid, plus sheets of courses and classes you can sort and edit.',
+    detail: 'The same week in the slot layout, plus sheets of courses and classes you can sort and edit.',
     icon: FileSpreadsheet,
     mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   },
@@ -50,10 +52,16 @@ export function TimetableDownload() {
     if (busy) return;
     setBusy(format);
     try {
+      // The semester's own slot system lays out the week; offline, the copy
+      // built into the app (the same slots, bar any the semester added).
+      const slots =
+        TimetableLoader.getMeta().slots ??
+        ((await import('@/data/timetable/slots.json')).default as unknown as SlotDefinitions);
       const model = buildTimetableExport({
         courses: activeCourses,
         profile,
         semesterName: semester?.name,
+        slots,
         now: new Date(),
       });
       // Both writers are large, so each is fetched only when it is asked for.

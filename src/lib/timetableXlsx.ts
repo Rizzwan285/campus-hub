@@ -1,9 +1,12 @@
-import type { Workbook, Worksheet, Borders } from 'exceljs';
-import { formatMinutes, shade, tint, type ExportClass, type Rgb, type TimetableExport } from './timetableExport';
+import type { Workbook, Worksheet, Borders, RichText } from 'exceljs';
+import { columnIsEmpty, shade, tint, type GridPlacement, type GridTable, type Rgb, type TimetableExport } from './timetableExport';
 
 /**
- * The timetable as a workbook: a coloured week grid that prints on one page,
- * then the courses and a plain list of classes that can be sorted and filtered.
+ * The timetable as a workbook: the week laid out like the institute's slot
+ * system sheet (days down the side, slot times across, one table for
+ * Monday/Wednesday/Friday and one for Tuesday/Thursday) printing on one page,
+ * then the courses with their slots and a plain list of classes that can be
+ * sorted and filtered.
  */
 
 const argb = ([r, g, b]: Rgb) =>
@@ -13,31 +16,20 @@ const INK = 'FF111827';
 const BODY = 'FF374151';
 const MUTED = 'FF6B7280';
 const HAIRLINE = 'FFE2E5EA';
+const LINE = 'FFD1D5DB';
 const ACCENT = 'FF2563EB';
-const BREAK_FILL = 'FFF8FAFC';
+const PANEL = 'FFF8FAFC';
+const BREAK_FILL = 'FFF1F5F9';
 const WHITE = 'FFFFFFFF';
 const FONT = 'Calibri';
 
+const DAY_COLUMN_WIDTH = 14;
+const TIME_COLUMN_WIDTH = 19;
+const LANE_HEIGHT = 64;
+
 const solid = (color: string) => ({ type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: color } });
 const hair = { style: 'thin' as const, color: { argb: HAIRLINE } };
-
-/** The row boundaries of the grid: every moment a class starts or ends. */
-export function timeSlices(model: TimetableExport): Array<{ start: number; end: number }> {
-  const marks = new Set<number>([model.startMin, model.endMin]);
-  model.classes.forEach((item) => {
-    marks.add(item.start);
-    marks.add(item.end);
-  });
-  const sorted = [...marks].sort((a, b) => a - b);
-  return sorted.slice(0, -1).map((start, index) => ({ start, end: sorted[index + 1] }));
-}
-
-/** First column and number of columns a class takes within its day. */
-export function classColumns(item: ExportClass, dayLaneCount: number): { offset: number; span: number } {
-  if (item.lanes === 1) return { offset: 0, span: dayLaneCount };
-  // The last of a group of overlapping classes takes whatever width is left.
-  return { offset: item.lane, span: item.lane === item.lanes - 1 ? dayLaneCount - item.lane : 1 };
-}
+const line = { style: 'thin' as const, color: { argb: LINE } };
 
 function titleRows(sheet: Worksheet, model: TimetableExport, label: string, lastColumn: number) {
   sheet.mergeCells(1, 1, 1, lastColumn);
@@ -73,9 +65,124 @@ function headerCell(sheet: Worksheet, row: number, column: number, text: string)
   cell.alignment = { vertical: 'middle', horizontal: 'center' };
 }
 
+/** What a class's cell says: code and slot, name, then room and anything unusual about its time. */
+export function classText(placement: GridPlacement): RichText[] {
+  const { item } = placement;
+  const dark = argb(shade(item.color, 0.4));
+  const where = `${item.type === 'lecture' ? '' : `${item.typeLabel} · `}${item.room}`;
+  const when = [placement.ownTime?.replace('-', '–'), item.alternate ? 'alternate weeks' : ''].filter(Boolean).join(' · ');
+  // Each line break ends its own run: LibreOffice drops one that opens a run.
+  return [
+    { text: item.slot ? item.courseCode : `${item.courseCode}\n`, font: { name: FONT, size: 11, bold: true, color: { argb: dark } } },
+    ...(item.slot
+      ? [{ text: `   ${item.slot}\n`, font: { name: FONT, size: 9, bold: true, color: { argb: argb(shade(item.color, 0.1)) } } }]
+      : []),
+    { text: `${item.courseName}\n`, font: { name: FONT, size: 9, color: { argb: BODY } } },
+    { text: when ? `${where}\n` : where, font: { name: FONT, size: 8, color: { argb: MUTED } } },
+    ...(when ? [{ text: when, font: { name: FONT, size: 8, color: { argb: MUTED } } }] : []),
+  ];
+}
+
+/** One table of the week from `top`; returns the last row it uses. */
+function weekTable(sheet: Worksheet, table: GridTable, top: number): number {
+  const lastColumn = 1 + table.columns.length;
+  const firstBody = top + 1;
+  const dayRows: Array<{ first: number; last: number }> = [];
+  let next = firstBody;
+  for (const day of table.days) {
+    dayRows.push({ first: next, last: next + day.lanes - 1 });
+    next += day.lanes;
+  }
+  const lastBody = next - 1;
+
+  // Heading row: the slot times, start over end as on the sheet.
+  const corner = sheet.getCell(top, 1);
+  corner.fill = solid(PANEL);
+  corner.border = { top: line, left: line, bottom: line, right: line };
+  table.columns.forEach((column, index) => {
+    const cell = sheet.getCell(top, index + 2);
+    const isBreak = column.kind !== 'slot';
+    cell.value = {
+      richText: [
+        { text: `${column.startTime}\n`, font: { name: FONT, size: 10, bold: true, color: { argb: isBreak ? MUTED : INK } } },
+        { text: column.endTime, font: { name: FONT, size: 9, color: { argb: MUTED } } },
+      ],
+    };
+    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    cell.fill = solid(isBreak ? BREAK_FILL : PANEL);
+    cell.border = { top: line, bottom: line, left: hair, right: index === table.columns.length - 1 ? line : hair };
+  });
+  sheet.getRow(top).height = 30;
+
+  // Day rows.
+  table.days.forEach((day, dayIndex) => {
+    const { first, last } = dayRows[dayIndex];
+    for (let row = first; row <= last; row += 1) {
+      sheet.getRow(row).height = LANE_HEIGHT;
+      for (let index = 0; index < table.columns.length; index += 1) {
+        const cell = sheet.getCell(row, index + 2);
+        cell.fill = solid(table.columns[index].kind === 'slot' ? WHITE : BREAK_FILL);
+        // Stacked rows of one day share no line: an empty day reads as one row.
+        cell.border = {
+          left: hair,
+          right: index === table.columns.length - 1 ? line : hair,
+          ...(row === first ? { top: hair } : {}),
+          ...(row === last ? { bottom: row === lastBody ? line : hair } : {}),
+        };
+      }
+    }
+    if (last > first) sheet.mergeCells(first, 1, last, 1);
+    const label = sheet.getCell(first, 1);
+    label.value = day.day;
+    label.font = { name: FONT, size: 11, bold: true, color: { argb: INK } };
+    label.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    label.fill = solid(PANEL);
+    label.border = { left: line, right: line, top: hair, bottom: last === lastBody ? line : hair };
+  });
+
+  // An empty lunch column is one cell down the table, labelled as on the sheet
+  // when there is height for the letters (not in a one-row Saturday table).
+  table.columns.forEach((column, index) => {
+    if (column.kind === 'slot' || !columnIsEmpty(table, index) || lastBody < firstBody) return;
+    if (lastBody > firstBody) sheet.mergeCells(firstBody, index + 2, lastBody, index + 2);
+    const cell = sheet.getCell(firstBody, index + 2);
+    if (lastBody > firstBody) cell.value = column.kind === 'lunch' ? 'LUNCH' : 'BREAK';
+    cell.font = { name: FONT, size: 10, bold: true, color: { argb: MUTED } };
+    cell.alignment = { vertical: 'middle', horizontal: 'center', textRotation: 'vertical' };
+    cell.fill = solid(BREAK_FILL);
+    cell.border = { left: hair, right: hair, top: line, bottom: line };
+  });
+
+  // Classes.
+  table.days.forEach((day, dayIndex) => {
+    for (const placement of day.placements) {
+      const row = dayRows[dayIndex].first + placement.lane;
+      const left = placement.first + 2;
+      const right = placement.last + 2;
+      const bar = { style: 'thick' as const, color: { argb: argb(placement.item.color) } };
+      const edge = { style: 'thin' as const, color: { argb: WHITE } };
+      for (let column = left; column <= right; column += 1) {
+        const border: Partial<Borders> = { top: edge, bottom: edge };
+        if (column === left) border.left = bar;
+        if (column === right) border.right = edge;
+        const cell = sheet.getCell(row, column);
+        cell.fill = solid(argb(tint(placement.item.color, 0.86)));
+        cell.border = border;
+      }
+      if (right > left) sheet.mergeCells(row, left, row, right);
+      const cell = sheet.getCell(row, left);
+      cell.value = { richText: classText(placement) };
+      cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true, indent: 1 };
+    }
+  });
+
+  return lastBody;
+}
+
 function weekSheet(workbook: Workbook, model: TimetableExport) {
+  const lastColumn = 1 + Math.max(1, ...model.tables.map((table) => table.columns.length));
   const sheet = workbook.addWorksheet('Week', {
-    views: [{ state: 'frozen', xSplit: 1, ySplit: 4, showGridLines: false }],
+    views: [{ state: 'frozen', xSplit: 1, ySplit: 0, showGridLines: false }],
     pageSetup: {
       orientation: 'landscape',
       paperSize: 9,
@@ -87,114 +194,26 @@ function weekSheet(workbook: Workbook, model: TimetableExport) {
     },
   });
 
-  // Column layout: time, then each day's lanes.
-  const dayStart: Record<string, number> = {};
-  let column = 2;
-  for (const day of model.days) {
-    dayStart[day] = column;
-    column += model.dayLanes[day] ?? 1;
-  }
-  const lastColumn = column - 1;
-  const dayEdges = new Set<number>([...Object.values(dayStart), lastColumn + 1]);
-
-  sheet.getColumn(1).width = 9;
-  for (const day of model.days) {
-    const lanes = model.dayLanes[day] ?? 1;
-    for (let lane = 0; lane < lanes; lane += 1) {
-      sheet.getColumn(dayStart[day] + lane).width = Math.max(14, 26 / lanes);
-    }
-  }
-
+  sheet.getColumn(1).width = DAY_COLUMN_WIDTH;
+  for (let column = 2; column <= lastColumn; column += 1) sheet.getColumn(column).width = TIME_COLUMN_WIDTH;
   titleRows(sheet, model, 'CLASS TIMETABLE', lastColumn);
 
-  const HEADER_ROW = 4;
-  headerCell(sheet, HEADER_ROW, 1, 'TIME');
-  for (const day of model.days) {
-    const lanes = model.dayLanes[day] ?? 1;
-    if (lanes > 1) sheet.mergeCells(HEADER_ROW, dayStart[day], HEADER_ROW, dayStart[day] + lanes - 1);
-    headerCell(sheet, HEADER_ROW, dayStart[day], day.toUpperCase());
-  }
-  sheet.getRow(HEADER_ROW).height = 22;
-
-  const slices = timeSlices(model);
-  const firstRow = HEADER_ROW + 1;
-  const rowOfStart = new Map<number, number>();
-  const rowOfEnd = new Map<number, number>();
-
-  slices.forEach((slice, index) => {
-    const row = firstRow + index;
-    rowOfStart.set(slice.start, row);
-    rowOfEnd.set(slice.end, row);
-    const minutes = slice.end - slice.start;
-    const busy = model.classes.some((item) => item.start < slice.end && item.end > slice.start);
-    sheet.getRow(row).height = Math.min(110, Math.max(busy ? 14 : 10, minutes * 1.25));
-
-    const time = sheet.getCell(row, 1);
-    // A time axis: each row is labelled with the moment it starts.
-    time.value = minutes >= 15 ? formatMinutes(slice.start) : '';
-    time.font = { name: FONT, size: 9, bold: busy, color: { argb: busy ? INK : MUTED } };
-    time.alignment = { vertical: 'top', horizontal: 'center' };
-    time.fill = solid(busy ? WHITE : BREAK_FILL);
-    time.border = { top: hair, bottom: hair, right: hair, left: hair };
-
-    for (let cellColumn = 2; cellColumn <= lastColumn; cellColumn += 1) {
-      const cell = sheet.getCell(row, cellColumn);
-      cell.fill = solid(busy ? WHITE : BREAK_FILL);
-      // No line between the lanes of one day: an empty day reads as one column.
-      cell.border = {
-        top: hair,
-        bottom: hair,
-        ...(dayEdges.has(cellColumn) ? { left: hair } : {}),
-        ...(dayEdges.has(cellColumn + 1) ? { right: hair } : {}),
-      };
-    }
-  });
-
-  for (const item of model.classes) {
-    const top = rowOfStart.get(item.start);
-    const bottom = rowOfEnd.get(item.end);
-    const base = dayStart[item.day];
-    if (top === undefined || bottom === undefined || base === undefined) continue;
-    const { offset, span } = classColumns(item, model.dayLanes[item.day] ?? 1);
-    const left = base + offset;
-    const right = left + span - 1;
-
-    const bar = { style: 'thick' as const, color: { argb: argb(item.color) } };
-    const edge = { style: 'thin' as const, color: { argb: WHITE } };
-    for (let row = top; row <= bottom; row += 1) {
-      for (let cellColumn = left; cellColumn <= right; cellColumn += 1) {
-        const border: Partial<Borders> = {};
-        if (cellColumn === left) border.left = bar;
-        if (cellColumn === right) border.right = edge;
-        if (row === top) border.top = edge;
-        if (row === bottom) border.bottom = edge;
-        const cell = sheet.getCell(row, cellColumn);
-        cell.fill = solid(argb(tint(item.color, 0.86)));
-        cell.border = border;
-      }
-    }
-    if (top !== bottom || left !== right) sheet.mergeCells(top, left, bottom, right);
-
-    const cell = sheet.getCell(top, left);
-    const dark = argb(shade(item.color, 0.35));
-    cell.value = {
-      richText: [
-        // Each line break ends its own run: LibreOffice drops one that opens a run.
-        { text: `${item.courseCode}\n`, font: { name: FONT, size: 11, bold: true, color: { argb: dark } } },
-        { text: `${item.courseName}\n`, font: { name: FONT, size: 9, color: { argb: BODY } } },
-        {
-          text: `${item.startTime}–${item.endTime} · ${item.typeLabel} · ${item.room}` +
-            (item.alternate ? ' · alternate weeks' : ''),
-          font: { name: FONT, size: 8, color: { argb: MUTED } },
-        },
-      ],
-    };
-    cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true, indent: 1 };
+  let row = 4;
+  for (const table of model.tables) {
+    row = weekTable(sheet, table, row) + 2;
+    sheet.getRow(row - 1).height = 14;
   }
 
-  const noteRow = firstRow + slices.length + 1;
-  sheet.mergeCells(noteRow, 1, noteRow, lastColumn);
-  const note = sheet.getCell(noteRow, 1);
+  if (model.classes.length === 0) {
+    sheet.mergeCells(row, 1, row, lastColumn);
+    const empty = sheet.getCell(row, 1);
+    empty.value = 'No weekly classes in the selected courses.';
+    empty.font = { name: FONT, size: 10, color: { argb: MUTED } };
+    row += 1;
+  }
+
+  sheet.mergeCells(row, 1, row, lastColumn);
+  const note = sheet.getCell(row, 1);
   note.value = 'From Campus Companion. Timings can change during the semester; the app has the latest.';
   note.font = { name: FONT, size: 8, italic: true, color: { argb: MUTED } };
 }
@@ -231,14 +250,14 @@ function tableSheet(
         bottom: hair,
         ...(index === 0 ? { left: { style: 'thick' as const, color: { argb: argb(row.color) } } } : {}),
       };
-      if (rowIndex % 2 === 1) cell.fill = solid(BREAK_FILL);
+      if (rowIndex % 2 === 1) cell.fill = solid(PANEL);
     });
     const lines = Math.max(
       1,
       ...row.cells.map((value, index) =>
         String(value)
           .split('\n')
-          .reduce((total, line) => total + Math.max(1, Math.ceil(line.length / Math.max(8, columns[index].width - 2))), 0),
+          .reduce((total, text) => total + Math.max(1, Math.ceil(text.length / Math.max(8, columns[index].width - 2))), 0),
       ),
     );
     sheet.getRow(rowNumber).height = Math.max(18, lines * 13.5 + 4);
@@ -248,8 +267,6 @@ function tableSheet(
     sheet.autoFilter = { from: { row: 4, column: 1 }, to: { row: 4 + rows.length, column: columns.length } };
   }
 }
-
-const DAY_INDEX = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export async function buildTimetableXlsx(model: TimetableExport): Promise<ArrayBuffer> {
   const ExcelJS = (await import('exceljs')).default;
@@ -267,6 +284,7 @@ export async function buildTimetableXlsx(model: TimetableExport): Promise<ArrayB
     [
       { title: 'Code', width: 12 },
       { title: 'Course', width: 40 },
+      { title: 'Slot', width: 16 },
       { title: 'Credits', width: 12 },
       { title: 'Category', width: 18 },
       { title: 'Instructors', width: 34 },
@@ -277,6 +295,7 @@ export async function buildTimetableXlsx(model: TimetableExport): Promise<ArrayB
       cells: [
         course.courseCode,
         course.courseName + (course.isPersonal ? ' (your own timings)' : ''),
+        course.slot,
         course.credits,
         course.category,
         course.instructors.join(', '),
@@ -285,22 +304,21 @@ export async function buildTimetableXlsx(model: TimetableExport): Promise<ArrayB
     })),
   );
 
-  const weekly = [...model.classes]
-    .sort((a, b) => DAY_INDEX.indexOf(a.day) - DAY_INDEX.indexOf(b.day) || a.start - b.start)
-    .map((item) => ({
-      color: item.color,
-      cells: [
-        item.day,
-        item.startTime,
-        item.endTime,
-        item.courseCode,
-        item.courseName,
-        item.typeLabel,
-        item.room,
-        item.alternate ? 'Alternate weeks' : 'Every week',
-        item.instructors.join(', '),
-      ],
-    }));
+  const weekly = model.classes.map((item) => ({
+    color: item.color,
+    cells: [
+      item.day,
+      item.startTime,
+      item.endTime,
+      item.courseCode,
+      item.slot ?? '',
+      item.courseName,
+      item.typeLabel,
+      item.room,
+      item.alternate ? 'Alternate weeks' : 'Every week',
+      item.instructors.join(', '),
+    ],
+  }));
   const oneOff = model.oneOff.map((item) => ({
     color: item.color,
     cells: [
@@ -308,6 +326,7 @@ export async function buildTimetableXlsx(model: TimetableExport): Promise<ArrayB
       item.startTime,
       item.endTime,
       item.courseCode,
+      '',
       item.courseName,
       item.typeLabel,
       item.room,
@@ -326,6 +345,7 @@ export async function buildTimetableXlsx(model: TimetableExport): Promise<ArrayB
       { title: 'Start', width: 9 },
       { title: 'End', width: 9 },
       { title: 'Code', width: 12 },
+      { title: 'Slot', width: 9 },
       { title: 'Course', width: 38 },
       { title: 'Class', width: 11 },
       { title: 'Room', width: 20 },

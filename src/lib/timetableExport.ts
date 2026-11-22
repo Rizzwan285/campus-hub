@@ -1,4 +1,5 @@
 import type { CourseOffering, MeetingDay, TimetableMeeting } from '@/engine/types';
+import { findSlot, type SlotDefinitions } from '@/engine/courseSchedule';
 import { firstYearBatch } from './academicProfile';
 import { calendarDateKey } from './calendarDate';
 
@@ -7,6 +8,10 @@ import { calendarDateKey } from './calendarDate';
  * and Excel). It is the semester's repeating week, not the week on screen: a
  * holiday this Thursday must not leave Thursday empty in a file someone keeps
  * until the end of term.
+ *
+ * The week is laid out like the institute's slot system sheet: days down the
+ * side, slot times across the top, one table for Monday/Wednesday/Friday and
+ * another for Tuesday/Thursday, whose slots run to different times.
  */
 
 export type Rgb = [number, number, number];
@@ -43,7 +48,19 @@ export const shade = ([r, g, b]: Rgb, amount: number): Rgb => [
 ];
 
 const DAY_ORDER: MeetingDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const ALWAYS_SHOWN = 5; // Monday–Friday, as the weekly grid does.
+
+/** The slot system's two weekday patterns, each its own table, as on the institute's sheet. */
+const WEEKDAY_TABLES: MeetingDay[][] = [
+  ['Monday', 'Wednesday', 'Friday'],
+  ['Tuesday', 'Thursday'],
+];
+const WEEKEND: MeetingDay[] = ['Saturday', 'Sunday'];
+
+/** The sheet's lunch column. */
+const LUNCH_START = 13 * 60;
+const LUNCH_END = 13 * 60 + 50;
+/** A gap between two slot columns at least this long gets a column of its own. */
+const BREAK_MINUTES = 40;
 
 const TYPE_LABEL: Record<TimetableMeeting['type'], string> = {
   lecture: 'Lecture',
@@ -67,9 +84,8 @@ export interface ExportClass {
   /** A class every other week rather than every week. */
   alternate: boolean;
   color: Rgb;
-  /** Side-by-side position among classes that overlap it, and how many share the width. */
-  lane: number;
-  lanes: number;
+  /** The slot-system slot this class is in ("F", "PA2"); null for a class outside the slots. */
+  slot: string | null;
 }
 
 export interface ExportOneOff {
@@ -88,6 +104,8 @@ export interface ExportOneOff {
 export interface ExportCourse {
   courseCode: string;
   courseName: string;
+  /** The course's slots in the course lists' notation, e.g. "F + I [Fri]"; empty when none. */
+  slot: string;
   credits: string;
   category: string;
   instructors: string[];
@@ -98,6 +116,41 @@ export interface ExportCourse {
   isPersonal: boolean;
 }
 
+/** One time column of a table. */
+export interface GridColumn {
+  /** Minutes from midnight. */
+  start: number;
+  end: number;
+  startTime: string;
+  endTime: string;
+  /** A gap in the slot system, drawn shaded: the sheet's lunch column, or another long break. */
+  kind: 'slot' | 'lunch' | 'break';
+}
+
+/** A class in its table: the columns it covers and its row within the day. */
+export interface GridPlacement {
+  item: ExportClass;
+  /** First and last column it covers, inclusive. */
+  first: number;
+  last: number;
+  /** Classes that would share a cell are stacked; this is its row within the day, from 0. */
+  lane: number;
+  /** "09:00-11:45" when its time is not what the column headings say; null when it is. */
+  ownTime: string | null;
+}
+
+export interface GridDay {
+  day: MeetingDay;
+  /** How many stacked rows the day needs (at least 1). */
+  lanes: number;
+  placements: GridPlacement[];
+}
+
+export interface GridTable {
+  days: GridDay[];
+  columns: GridColumn[];
+}
+
 export interface TimetableExport {
   /** The semester's name, or a plain title when it is not known. */
   title: string;
@@ -105,15 +158,12 @@ export interface TimetableExport {
   /** e.g. "UG · CSE · Year 1 · Batch B5" */
   studentDetail: string;
   generatedLabel: string;
-  days: MeetingDay[];
-  /** Whole hours bounding every class, in minutes from midnight. */
-  startMin: number;
-  endMin: number;
+  /** Monday/Wednesday/Friday, Tuesday/Thursday, then the weekend when it has classes. */
+  tables: GridTable[];
+  /** Every weekly class, in week order. */
   classes: ExportClass[];
   oneOff: ExportOneOff[];
   courses: ExportCourse[];
-  /** How many columns each day needs for its overlapping classes (at least 1). */
-  dayLanes: Record<string, number>;
   fileBase: string;
 }
 
@@ -129,10 +179,12 @@ export interface ExportInput {
   courses: CourseOffering[];
   profile?: ExportProfile | null;
   semesterName?: string | null;
+  /** The semester's slot system. Without it the columns are plain hours and no slots are named. */
+  slots?: SlotDefinitions | null;
   now: Date;
 }
 
-const toMinutes = (time: string): number | null => {
+const toMinutes = (time: string | undefined | null): number | null => {
   const match = /^(\d{1,2}):(\d{2})$/.exec(time?.trim() ?? '');
   if (!match) return null;
   const minutes = Number(match[1]) * 60 + Number(match[2]);
@@ -170,42 +222,218 @@ function studentDetail(profile?: ExportProfile | null): string {
   return parts.join(' · ');
 }
 
+// ---------------------------------------------------------------- slots
+
+const slotTimes = (slots: SlotDefinitions, code: string) =>
+  (slots[code]?.timings ?? []).map((timing) => ({
+    day: timing.day,
+    start: toMinutes(timing.startTime),
+    end: toMinutes(timing.endTime),
+  }));
+
 /**
- * Gives overlapping classes of one day their own lanes, so two classes at the
- * same time sit side by side instead of one hiding the other.
+ * The slot a class is in. A slot the data names is believed when the class is
+ * at that slot's time, and, for the official timetable, also when it is only
+ * moved within the slot's day (the sheets say "H (9-9:55)"). A student's own
+ * timings keep the slot of the class they edited, so for them, and for data
+ * that names no slot, the slot is the one whose time this is exactly.
  */
-function assignLanes(dayClasses: ExportClass[]): number {
-  const sorted = [...dayClasses].sort((a, b) => a.start - b.start || a.end - b.end);
-  let dayMax = 1;
-  let cluster: ExportClass[] = [];
-  let clusterEnd = -1;
-  let laneEnds: number[] = [];
-
-  const closeCluster = () => {
-    const lanes = Math.max(1, laneEnds.length);
-    cluster.forEach((item) => { item.lanes = lanes; });
-    dayMax = Math.max(dayMax, lanes);
-    cluster = [];
-    laneEnds = [];
-  };
-
-  for (const item of sorted) {
-    if (cluster.length > 0 && item.start >= clusterEnd) closeCluster();
-    let lane = laneEnds.findIndex((end) => end <= item.start);
-    if (lane === -1) lane = laneEnds.length;
-    laneEnds[lane] = item.end;
-    item.lane = lane;
-    cluster.push(item);
-    clusterEnd = Math.max(clusterEnd, item.end);
+function slotOf(
+  meeting: TimetableMeeting,
+  start: number,
+  end: number,
+  slots: SlotDefinitions,
+  personal: boolean,
+): string | null {
+  const at = (code: string) => slotTimes(slots, code).some((t) => t.day === meeting.day && t.start === start && t.end === end);
+  const named = meeting.slot?.trim();
+  if (named) {
+    const code = findSlot(slots, named)?.[0] ?? null;
+    if (code && at(code)) return code;
+    if (!personal) {
+      if (!code) return named;
+      if (slotTimes(slots, code).some((t) => t.day === meeting.day)) return code;
+    }
   }
-  if (cluster.length > 0) closeCluster();
-  return dayMax;
+
+  const matches = Object.keys(slots).filter(at);
+  if (matches.length === 1) return matches[0];
+  const sameKind = matches.filter((code) => (slots[code].type === 'lab') === (meeting.type === 'lab'));
+  return sameKind.length === 1 ? sameKind[0] : null;
+}
+
+const shortDay = (day: MeetingDay) => day.slice(0, 3);
+
+/**
+ * A course's slots as the institute's course lists write them: lecture slots,
+ * then labs, each in the order the week meets them, with the days in brackets
+ * when the course uses only some of a slot's days ("F + I [Fri]").
+ */
+function courseSlotCode(classes: ExportClass[], slots: SlotDefinitions): string {
+  const used = new Map<string, Set<MeetingDay>>();
+  for (const item of classes) {
+    if (!item.slot) continue;
+    used.set(item.slot, (used.get(item.slot) ?? new Set()).add(item.day));
+  }
+  const isLab = (code: string) => slots[code]?.type === 'lab';
+  return [...used.keys()]
+    .sort((a, b) => Number(isLab(a)) - Number(isLab(b)))
+    .map((code) => {
+      const slotDays = new Set(slotTimes(slots, code).map((t) => t.day));
+      const days = DAY_ORDER.filter((day) => used.get(code)!.has(day));
+      const partial = slotDays.size > 0 && days.length < slotDays.size;
+      return partial ? `${code} [${days.map(shortDay).join(', ')}]` : code;
+    })
+    .join(' + ');
+}
+
+// ---------------------------------------------------------------- columns
+
+const column = (start: number, end: number, kind: GridColumn['kind'] = 'slot'): GridColumn => ({
+  start,
+  end,
+  startTime: formatMinutes(start),
+  endTime: formatMinutes(end),
+  kind,
+});
+
+/**
+ * The columns of one table, from the slot system: a time becomes a column when
+ * it recurs across the table's days (09:00-09:50 is a slot on Monday, Wednesday
+ * and Friday). A time only one day has, like Wednesday's Q at 14:00-14:50,
+ * goes in the columns it falls within, as on the sheet. Labs span columns.
+ */
+function slotColumns(slots: SlotDefinitions, days: MeetingDay[]): GridColumn[] {
+  const seen = new Map<string, { start: number; end: number; days: Set<MeetingDay> }>();
+  for (const [code, definition] of Object.entries(slots)) {
+    if (definition.type === 'lab') continue;
+    for (const time of slotTimes(slots, code)) {
+      if (!days.includes(time.day) || time.start === null || time.end === null || time.end <= time.start) continue;
+      const key = `${time.start}-${time.end}`;
+      const entry = seen.get(key) ?? { start: time.start, end: time.end, days: new Set<MeetingDay>() };
+      entry.days.add(time.day);
+      seen.set(key, entry);
+    }
+  }
+
+  const needed = Math.min(2, days.length);
+  const accepted: Array<{ start: number; end: number }> = [];
+  [...seen.values()]
+    .filter((entry) => entry.days.size >= needed)
+    .sort((a, b) => b.days.size - a.days.size || a.end - a.start - (b.end - b.start) || a.start - b.start)
+    .forEach((entry) => {
+      if (!accepted.some((other) => other.start < entry.end && entry.start < other.end)) accepted.push(entry);
+    });
+  return accepted.sort((a, b) => a.start - b.start).map((entry) => column(entry.start, entry.end));
+}
+
+/** Plain hours, for a semester whose slot system is not known. */
+function hourColumns(): GridColumn[] {
+  return Array.from({ length: 10 }, (_, index) => column((8 + index) * 60, (9 + index) * 60));
+}
+
+/** Adds the lunch column, and hours before or after the slots for classes that fall there. */
+function completeColumns(base: GridColumn[], classes: ExportClass[]): GridColumn[] {
+  const columns: GridColumn[] = [];
+  base.forEach((current, index) => {
+    columns.push(current);
+    const next = base[index + 1];
+    if (!next || next.start - current.end < BREAK_MINUTES) return;
+    const lunch = current.end <= LUNCH_START && next.start >= LUNCH_END;
+    columns.push(lunch ? column(LUNCH_START, LUNCH_END, 'lunch') : column(current.end, next.start, 'break'));
+  });
+
+  if (classes.length === 0) return columns;
+  const earliest = Math.min(...classes.map((item) => item.start));
+  const latest = Math.max(...classes.map((item) => item.end));
+
+  const before: GridColumn[] = [];
+  for (let edge = columns[0].start; earliest < edge; ) {
+    const start = edge % 60 === 0 ? edge - 60 : edge - (edge % 60);
+    before.unshift(column(start, edge));
+    edge = start;
+  }
+  const after: GridColumn[] = [];
+  for (let edge = columns[columns.length - 1].end; latest > edge; ) {
+    const end = Math.min(24 * 60, edge % 60 === 0 ? edge + 60 : edge + (60 - (edge % 60)));
+    after.push(column(edge, end));
+    if (end === edge) break;
+    edge = end;
+  }
+  return [...before, ...columns, ...after];
+}
+
+/**
+ * The columns a class covers: each column it fills at least half of. A class
+ * that fills none (Wednesday's R3, 15:00-15:50, straddles two) goes in the one
+ * it overlaps most, or failing that the nearest.
+ */
+export function columnSpan(columns: GridColumn[], start: number, end: number): { first: number; last: number } {
+  const overlap = columns.map((c) => Math.max(0, Math.min(end, c.end) - Math.max(start, c.start)));
+  const hits = columns.map((c, index) => index).filter((index) => overlap[index] * 2 >= columns[index].end - columns[index].start);
+  if (hits.length > 0) return { first: Math.min(...hits), last: Math.max(...hits) };
+
+  let best = 0;
+  columns.forEach((c, index) => {
+    const distance = (col: GridColumn) => Math.abs((col.start + col.end) / 2 - (start + end) / 2);
+    if (overlap[index] > overlap[best] || (overlap[index] === overlap[best] && distance(c) < distance(columns[best]))) {
+      best = index;
+    }
+  });
+  return { first: best, last: best };
+}
+
+/** Whether no class in the table falls in this column (an empty lunch column is drawn as one cell). */
+export function columnIsEmpty(table: GridTable, index: number): boolean {
+  return !table.days.some((day) => day.placements.some((p) => p.first <= index && index <= p.last));
+}
+
+function placeDay(day: MeetingDay, classes: ExportClass[], columns: GridColumn[]): GridDay {
+  const placements: GridPlacement[] = classes
+    .filter((item) => item.day === day)
+    .map((item) => {
+      const { first, last } = columnSpan(columns, item.start, item.end);
+      const asHeaded = item.start === columns[first].start && item.end === columns[last].end;
+      return { item, first, last, lane: 0, ownTime: asHeaded ? null : `${item.startTime}-${item.endTime}` };
+    })
+    .sort((a, b) => a.first - b.first || b.last - a.last || a.item.start - b.item.start);
+
+  // Two classes in the same cell, a clash or alternate weeks, sit one above the other.
+  const laneEnds: number[] = [];
+  for (const placement of placements) {
+    let lane = laneEnds.findIndex((last) => last < placement.first);
+    if (lane === -1) lane = laneEnds.length;
+    laneEnds[lane] = placement.last;
+    placement.lane = lane;
+  }
+  return { day, lanes: Math.max(1, laneEnds.length), placements };
+}
+
+function buildTables(classes: ExportClass[], slots: SlotDefinitions | null): GridTable[] {
+  const fromSlots = (days: MeetingDay[]) => {
+    const columns = slots ? slotColumns(slots, days) : [];
+    return columns.length >= 2 ? columns : hourColumns();
+  };
+  const groups: Array<{ days: MeetingDay[]; base: GridColumn[] }> = WEEKDAY_TABLES.map((days) => ({
+    days,
+    base: fromSlots(days),
+  }));
+  // Saturday and Sunday have no slots; an extra class there is laid out on the Monday pattern.
+  const weekend = WEEKEND.filter((day) => classes.some((item) => item.day === day));
+  if (weekend.length > 0) groups.push({ days: weekend, base: groups[0].base });
+
+  return groups.map(({ days, base }) => {
+    const mine = classes.filter((item) => days.includes(item.day));
+    const columns = completeColumns(base, mine);
+    return { columns, days: days.map((day) => placeDay(day, mine, columns)) };
+  });
 }
 
 const slug = (text: string) =>
   text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-export function buildTimetableExport({ courses, profile, semesterName, now }: ExportInput): TimetableExport {
+export function buildTimetableExport({ courses, profile, semesterName, slots, now }: ExportInput): TimetableExport {
+  const definitions = slots && Object.keys(slots).length > 0 ? slots : null;
   const ordered = [...courses].sort((a, b) => a.courseCode.localeCompare(b.courseCode));
   const todayKey = calendarDateKey(now);
 
@@ -263,8 +491,9 @@ export function buildTimetableExport({ courses, profile, semesterName, now }: Ex
         instructors: (meeting.instructors ?? []).map((name) => name?.trim()).filter(Boolean),
         alternate: kind === 'biweekly_odd' || kind === 'biweekly_even',
         color,
-        lane: 0,
-        lanes: 1,
+        slot: definitions
+          ? slotOf(meeting, start, end, definitions, course.isPersonal === true)
+          : meeting.slot?.trim() || null,
       });
     }
 
@@ -274,12 +503,13 @@ export function buildTimetableExport({ courses, profile, semesterName, now }: Ex
     courseRows.push({
       courseCode: course.courseCode,
       courseName: course.courseName,
+      slot: courseSlotCode(mine, definitions ?? {}),
       credits: course.credits ?? '',
       category: course.category ?? '',
       instructors: [...instructors],
       sessions: mine.map(
         (item) =>
-          `${item.day.slice(0, 3)} ${item.startTime}-${item.endTime} · ${item.typeLabel} · ${item.room}` +
+          `${shortDay(item.day)} ${item.startTime}-${item.endTime} · ${item.typeLabel} · ${item.room}` +
           (item.alternate ? ' · alternate weeks' : ''),
       ),
       color,
@@ -287,39 +517,18 @@ export function buildTimetableExport({ courses, profile, semesterName, now }: Ex
     });
   });
 
-  const days = DAY_ORDER.filter(
-    (day, index) => index < ALWAYS_SHOWN || classes.some((item) => item.day === day),
-  );
-
-  const dayLanes: Record<string, number> = {};
-  for (const day of days) {
-    dayLanes[day] = assignLanes(classes.filter((item) => item.day === day));
-  }
-
-  const earliest = classes.length ? Math.min(...classes.map((item) => item.start)) : 8 * 60;
-  const latest = classes.length ? Math.max(...classes.map((item) => item.end)) : 18 * 60;
-
+  classes.sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) || a.start - b.start || a.end - b.end);
   oneOff.sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
 
-  const title = semesterName?.trim() || 'Weekly timetable';
-
   return {
-    title,
+    title: semesterName?.trim() || 'Weekly timetable',
     studentName: profile?.name?.trim() ?? '',
     studentDetail: studentDetail(profile),
     generatedLabel: dateLabel(now),
-    days,
-    startMin: Math.floor(earliest / 60) * 60,
-    endMin: Math.ceil(latest / 60) * 60,
+    tables: buildTables(classes, definitions),
     classes,
     oneOff,
     courses: courseRows,
-    dayLanes,
     fileBase: `timetable-${slug(semesterName?.trim() || '') || calendarDateKey(now)}`,
   };
-}
-
-/** Where a class sits within its day, as a fraction of the day's width. */
-export function laneSpan(item: ExportClass): { offset: number; width: number } {
-  return { offset: item.lane / item.lanes, width: 1 / item.lanes };
 }
