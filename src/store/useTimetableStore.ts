@@ -122,6 +122,13 @@ interface TimetableState {
   semesterConfig: SemesterConfig;
   
   // Resolved Output
+  /**
+   * The selected courses exactly as the student's timetable uses them: their
+   * own timings applied and, for first years, only their batch's classes and
+   * rooms. Unlike `resolvedEvents` it is the whole semester's pattern, not one
+   * week of it, which is what a downloaded timetable needs.
+   */
+  activeCourses: CourseOffering[];
   resolvedEvents: CalendarEvent[];
   collisions: Collision[];
   holidaysEncountered: Holiday[];
@@ -204,7 +211,7 @@ export const useTimetableStore = create<TimetableState>()(
         } = get();
 
         if (!loadedCourses.length || get().timetableOutdated) {
-          set({ resolvedEvents: [], collisions: [], holidaysEncountered: [] });
+          set({ activeCourses: [], resolvedEvents: [], collisions: [], holidaysEncountered: [] });
           return;
         }
         const config = get().semesterConfig;
@@ -245,7 +252,7 @@ export const useTimetableStore = create<TimetableState>()(
         if (profile?.program === 'UG' && profile?.yearOfStudy === '1') {
           const batchNo = firstYearBatch(profile.batchNo);
           if (!batchNo) {
-            set({ resolvedEvents: [], collisions: [], holidaysEncountered: [] });
+            set({ activeCourses: [], resolvedEvents: [], collisions: [], holidaysEncountered: [] });
             return;
           }
           if (batchNo) {
@@ -328,13 +335,14 @@ export const useTimetableStore = create<TimetableState>()(
           );
 
           set({
+            activeCourses,
             resolvedEvents: result.events,
             collisions: result.collisions,
             holidaysEncountered: result.holidaysEncountered,
             error: null
           });
         } catch (err) {
-          set({ error: 'Failed to compute timetable events.', resolvedEvents: [], collisions: [] });
+          set({ error: 'Failed to compute timetable events.', activeCourses: [], resolvedEvents: [], collisions: [] });
           console.error(err);
         }
       };
@@ -358,6 +366,7 @@ export const useTimetableStore = create<TimetableState>()(
         timetableOutdated: false,
         semesterConfig: DEFAULT_SEMESTER_CONFIG,
 
+        activeCourses: [],
         resolvedEvents: [],
         collisions: [],
         holidaysEncountered: [],

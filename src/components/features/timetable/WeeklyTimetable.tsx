@@ -9,6 +9,7 @@ import { WeeklyGrid } from './WeeklyGrid';
 import { CollisionBanner } from './CollisionBanner';
 import { CourseSelector } from './CourseSelector';
 import { CourseTimingsEditor } from './CourseTimingsEditor';
+import { TimetableDownload } from './TimetableDownload';
 
 export function WeeklyTimetable() {
   const {
@@ -146,6 +147,7 @@ export function WeeklyTimetable() {
                 <span className="hidden sm:inline">Edit timings</span>
               </Button>
             )}
+            {selectedCourseIds.length > 0 && <TimetableDownload />}
             <CourseSelector />
           </div>
         </div>
