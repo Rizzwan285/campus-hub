@@ -18,12 +18,6 @@ const sahyadriBuggies = toRides(resolveDepartures(workingDaysBuggy.sahyadriToNil
 describe('liveBoard at 5:46 pm, a minute after the 5:45 bus was due', () => {
   const now = at(17, 46);
 
-  it('still points out the 5:45, whichever view is chosen', () => {
-    for (const view of ['next', 'all'] as const) {
-      expect(times(liveBoard(nilaBuses, [], view, now).late)).toEqual(['5:45']);
-    }
-  });
-
   it('gives the 6:00 as the next bus', () => {
     expect(times(liveBoard(nilaBuses, [], 'next', now).next)).toEqual(['6:00']);
   });
@@ -44,33 +38,13 @@ describe('liveBoard at 5:46 pm, a minute after the 5:45 bus was due', () => {
   });
 });
 
-describe('liveBoard late notices', () => {
-  it('starts the moment a bus is due and lasts ten minutes', () => {
-    expect(liveBoard(nilaBuses, [], 'next', at(17, 44)).late).toEqual([]);
-    expect(times(liveBoard(nilaBuses, [], 'next', at(17, 45)).late)).toEqual(['5:45']);
-    expect(times(liveBoard(nilaBuses, [], 'next', at(17, 54)).late)).toEqual(['5:45']);
-    expect(liveBoard(nilaBuses, [], 'next', at(17, 55)).late).toEqual([]);
-  });
-
-  it('names only the latest of two buses due close together', () => {
-    // Sahyadri → Nila has an 8:55 and a 9:00.
-    expect(times(liveBoard(sahyadriBuses, [], 'next', at(9, 1)).late)).toEqual(['9:00']);
-  });
-
-  it('names a late buggy separately from a late bus, only when buggies are shown', () => {
-    // The 1:55 bus and the 2:00 PM buggy are both a few minutes old at 2:01.
-    expect(times(liveBoard(sahyadriBuses, sahyadriBuggies, 'next', at(14, 1)).late)).toEqual(['1:55', '2:00 PM']);
-    expect(times(liveBoard(sahyadriBuses, [], 'next', at(14, 1)).late)).toEqual(['1:55']);
-  });
-
-  it('treats an extra bus like a regular one', () => {
-    // The exam shuttle's 9:05 AM is due after the regular 9:00, and its 9:10 AM
-    // beats the regular 9:25 to "next".
+describe('liveBoard with an extra bus', () => {
+  it('treats it like a regular one', () => {
+    // The exam shuttle's 9:10 AM beats the regular 9:25 to "next".
     const [examShuttle] = bundledSpecialServices;
     const buses = mergeRides(nilaBuses, specialRides([examShuttle], 'nilaToSahyadri', day));
     const board = liveBoard(buses, [], 'next', at(9, 6));
 
-    expect(board.late.map((ride) => [ride.time, ride.mode])).toEqual([['9:05 AM', 'special']]);
     expect(board.next.map((ride) => [ride.time, ride.mode])).toEqual([['9:10 AM', 'special']]);
   });
 });
@@ -108,19 +82,17 @@ describe('liveBoard around the last bus', () => {
     expect(times(liveBoard(sahyadriBuses, [], 'next', at(23, 59)).next)).toEqual(['12:10*']);
   });
 
-  it('leaves only the late notice once it is due', () => {
+  it('shows nothing under Next once it is due', () => {
     const board = liveBoard(sahyadriBuses, [], 'next', justAfterMidnight(11));
 
     expect(board.next).toEqual([]);
     expect(board.grid).toEqual([]);
-    expect(times(board.late)).toEqual(['12:10*']);
   });
 
   it('still lists the whole day under All day', () => {
     const board = liveBoard(sahyadriBuses, [], 'all', justAfterMidnight(30));
 
     expect(board.next).toEqual([]);
-    expect(board.late).toEqual([]);
     expect(board.grid).toHaveLength(sahyadriBuses.length);
   });
 });

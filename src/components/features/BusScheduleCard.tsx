@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info, Star, Hourglass } from 'lucide-react';
+import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info, Star } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -63,29 +63,6 @@ function BusViewToggle({ value, onChange }: { value: BusView; onChange: (view: B
           );
         })}
       </div>
-    </div>
-  );
-}
-
-/**
- * A ride whose time has just passed. Buses often come a minute or two late,
- * so the card says so instead of quietly moving on to the next one.
- */
-function LateRideNotice({ ride, now }: { ride: Ride; now: Date }) {
-  const kind = ride.mode === 'buggy' ? 'buggy' : 'bus';
-  const service = ride.mode === 'special' && ride.label ? ` (${ride.label})` : '';
-
-  return (
-    <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs">
-      <Hourglass className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-      <p className="text-muted-foreground">
-        <span className="font-semibold text-foreground">
-          The {ride.time} {kind}
-          {service} was due {formatTimeSince(ride.at, now)}.
-        </span>{' '}
-        {ride.mode === 'buggy' ? 'Buggy timings vary' : 'Buses often run a few minutes late'}, so it may still be on
-        its way.
-      </p>
     </div>
   );
 }
@@ -223,20 +200,16 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
     const buggies = showBuggies ? buggy : [];
 
     // Nothing on another date has gone yet, so it simply lists the whole day.
-    const { late, next, grid } = isPreviewMode
-      ? { late: [], next: [], grid: mergeRides(buses, buggies) }
+    const { next, grid } = isPreviewMode
+      ? { next: [], grid: mergeRides(buses, buggies) }
       : liveBoard(buses, buggies, view, currentTime);
 
     const rides = showBuggies ? 'buses or buggies' : 'buses';
     // Only when one of those buses is actually on screen.
-    const hasNilaParkingBus = [...late, ...next, ...grid].some((ride) => ride.time.includes('*'));
+    const hasNilaParkingBus = [...next, ...grid].some((ride) => ride.time.includes('*'));
 
     return (
       <div className="space-y-3">
-        {late.map((ride) => (
-          <LateRideNotice key={`late-${ride.mode}`} ride={ride} now={currentTime} />
-        ))}
-
         {next.map((ride) => (
           <NextRideHero key={ride.mode === 'buggy' ? 'buggy' : 'bus'} ride={ride} direction={direction} />
         ))}

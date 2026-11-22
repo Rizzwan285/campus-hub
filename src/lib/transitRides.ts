@@ -50,9 +50,10 @@ export function specialRides(
  * How long a ride still counts as "due" after its printed time, rather than
  * gone.
  *
- * Buses often reach the stop a minute or two late. Dropping one the moment its
- * time passed told someone checking at 5:46 that the 5:45 had left, when it
- * had not even arrived yet.
+ * Buses often reach the stop a minute or two late, so under All day a ride
+ * keeps a quiet marker for a few minutes instead of fading the moment its time
+ * passes. There is deliberately no written "it may be late" notice (user, 23
+ * Nov 2026).
  */
 export const LATE_GRACE_MINUTES = 10;
 
@@ -66,15 +67,6 @@ export function rideStatus(ride: Departure, now: Date): RideStatus {
   const elapsed = now.getTime() - ride.at.getTime();
   if (elapsed < 0) return 'upcoming';
   return elapsed < LATE_GRACE_MINUTES * 60000 ? 'due' : 'departed';
-}
-
-/**
- * The most recent ride that is due but may not have come yet. Expects rides
- * in time order, as `toRides` and `mergeRides` return them.
- */
-export function latestDue(rides: Ride[], now: Date): Ride | undefined {
-  const due = rides.filter((ride) => rideStatus(ride, now) === 'due');
-  return due[due.length - 1];
 }
 
 // A shared time reads regular bus, then extra bus, then buggy.

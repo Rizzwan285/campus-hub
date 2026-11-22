@@ -1,4 +1,4 @@
-import { latestDue, mergeRides, rideStatus, type Ride } from './transitRides';
+import { mergeRides, rideStatus, type Ride } from './transitRides';
 
 /**
  * What the bus card lists for today: the next ride and everything after it,
@@ -19,8 +19,6 @@ export const BUS_VIEWS: ReadonlyArray<{ value: BusView; label: string }> = [
 export const DEFAULT_BUS_VIEW: BusView = 'next';
 
 export interface LiveBoard {
-  /** Rides whose time has just passed and which may still turn up late. */
-  late: Ride[];
   /** The next bus and, when buggies are shown, the next buggy. */
   next: Ride[];
   /** The tiles listed under them. */
@@ -40,7 +38,6 @@ const isRide = (ride: Ride | undefined): ride is Ride => ride !== undefined;
 export function liveBoard(buses: Ride[], buggies: Ride[], view: BusView, now: Date): LiveBoard {
   const isUpcoming = (ride: Ride) => rideStatus(ride, now) === 'upcoming';
   const next = [buses.find(isUpcoming), buggies.find(isUpcoming)].filter(isRide);
-  const late = [latestDue(buses, now), latestDue(buggies, now)].filter(isRide);
   const wholeDay = mergeRides(buses, buggies);
 
   const grid =
@@ -51,5 +48,5 @@ export function liveBoard(buses: Ride[], buggies: Ride[], view: BusView, now: Da
       : // Everything still to come; the next ones are already shown above it.
         wholeDay.filter((ride) => isUpcoming(ride) && !next.includes(ride));
 
-  return { late, next, grid };
+  return { next, grid };
 }
