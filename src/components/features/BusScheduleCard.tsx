@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, Info, Star } from 'lucide-react';
+import { Bus, CarFront, Clock, ChevronDown, ChevronUp, AlertCircle, FileText, Info, Star } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,7 @@ import {
 } from '@/lib/specialServices';
 import { useBusSchedules, useSpecialServices } from '@/hooks/useApiData';
 import { busEffectiveFrom } from '@/data/busData';
+import { OFFICIAL_BUS_PDF_URL } from '@/lib/officialBusPdf';
 import {
   workingDaysBuggy,
   saturdayHolidayBuggy,
@@ -525,34 +526,44 @@ export function BusScheduleCard({ currentTime, displayDate }: BusScheduleCardPro
         )
       )}
 
-      {(showBuggies || activeSpecials.length > 0) && (
-        <div className="mt-6 pt-3 border-t border-border/40 space-y-2">
-          {showBuggies && (
-            <div className="flex items-start gap-2 text-xs text-muted-foreground">
-              <Info className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-              <p>
-                <span className="font-semibold text-foreground">Buggy disclaimer: </span>
-                {BUGGY_DISCLAIMER} Buggy timings are effective from {buggyEffectiveFrom}.
-              </p>
-            </div>
-          )}
+      <div className="mt-6 pt-3 border-t border-border/40 space-y-2">
+        {/* The institute's own PDF, for anyone who would rather check the
+            source than the app (copied from iitpkd.ac.in every week). */}
+        <a
+          href={OFFICIAL_BUS_PDF_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+        >
+          <FileText className="h-3.5 w-3.5 shrink-0" />
+          Official bus timings PDF
+        </a>
 
-          {/* A key for the star times, kept to one small line: on a phone
-              nothing else says what they are. */}
-          {activeSpecials.map((service) => {
-            const exceptions = formatServiceExceptions(service);
-            return (
-              <p key={service.id} className="flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
-                <Star className="h-3 w-3 mt-px shrink-0 text-violet-500" />
-                <span>
-                  {service.title}: extra buses {formatServiceWindow(service)}
-                  {exceptions ? `, except ${exceptions}` : ''}.
-                </span>
-              </p>
-            );
-          })}
-        </div>
-      )}
+        {showBuggies && (
+          <div className="flex items-start gap-2 text-xs text-muted-foreground">
+            <Info className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+            <p>
+              <span className="font-semibold text-foreground">Buggy disclaimer: </span>
+              {BUGGY_DISCLAIMER} Buggy timings are effective from {buggyEffectiveFrom}.
+            </p>
+          </div>
+        )}
+
+        {/* A key for the star times, kept to one small line: on a phone
+            nothing else says what they are. */}
+        {activeSpecials.map((service) => {
+          const exceptions = formatServiceExceptions(service);
+          return (
+            <p key={service.id} className="flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
+              <Star className="h-3 w-3 mt-px shrink-0 text-violet-500" />
+              <span>
+                {service.title}: extra buses {formatServiceWindow(service)}
+                {exceptions ? `, except ${exceptions}` : ''}.
+              </span>
+            </p>
+          );
+        })}
+      </div>
     </Card>
   );
 }

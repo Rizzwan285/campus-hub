@@ -19,6 +19,7 @@ live content editing through `/admin`.
 - **Mess Menu** — 4-week rotating menu with daily breakfast, lunch, snacks, and dinner
 - **Bus Schedule** — Weekday, Friday, Saturday/holiday and Sunday timetables for campus, town, and Wise Park routes. Show the buses still to come or the whole day; a bus that was due in the last 10 minutes stays on screen, since it may be running late
 - **Exam shuttles** — Temporary extra buses appear on the bus card only on the dates they run, and drop off by themselves afterwards
+- **Official bus timings PDF** — The bus card links to the institute's own bus timings PDF, fetched from iitpkd.ac.in every week
 - **Mess Timings** — Separate timings for weekdays and weekends
 - **Date Preview** — Browse any date's menu and bus schedule
 - **Class Timetable** — Pick your courses; the weekly grid resolves slots, rooms and clashes
@@ -281,12 +282,14 @@ campus-hub/
 │   ├── nginx.conf           # SPA fallback for the built frontend
 │   └── initdb/              # Creates the separate `airflow` database
 ├── .github/workflows/
-│   └── health-check.yml     # Keeps a free-tier API awake (see below)
+│   ├── health-check.yml     # Keeps a free-tier API awake (see below)
+│   └── fetch-bus-timings.yml # Weekly copy of the official bus timings PDF (see below)
 ├── pipeline/                # Airflow DAGs + dbt project (see pipeline/README.md)
 │   ├── dags/                # campus_data_quality, campus_analytics_etl, menu_change_tracker
 │   ├── dbt/                 # staging + marts models with tests
 │   └── scripts/             # Standalone quality checks, analytics DDL
 ├── scripts/pipeline/        # Offline Python parsers: institute .xlsx → src/data/timetable
+├── scripts/fetch-bus-timings-pdf.mjs # Downloads the bus timings PDF from iitpkd.ac.in
 ├── server/                  # Express + Postgres API (see server/README.md)
 │   ├── Dockerfile           # Build from the repo root, not from server/
 │   ├── db/migrations/       # Plain SQL, applied in order, never edited after the fact
@@ -560,7 +563,25 @@ external uptime monitor (UptimeRobot or cron-job.org, 5-minute interval, pointed
 at `/api/ping`) is more punctual than GitHub and will email you when the API is
 down; the two do not conflict.
 
-### 8. Updating content after deployment
+### 8. Keep the official bus timings PDF current
+
+[`.github/workflows/fetch-bus-timings.yml`](.github/workflows/fetch-bus-timings.yml)
+runs every Monday morning (or by hand: **Actions → Fetch official bus timings
+PDF → Run workflow**). It runs `node scripts/fetch-bus-timings-pdf.mjs`, which
+follows the **Bus Times** link in the footer of https://iitpkd.ac.in/ and, only
+when the PDF changed, commits it as `public/docs/official-bus-timings.pdf`. The
+push redeploys the frontend, and the bus card's **Official bus timings PDF**
+link serves the new copy.
+
+- The commit is authored as the repository owner (their GitHub noreply
+  address), so no bot shows up as a contributor. Nothing needs configuring.
+- If the site moves or renames the link, the run fails, GitHub emails you, and
+  the old copy stays up.
+- A new PDF does not change the app's own bus times, which come from the
+  database: it is the cue to update them in `/admin` → Bus.
+- When the workflow has pushed, pull before your next push (`git pull --rebase`).
+
+### 9. Updating content after deployment
 
 The point of the backend is that content no longer needs a code change and a
 redeploy. Sign in as the developer account and edit at **`/admin`**: mess menus

@@ -1,0 +1,63 @@
+# Keeps public/docs/official-bus-timings.pdf the same as the bus timings PDF
+# that the footer of https://iitpkd.ac.in/ links to ("Bus Times"). The bus
+# card links to that copy as the official timings.
+#
+# Weekly is plenty: a new circular comes every few months. A run commits only
+# when the PDF changed, and that push redeploys the site. If the institute
+# moves or renames the link, the run fails (GitHub emails the repository
+# owner) and the old copy stays up.
+#
+# The commit is authored as the repository owner, with their GitHub noreply
+# address, so the repository never gets a bot as a contributor.
+name: Fetch official bus timings PDF
+
+on:
+  schedule:
+    # Mondays 06:00 IST. GitHub may start it a few hours late; that is fine.
+    - cron: "30 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-bus-timings
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Download the PDF from iitpkd.ac.in
+        id: fetch
+        run: node scripts/fetch-bus-timings-pdf.mjs
+
+      - name: Commit and push it if it changed
+        if: steps.fetch.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+        env:
+          OWNER: ${{ github.repository_owner }}
+          OWNER_ID: ${{ github.repository_owner_id }}
+          SOURCE: ${{ steps.fetch.outputs.source }}
+        run: |
+          set -euo pipefail
+          git config user.name "$OWNER"
+          git config user.email "${OWNER_ID}+${OWNER}@users.noreply.github.com"
+          git add public/docs/official-bus-timings.pdf
+          git commit -m "Update official bus timings PDF" -m "From $SOURCE"
+          # Someone may have pushed since the checkout: replay on top and retry.
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep 10
+            git pull --rebase origin main
+          done
+          echo "::error::could not push the new PDF"
+          exit 1
