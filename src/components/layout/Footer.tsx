@@ -1,5 +1,6 @@
 import { AlertCircle, MessageSquarePlus } from 'lucide-react';
 import { FEEDBACK_FORM_URL } from '@/lib/feedbackForm';
+import { INSTITUTE_SITE_URL } from '@/lib/officialBusPdf';
 
 export function Footer() {
   return (
@@ -30,6 +31,11 @@ export function Footer() {
         </p>
         <p>
           Contact me for queries or any issues on the email <a href="mailto:142301026@smail.iitpkd.ac.in" className="text-primary hover:underline">142301026@smail.iitpkd.ac.in</a> and Mobile <a href="tel:+919207267393" className="text-primary hover:underline">9207267393</a>.
+        </p>
+        <p className="text-xs">
+          The bus timings PDF is fetched from{' '}
+          <a href={INSTITUTE_SITE_URL} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">iitpkd.ac.in</a>
+          {' '}every week.
         </p>
       </div>
     </footer>
